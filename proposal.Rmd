@@ -1,6 +1,6 @@
 ---
 title: "proposal"
-output: html_document
+output: github_document
 ---
 
 The group members (names and UNIs)

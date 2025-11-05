@@ -10,18 +10,44 @@ Danchen Xu, dx2262
 
 ### Project Title
 
-Where the Grass is Greener: Linking Demographics and Health Outcomes to
-Urban Green Space in NYC
+Where the Grass is Greener: Linking Demographic and Health Outcome Data
+to Urban Green Space in NYC
 
 The motivation for this project - maria
 
-The intended final products - nicole
-
-## Data Sources
+### Data Sources
 
 <https://www.nyc.gov/site/doh/data/data-publications/profiles.page>
 
 <https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn>
+
+### Intended Final Products and Report Structure
+
+Introduction: This will include an explanation of our motivation for
+this project and questions we are hoping to answer along with possible
+anticipated results. It will also include brief background information
+about how environmental access can contribute to health disparities.
+
+Exploratory data analysis and cleaning: Since our demographic dataset is
+so extensive, the data cleaning process will first involve selecting the
+variables in this dataset that will be used in the analysis. We will
+focus mostly on the variables under social and economic conditions as
+well as the variables under the healthy living section of the dataset.
+We will explore the distributions of these variables for each
+neighborhood and borough and use tables and boxplots for visualization.
+
+Data Analysis: We will focus on predictive modeling in which we will
+examine whether social and economic factors are associated with the
+distribution of green space across New York City neighborhoods and
+assess whether variations in the amount of green space correlate to
+residents’ lifestyle habits. We will also include visualizations to
+display the relationships such as scatter plots, regression line plots,
+and maps.
+
+Discussion: This will include a discussion of our findings and whether
+they align with what we were expecting. We will also discuss possible
+explanations of why we got the results we did and discuss limitations of
+our analysis.
 
 The planned analyses / visualizations - chris
 
@@ -30,6 +56,8 @@ The planned analyses / visualizations - chris
 ### Timeline
 
 November 10-14 Exploratory data analysis and cleaning; Project review
-meeting November 17-21 Data Analysis and Start Visualizations November
-24-28 Finish Visualizations and Write Report December 1-5 Work on
-webpage and record screen cast December 8-10 Finishing touches
+meeting  
+November 17-21 Data Analysis and Start Visualizations  
+November 24-28 Finish Visualizations and Write Report  
+December 1-5 Work on formatting of webpage and record screen cast  
+December 8-10 Finishing touches

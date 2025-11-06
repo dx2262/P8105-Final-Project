@@ -33,7 +33,53 @@ Data Analysis: We will focus on predictive modeling in which we will examine whe
 Discussion: This will include a discussion of our findings and whether they align with what we were expecting. We will also discuss possible explanations of why we got the results we did and discuss limitations of our analysis. 
 
 
-The planned analyses / visualizations - chris
+
+### The Planned Modeling and Visualization
+
+Goal: Assess whether access to green space is associated with community health after accounting for socioeconomic differences.  
+
+* Model 1 — Baseline bivariate OLS
+Purpose: quantify crude associations.
+Examples:  
+obesity_rate ~ park_area_per_capita;
+poor_mental_health ~ park_area_density.
+
+* Model 2 — Adjusted multiple OLS (confounder-controlled)
+Purpose: control socioeconomic confounding and borough fixed effects.
+Example:  
+obesity_rate ~ park_area_per_capita + poverty_rate + education_level + unemployment_rate + factor(borough).  
+Alternative outcomes: premature_mortality or poor_mental_health.
+
+* Model 3 — GLM for proportion outcomes
+Purpose: model proportion outcomes with appropriate mean–variance relationship.
+Example:  
+glm(poor_mental_health_prop ~ park_area_density + poverty_rate + education_level, family = quasibinomial(link = "logit")).
+We will report effect sizes as odds ratios with CIs.
+
+* Model 4 — Mixed-effects model (random intercept by borough)
+Purpose: account for geographic clustering/heterogeneity.
+Example:  
+obesity_rate ~ park_area_per_capita + poverty_rate + education_level + (1 | borough).
+Random intercepts capture unobserved borough-level differences.
+
+* Robustness / Sensitivity
+  (i) Alternative green-space definitions (density vs per-capita vs count),
+  (ii) Alternate park-type filters,
+  (iii) Multicollinearity checks (VIF) and standardized coefficients,
+
+* Diagnostics
+Residual–fitted and QQ plots (linearity/normality), heteroskedasticity checks, influence measures, and comparison of AIC/R² across specifications.
+
+Visualization Plan
+
+* Descriptive/EDA: histograms or density plots of key variables; boxplots by borough to show between-borough variability; a correlation heatmap for selected features.
+
+* Associations: scatter plots with linear smooths (green-space metrics vs health outcomes), faceted by borough to highlight heterogeneity.
+
+* Spatial context: choropleth maps for (a) green-space indicators and (b) health outcomes, presented side-by-side for visual comparison.
+
+* Model results: coefficient plots (point estimates with 95% CIs) and fitted-vs-observed plots; concise tables summarizing key effects.
+
 
 / coding challenges - danchen
 

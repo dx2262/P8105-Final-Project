@@ -13,7 +13,41 @@ Danchen Xu, dx2262
 Where the Grass is Greener: Linking Demographic and Health Outcome Data
 to Urban Green Space in NYC
 
-The motivation for this project - maria
+### Motivation
+
+Access to quality green space is increasingly recognized as a key
+determinant of public health in urban environments. Parks and other
+green areas promote physical activity, social interaction, and stress
+reduction, all of which contribute to improved physical and mental
+health outcomes. However, as New York City become increasingly dense,
+disparities in the availability, quality, and accessibility of parks
+raise important questions about environmental equity and community
+well-being.
+
+This project aims to explore the relationship between parks, health
+outcomes, and neighborhood demographics across New York City. Using the
+NYC Parks Properties dataset, we plan to characterize park features such
+as size, location, and type, while the NYC Community Health Profiles
+data provides neighborhood-level indicators on chronic disease, mental
+health, and socioeconomic conditions. By integrating these datasets, we
+aim to assess how park distribution and attributes relate to health
+outcomes and to identify geographic areas where improvements in green
+space quality or accessibility could have the greatest public health
+impact.
+
+Our analysis is informed by evidence from a recent systematic review on
+green space and health by Nguyen et al. (2021), which highlights that
+specific park characteristics, such as tree canopy coverage,
+connectivity, and well-maintained amenities, are more strongly linked to
+health benefits than overall “greenness.” These insights guide our focus
+on spatial patterns and equity implications in New York City’s park
+system.
+
+Ultimately, this project seeks to demonstrate how publicly available
+urban and health data can be used to uncover actionable relationships
+between the built environment and population health, informing
+data-driven strategies to promote environmental justice and healthier
+urban living
 
 ### Data Sources
 

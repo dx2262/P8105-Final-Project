@@ -1,4 +1,4 @@
-proposal
+Proposal
 ================
 
 ### Group Members
@@ -47,13 +47,18 @@ Ultimately, this project seeks to demonstrate how publicly available
 urban and health data can be used to uncover actionable relationships
 between the built environment and population health, informing
 data-driven strategies to promote environmental justice and healthier
-urban living
+urban living.
 
 ### Data Sources
 
-<https://www.nyc.gov/site/doh/data/data-publications/profiles.page>
+The [NYC Community Health
+Profiles](https://www.nyc.gov/site/doh/data/data-publications/profiles.page)
+capture the health of 59 community districts across the city. They
+contain over 50 measures of neighborhood health.
 
-<https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn>
+The [Parks Properties
+map](https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn)
+identifies property managed partially or solely by NYC Parks.
 
 ### Intended Final Products and Report Structure
 
@@ -138,7 +143,43 @@ Visualization Plan
 - Model results: coefficient plots (point estimates with 95% CIs) and
   fitted-vs-observed plots; concise tables summarizing key effects.
 
-/ coding challenges - danchen
+### Coding Challenges
+
+When implementing this analytic plan, several technical and conceptual
+challenges are likely to arise across data preparation, modeling,
+diagnostics, and visualization.
+
+Data preparation will probably be the first and most time-consuming
+stage. Public health and green-space data often come in different
+spatial or administrative resolutions, such as census tracts, ZIP codes,
+or boroughs, and reconciling these levels can be tricky. Aggregating
+data to a common unit of analysis must also handle denominators
+carefully—park area per capita, per km², or density all require
+different normalizations. Missing or inconsistent entries are another
+common issue, we’ll need to decide whether to impute or restrict to
+complete cases.
+
+For the modeling stage, each specification brings distinct technical
+challenges. The baseline OLS models are simple to estimate but may
+conceal nonlinear relationships or be unduly influenced by outliers. The
+confounder-controlled multiple OLS models require careful encoding of
+borough fixed effects and thoughtful interpretation of within-borough
+contrasts. Socioeconomic predictors are typically correlated, so
+variance inflation factors will be necessary to monitor
+multicollinearity. Model comparison using AIC or adjusted R^2 can be
+complicated by the inclusion of categorical fixed effects. For GLM
+models, proportion outcomes must be correctly specified, and
+overdispersion should be checked. In contrast, mixed-effects models
+often struggle with convergence when borough-level sample sizes are
+small or predictors are correlated. Properly specifying the random
+structure is critical for interpreting geographic heterogeneity.
+
+Finally, reproducibility is a meta-level challenge running through the
+entire workflow. Managing multiple models and variants can quickly
+become unwieldy; using a tidy modeling workflow to store and summarize
+model outputs helps maintain consistency. It’s also important to
+document all preprocessing and ensure that diagnostics and plots draw
+from the same dataset used for estimation.
 
 ### Timeline
 

@@ -1,0 +1,66 @@
+---
+title: "EDA"
+author: "Nicole Criscuolo"
+date: "2025-11-19"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(stringr)
+library(purrr)
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+```{r}
+parks_df =
+  read.csv("data/Parks_Properties_20251104.csv") |> 
+  janitor::clean_names() |> 
+  select(acquisitiondate, acres, communityboard, eapply, gispropnum, location, pip_ratable, subcategory, typecategory, zipcode, multipolygon) |> 
+  rename(
+    "id" = "communityboard",
+    "park_name"= "eapply",
+    "unique_id" = "gispropnum",
+    "inpsected" = "pip_ratable"
+  ) |> 
+  mutate(
+    acquisitiondate = format(as.Date(acquisitiondate, format = "%Y %b %d %I:%M:%S %p"), "%m/%d/%Y")
+  )
+```
+
+```{r}
+demo_df =
+  read_excel("data/2022-chp-pud.xlsx", sheet = 4, range = cell_rows(2:67)) |> 
+  janitor::clean_names() |> 
+  filter(row_number() > 6) |> 
+  select(-starts_with(c("nyc_comparison_", "lower_95cl_", "upper_95cl_"))) |> 
+  select(id:rent_burden, air_pollution, child_obesity:unmet_med_care_reliability_note,
+         obesity:binge_drink_reliability_note, premature_mort_number:life_expectancy) |> 
+  rename("neighbourhood" = "name")|> 
+  mutate(id = as.character(id))
+```
+
+
+
+
+
+
+
+
+

@@ -1,16 +1,15 @@
 ---
 title: "EDA"
-author: "Nicole Criscuolo"
-date: "2025-11-19"
-output: github_document
+output: 
+  html_document:
+    theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(readxl)
-library(dplyr)
-library(stringr)
-library(purrr)
+library(plotly)
+library(sf)
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
@@ -40,11 +39,15 @@ parks_df =
     "inpsected" = "pip_ratable"
   ) |> 
   mutate(
-    acquisitiondate = format(as.Date(acquisitiondate, format = "%Y %b %d %I:%M:%S %p"), "%m/%d/%Y")
-  )
+    acquisitiondate = format(as.Date(acquisitiondate, format = "%Y %b %d %I:%M:%S %p"), "%m/%d/%Y"),
+    n_communities = str_count(id, ",") + 1
+  ) |> 
+  separate_rows(id, sep = ",") |> 
+  mutate(acres = as.numeric(acres) / n_communities) |> 
+  select(-n_communities)
 ```
 
-```{r}
+```{r, message = FALSE}
 demo_df =
   read_excel("data/2022-chp-pud.xlsx", sheet = 4, range = cell_rows(2:67)) |> 
   janitor::clean_names() |> 
@@ -56,10 +59,124 @@ demo_df =
   mutate(id = as.character(id))
 ```
 
+```{r}
+full_df =
+  inner_join(parks_df, demo_df)
+```
 
+```{r fig.height = 15, fig.width = 15}
+full_df |> 
+  group_by(id, neighbourhood) |> 
+  summarize(
+    total_acres = sum(acres, na.rm = TRUE),
+    total_population = sum(overall_pop, na.rm = TRUE)
+  ) |> 
+  mutate(acres_per_capita = total_acres / total_population) |> 
+  ggplot(aes(x = acres_per_capita, y = reorder(neighbourhood, acres_per_capita))) +
+  geom_col(color = "forestgreen") +
+  labs(
+    x = "Acres per Capita",
+    y = "Neighbourhood",
+    title = "Acres per Capita of Green Space in NYC Neighbourhoods"
+  )
+```
 
+```{r}
+full_df |> 
+  group_by(borough) |> 
+  summarize(
+    total_acres = sum(acres, na.rm = TRUE),
+    total_population = sum(overall_pop, na.rm = TRUE)
+  ) |> 
+  mutate(acres_per_capita = total_acres / total_population,
+         label = str_c("Total Acres: ", total_acres, "\nPopulation: ", total_population)) |> 
+  plot_ly(
+    x = ~acres_per_capita,
+    y = ~borough,
+    type = 'bar',
+    orientation = 'h',
+    text = ~label,
+    marker = list(color = 'forestgreen')
+) |> 
+  layout(
+    title = "Green Space per Capita for Each NYC Borough",
+    xaxis = list(title = "Acres per Capita"),
+    yaxis = list(title = "Borough")
+  )
+```
 
+```{r}
+full_df |> 
+  arrange(acres) |> 
+  filter(row_number() < 10) |>
+  select(id, borough, park_name) |> 
+  knitr::kable(caption = "Smallest NYC Green Spaces")
 
+full_df |>
+  arrange(desc(acres)) |> 
+  filter(row_number() < 10) |> 
+  select(id, borough, park_name) |> 
+  knitr::kable(caption = "Largest NYC Green Spaces")
+```
+
+```{r}
+full_df |> 
+  group_by(neighbourhood) |> 
+  summarize(
+    total_acres = sum(acres, na.rm = TRUE),
+    total_population = sum(overall_pop, na.rm = TRUE)
+  ) |> 
+  mutate(label = str_c("Neigbourhood: ", neighbourhood,
+    "Total Acres: ", total_acres, 
+    "\nPopulation: ", total_population)) |> 
+  plot_ly(
+    x = ~total_population,
+    y = ~total_acres,
+    type = 'scatter',
+    text = ~label,
+    mode = "markers",
+    marker = list(color = 'forestgreen')
+) |> 
+  layout(
+    title = "Relationship between Neighbourhood Population and Green Space",
+    xaxis = list(title = "Neighbourhood Population"),
+    yaxis = list(title = "Acres of Green Space")
+  )
+```
+
+```{r}
+full_df |> 
+  mutate(label = str_c("Park: ", park_name,
+    "\nAcres: ", acres, 
+    "\nLog Acres: ", log1p(acres))) |> 
+  plot_ly(
+    x = ~borough,
+    y = ~log1p(acres),
+    type = 'box',
+    text = ~label,
+    marker = list(color = 'forestgreen'),
+    fillcolor = "forestgreen",
+    line = list(color = "black")
+) |> 
+  layout(
+    title = "Distribution of Park Sizes in Each Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Log Transformed Acres")
+  )
+```
+
+```{r}
+full_df |> 
+  mutate(geometry = st_as_sfc(multipolygon)) |> 
+  st_as_sf() |> 
+  plot_ly() |> 
+    add_sf(
+      color = ~borough
+    ) |> 
+  layout(
+    title = "Layout of Green Spaces in NYC"
+  )
+```
 
 
 

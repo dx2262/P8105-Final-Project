@@ -36,7 +36,7 @@ parks_df =
     "id" = "communityboard",
     "park_name"= "eapply",
     "unique_id" = "gispropnum",
-    "inpsected" = "pip_ratable"
+    "inspected" = "pip_ratable"
   ) |> 
   mutate(
     acquisitiondate = format(as.Date(acquisitiondate, format = "%Y %b %d %I:%M:%S %p"), "%m/%d/%Y"),
@@ -55,7 +55,7 @@ demo_df =
   select(-starts_with(c("nyc_comparison_", "lower_95cl_", "upper_95cl_"))) |> 
   select(id:rent_burden, air_pollution, child_obesity:unmet_med_care_reliability_note,
          obesity:binge_drink_reliability_note, premature_mort_number:life_expectancy) |> 
-  rename("neighbourhood" = "name")|> 
+  rename("neighbourhood" = "name") |> 
   mutate(id = as.character(id))
 ```
 
@@ -178,6 +178,81 @@ full_df |>
   )
 ```
 
+```{r}
+demo_df |> 
+  pivot_longer(
+    cols = starts_with("race_"),
+    names_to = "race",
+    values_to = "race_pct"
+    ) |> 
+  mutate(race = str_remove(race, "race_")) |> 
+  group_by(borough, race) |> 
+  summarize(race_pct = mean(race_pct)) |> 
+  plot_ly(
+    x = ~borough,
+    y = ~race_pct,
+    color = ~race,
+    type = "bar"
+    ) |> 
+  layout(
+    barmode = "stack",
+    title = "Race Distributions for Each NYC Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Percentage")
+  )
+```
 
+```{r}
+demo_df |> 
+  pivot_longer(
+    cols = starts_with("age"),
+    names_to = "age",
+    values_to = "age_pct"
+    ) |> 
+  mutate(age = str_remove(age, "age"),
+         age = str_replace(age, "to", "-")) |> 
+  group_by(borough, age) |> 
+  summarize(age_pct = mean(age_pct)) |> 
+  plot_ly(
+    x = ~borough,
+    y = ~age_pct,
+    color = ~age,
+    type = "bar"
+    ) |> 
+  layout(
+    barmode = "stack",
+    title = "Age Distributions for Each NYC Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Percentage")
+  )
+```
+
+```{r}
+demo_df |> 
+  plot_ly(
+    x = ~poverty,
+    y = ~physical_activity,
+    type = "scatter"
+  )|> 
+  layout(
+    title = "Relationship Between Poverty and Physical Activity Percentages",
+    xaxis = list(title = "Percentage of Population Living in Poverty"),
+    yaxis = list(title = "Percentager of Population Reporting Physical Activity")
+  )
+```
+
+```{r}
+demo_df |> 
+  plot_ly(
+    x = ~edu_college_degree_and_higher,
+    y = ~unemployment,
+    type = "scatter"
+  )|> 
+  layout(
+    title = "Relationship Between Unemployment Rate and Education",
+    xaxis = list(title = "Percentage of Population With College Degree or Higher"),
+    yaxis = list(title = "Unemployment Rate")
+  )
+```
 
 

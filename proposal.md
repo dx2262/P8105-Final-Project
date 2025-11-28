@@ -49,6 +49,12 @@ between the built environment and population health, informing
 data-driven strategies to promote environmental justice and healthier
 urban living.
 
+Reference:  
+Nguyen, P.-Y., Astell-Burt, T., Rahimi-Ardabili, H., & Feng, X. (2021).
+Green Space Quality and Health: A Systematic Review. International
+Journal of Environmental Research and Public Health, 18(21), 11028.
+<https://doi.org/10.3390/ijerph182111028>
+
 ### Data Sources
 
 The [NYC Community Health
@@ -185,7 +191,7 @@ from the same dataset used for estimation.
 
 November 10-14 Exploratory data analysis and cleaning; Project review
 meeting  
-November 17-21 Data Analysis and Start Visualizations  
-November 24-28 Finish Visualizations and Write Report  
+November 17-21 Data Analysis and Visualizations  
+November 24-28 Finish Analysis and Visualizations and Write Report  
 December 1-5 Work on formatting of webpage and record screen cast  
 December 8-10 Finishing touches

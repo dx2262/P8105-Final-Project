@@ -1,0 +1,10 @@
+name: "Website"
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "EDA"
+      href: EDA.html
+output:
+  html_document:
+    theme: cerulean

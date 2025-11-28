@@ -5,7 +5,7 @@ Proposal
 
 Nicole Criscuolo, nec2159  
 Maria Serafini, mas2514  
-Chris Wang, tw3128  
+Tianhang Wang, tw3128  
 Danchen Xu, dx2262
 
 ### Project Title

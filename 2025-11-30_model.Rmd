@@ -1,0 +1,228 @@
+---
+title: "2025-11-30_model"
+author: "Chris"
+date: "2025-11-30"
+output: html_document
+---
+
+```{r}
+source("01_datacleaning.R")
+
+library(tidyverse)
+library(readxl)
+library(plotly)
+library(sf)
+library(betareg)
+library(lmerTest)
+library(car)
+library(effects)
+library(DHARMa)
+library(glmmTMB)
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+
+
+# multi linear regression
+
+## fitting mlr
+```{r}
+df_analysis <- 
+  df_analysis |>
+  mutate(
+    obesity = as.numeric(obesity),
+    poverty = as.numeric(poverty),
+    smoking = as.numeric(smoking),
+    binge_drink = as.numeric(binge_drink),
+    sugary_drink = as.numeric(sugary_drink),
+    pedestrian_hosp = as.numeric(pedestrian_hosp),
+    uninsured = as.numeric(uninsured)
+  )
+model_mlr <- lm(
+  obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  data = df_analysis
+)
+
+summary(model_mlr)
+
+```
+
+
+## mlr diagnostic
+
+
+linear relationship and equal variances
+```{r}
+plot(model_mlr, which = 1)
+```
+
+
+heavy tail conpared with normal distribution
+```{r}
+plot(model_mlr, which = 2)
+```
+
+
+there are some outliers
+```{r}
+
+influencePlot(model_mlr)
+
+```
+
+
+no obvious multicollinearity 
+```{r}
+vif(model_mlr)
+```
+
+theoretically, poverty and sugary_drink should have strong linear relationships, however in this dataset, they don't. Besides, the effect of poverty on obesity in this dataset is also not significant. Maybe we should pay more attention on the origin of this poverty data.  
+
+
+no autocorrelation between residuals
+```{r}
+lmtest::dwtest(model_mlr)
+```
+
+
+## analysing stability (sensitivity analysis)
+
+```{r}
+df <- df_analysis
+influential_points <- c(34, 60, 61, 64, 65)
+
+df_no_inf <- df[-influential_points, ]
+
+model_mlr_no_inf <- lm(formula(model_mlr), data = df_no_inf)
+
+summary(model_mlr_no_inf)
+
+```
+
+Overall, after removing the outliers, the outcome is very similar to the former one, so mlr model is stable enough for analysing obesity.  
+Only the coefficient for pedestrian_hosp showed noticeable sensitivity, suggesting that its effect may be driven by a few extreme communities.  
+
+Influence diagnostics identified several observations with high leverage (IDs 34, 60, 61, 64, 65).
+To assess the robustness of our findings, we re-estimated the multivariable linear model after removing these influential points.
+
+The direction and significance of the main predictors remained unchanged, and p-values exhibited minimal variation.
+This indicates that the observed associations are not driven by a few extreme communities.
+
+Therefore, all observations were retained in the final analysis.  
+
+
+# beta regression
+
+
+## model
+
+```{r}
+n <- nrow(df_analysis)
+df_new <- df_analysis |>
+  mutate(p_obesity = (obesity/100)*(n-1)/n + 0.5/n)
+
+model_beta <- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  family = beta_family(link = "logit"),
+  data = df_new
+)
+summary(model_beta)
+```
+
+
+## beta regression diagnostic
+
+```{r}
+res_beta <- simulateResiduals(model_beta)
+plot(res_beta)
+testDispersion(res_beta)
+testZeroInflation(res_beta)
+```
+
+We assessed model fit using simulated residuals generated through the DHARMa package.
+No significant deviations from model assumptions were detected.
+The uniform quantile-quantile plot showed no deviations (KS test p = 0.98).
+The dispersion test indicated no overdispersion (p = 0.97), and the zero-inflation test suggested no excess zeros (p = 1).
+Residuals were evenly distributed across predicted values, with no evidence of nonlinearity or heteroskedasticity.
+Overall, the diagnostic results confirm that the beta regression model provides an adequate fit to the data.  
+
+
+
+# beta mixed model
+
+```{r}
+model_beta_mixed <- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured +
+    (1 | borough),
+  family = beta_family(link = "logit"),
+  data = df_new
+)
+
+summary(model_beta_mixed)
+```
+
+
+
+## beta mixed model diagnostic
+
+```{r}
+anova(model_beta, model_beta_mixed)
+```
+
+We compared a beta mixed-effects model with a random intercept for borough
+to a marginal beta regression model without random effects, using a likelihood ratio test.
+The random intercept variance was essentially zero (≈ 4×10⁻¹¹), and the likelihood ratio test was not significant (p = 1).
+AIC values for the two models were nearly identical.
+These results indicate that little residual variability remains between boroughs after adjusting for covariates, so we proceeded with the simpler marginal beta regression model.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

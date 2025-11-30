@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Chris" />
+
+<meta name="date" content="2025-11-30" />
+
+<title>2025-11-30_model</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="EDA.html">EDA</a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">2025-11-30_model</h1>
+<h4 class="author">Chris</h4>
+<h4 class="date">2025-11-30</h4>
+
+</div>
+
+
+<pre class="r"><code>source(&quot;01_datacleaning.R&quot;)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.1     ✔ stringr   1.5.2
+## ✔ ggplot2   4.0.0     ✔ tibble    3.3.0
+## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+## ✔ purrr     1.1.0     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+## 
+## Attaching package: &#39;plotly&#39;
+## 
+## 
+## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot
+## 
+## 
+## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter
+## 
+## 
+## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout
+## 
+## 
+## 
+## Attaching package: &#39;janitor&#39;
+## 
+## 
+## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test
+## 
+## 
+## Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE
+## 
+## Rows: 2054 Columns: 34
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (22): ACQUISITIONDATE, ADDRESS, BOROUGH, CLASS, COUNCILDISTRICT, DEPARTM...
+## dbl  (1): PRECINCT
+## num  (7): ACRES, COMMUNITYBOARD, GISOBJID, NYS_ASSEMBLY, NYS_SENATE, OBJECTI...
+## lgl  (4): PERMIT, PIP_RATABLE, RETIRED, WATERFRONT
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## New names:</code></pre>
+<pre><code>## Warning: There was 1 warning in `filter()`.
+## ℹ In argument: `borough == c(&quot;B&quot;, &quot;M&quot;, &quot;Q&quot;, &quot;R&quot;, &quot;X&quot;)`.
+## Caused by warning in `borough == c(&quot;B&quot;, &quot;M&quot;, &quot;Q&quot;, &quot;R&quot;, &quot;X&quot;)`:
+## ! longer object length is not a multiple of shorter object length</code></pre>
+<pre><code>## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `uninsured = as.numeric(uninsured)`.
+## Caused by warning:
+## ! NAs introduced by coercion</code></pre>
+<pre class="r"><code>library(tidyverse)
+library(readxl)
+library(plotly)
+library(sf)
+library(betareg)</code></pre>
+<pre><code>## Warning: package &#39;betareg&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(lmerTest)</code></pre>
+<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Loading required package: lme4</code></pre>
+<pre><code>## Warning: package &#39;lme4&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Loading required package: Matrix
+## 
+## Attaching package: &#39;Matrix&#39;
+## 
+## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack
+## 
+## 
+## Attaching package: &#39;lmerTest&#39;
+## 
+## The following object is masked from &#39;package:lme4&#39;:
+## 
+##     lmer
+## 
+## The following object is masked from &#39;package:stats&#39;:
+## 
+##     step</code></pre>
+<pre class="r"><code>library(car)</code></pre>
+<pre><code>## Warning: package &#39;car&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## Warning: package &#39;carData&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;
+## 
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode
+## 
+## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     some</code></pre>
+<pre class="r"><code>library(effects)</code></pre>
+<pre><code>## Warning: package &#39;effects&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## lattice theme set by effectsTheme()
+## See ?effectsTheme for details.</code></pre>
+<pre class="r"><code>library(DHARMa)</code></pre>
+<pre><code>## Warning: package &#39;DHARMa&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## This is DHARMa 0.4.7. For overview type &#39;?DHARMa&#39;. For recent changes, type news(package = &#39;DHARMa&#39;)</code></pre>
+<pre class="r"><code>library(glmmTMB)</code></pre>
+<pre><code>## Warning: package &#39;glmmTMB&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = &quot;90%&quot;
+)
+
+theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
+
+options(
+  ggplot2.continuous.colour = &quot;viridis&quot;,
+  ggplot2.continuous.fill = &quot;viridis&quot;
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d</code></pre>
+<div id="multi-linear-regression" class="section level1">
+<h1>multi linear regression</h1>
+<div id="fitting-mlr" class="section level2">
+<h2>fitting mlr</h2>
+<pre class="r"><code>df_analysis &lt;- 
+  df_analysis |&gt;
+  mutate(
+    obesity = as.numeric(obesity),
+    poverty = as.numeric(poverty),
+    smoking = as.numeric(smoking),
+    binge_drink = as.numeric(binge_drink),
+    sugary_drink = as.numeric(sugary_drink),
+    pedestrian_hosp = as.numeric(pedestrian_hosp),
+    uninsured = as.numeric(uninsured)
+  )
+model_mlr &lt;- lm(
+  obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  data = df_analysis
+)
+
+summary(model_mlr)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = obesity ~ area_per_capita + poverty + smoking + 
+##     binge_drink + sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + 
+##     uninsured, data = df_analysis)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -11.5823  -2.4092  -0.5756   3.3853  12.4744 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                   28.0474431  7.9189279   3.542 0.000828 ***
+## area_per_capita               -0.0006714  0.0024368  -0.276 0.783964    
+## poverty                       -0.4591853  0.1905760  -2.409 0.019415 *  
+## smoking                        0.0689351  0.1941429   0.355 0.723917    
+## binge_drink                   -0.0832997  0.1369300  -0.608 0.545514    
+## sugary_drink                   0.5754605  0.1246382   4.617 2.45e-05 ***
+## pedestrian_hosp                0.2474159  0.1196513   2.068 0.043463 *  
+## edu_college_degree_and_higher -0.2546617  0.0882145  -2.887 0.005585 ** 
+## uninsured                     -0.0593239  0.1443250  -0.411 0.682667    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 5.052 on 54 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.7322, Adjusted R-squared:  0.6926 
+## F-statistic: 18.46 on 8 and 54 DF,  p-value: 5.882e-13</code></pre>
+</div>
+<div id="mlr-diagnostic" class="section level2">
+<h2>mlr diagnostic</h2>
+<p>linear relationship and equal variances</p>
+<pre class="r"><code>plot(model_mlr, which = 1)</code></pre>
+<p><img src="2025-11-30_model_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
+<p>heavy tail conpared with normal distribution</p>
+<pre class="r"><code>plot(model_mlr, which = 2)</code></pre>
+<p><img src="2025-11-30_model_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p>there are some outliers</p>
+<pre class="r"><code>influencePlot(model_mlr)</code></pre>
+<p><img src="2025-11-30_model_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<pre><code>##      StudRes       Hat      CookD
+## 34 -2.935173 0.3038918 0.36624598
+## 61  2.897178 0.1741979 0.17303938
+## 62  1.280940 0.4527428 0.14905677
+## 64 -1.220125 0.3198448 0.07708756</code></pre>
+<p>no obvious multicollinearity</p>
+<pre class="r"><code>vif(model_mlr)</code></pre>
+<pre><code>##               area_per_capita                       poverty 
+##                      1.515675                      4.233308 
+##                       smoking                   binge_drink 
+##                      1.985294                      1.444823 
+##                  sugary_drink               pedestrian_hosp 
+##                      2.647827                      2.068471 
+## edu_college_degree_and_higher                     uninsured 
+##                      5.867964                      2.029569</code></pre>
+<p>theoretically, poverty and sugary_drink should have strong linear
+relationships, however in this dataset, they don’t. Besides, the effect
+of poverty on obesity in this dataset is also not significant. Maybe we
+should pay more attention on the origin of this poverty data.</p>
+<p>no autocorrelation between residuals</p>
+<pre class="r"><code>lmtest::dwtest(model_mlr)</code></pre>
+<pre><code>## 
+##  Durbin-Watson test
+## 
+## data:  model_mlr
+## DW = 1.9946, p-value = 0.3748
+## alternative hypothesis: true autocorrelation is greater than 0</code></pre>
+</div>
+<div id="analysing-stability-sensitivity-analysis"
+class="section level2">
+<h2>analysing stability (sensitivity analysis)</h2>
+<pre class="r"><code>df &lt;- df_analysis
+influential_points &lt;- c(34, 60, 61, 64, 65)
+
+df_no_inf &lt;- df[-influential_points, ]
+
+model_mlr_no_inf &lt;- lm(formula(model_mlr), data = df_no_inf)
+
+summary(model_mlr_no_inf)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = formula(model_mlr), data = df_no_inf)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.6274 -2.2404 -0.2986  2.2098  9.5423 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                   21.8197199  7.3091194   2.985  0.00441 ** 
+## area_per_capita               -0.0007606  0.0025690  -0.296  0.76842    
+## poverty                       -0.4449205  0.1767957  -2.517  0.01517 *  
+## smoking                        0.1764506  0.1841834   0.958  0.34276    
+## binge_drink                    0.0017782  0.1223450   0.015  0.98846    
+## sugary_drink                   0.5816249  0.1079865   5.386 2.03e-06 ***
+## pedestrian_hosp                0.2844868  0.1094340   2.600  0.01230 *  
+## edu_college_degree_and_higher -0.2253552  0.0795815  -2.832  0.00670 ** 
+## uninsured                      0.0240920  0.1267345   0.190  0.85002    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4.296 on 49 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.8124, Adjusted R-squared:  0.7817 
+## F-statistic: 26.52 on 8 and 49 DF,  p-value: 2.685e-15</code></pre>
+<p>Overall, after removing the outliers, the outcome is very similar to
+the former one, so mlr model is stable enough for analysing
+obesity.<br />
+Only the coefficient for pedestrian_hosp showed noticeable sensitivity,
+suggesting that its effect may be driven by a few extreme
+communities.</p>
+<p>Influence diagnostics identified several observations with high
+leverage (IDs 34, 60, 61, 64, 65). To assess the robustness of our
+findings, we re-estimated the multivariable linear model after removing
+these influential points.</p>
+<p>The direction and significance of the main predictors remained
+unchanged, and p-values exhibited minimal variation. This indicates that
+the observed associations are not driven by a few extreme
+communities.</p>
+<p>Therefore, all observations were retained in the final analysis.</p>
+</div>
+</div>
+<div id="beta-regression" class="section level1">
+<h1>beta regression</h1>
+<div id="model" class="section level2">
+<h2>model</h2>
+<pre class="r"><code>n &lt;- nrow(df_analysis)
+df_new &lt;- df_analysis |&gt;
+  mutate(p_obesity = (obesity/100)*(n-1)/n + 0.5/n)
+
+model_beta &lt;- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  family = beta_family(link = &quot;logit&quot;),
+  data = df_new
+)
+summary(model_beta)</code></pre>
+<pre><code>##  Family: beta  ( logit )
+## Formula:          
+## p_obesity ~ area_per_capita + poverty + smoking + binge_drink +  
+##     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher +  
+##     uninsured
+## Data: df_new
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    -189.7    -168.2     104.8    -209.7        53 
+## 
+## 
+## Dispersion parameter for beta family (): 84.2 
+## 
+## Conditional model:
+##                                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                   -6.738e-01  3.985e-01  -1.691 0.090885 .  
+## area_per_capita               -3.133e-05  1.409e-04  -0.222 0.824037    
+## poverty                       -2.551e-02  9.293e-03  -2.745 0.006053 ** 
+## smoking                        2.694e-03  9.705e-03   0.278 0.781357    
+## binge_drink                   -5.631e-03  7.047e-03  -0.799 0.424251    
+## sugary_drink                   2.765e-02  5.904e-03   4.683 2.82e-06 ***
+## pedestrian_hosp                1.200e-02  5.757e-03   2.084 0.037144 *  
+## edu_college_degree_and_higher -1.668e-02  4.565e-03  -3.654 0.000258 ***
+## uninsured                     -3.415e-03  7.061e-03  -0.484 0.628659    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="beta-regression-diagnostic" class="section level2">
+<h2>beta regression diagnostic</h2>
+<pre class="r"><code>res_beta &lt;- simulateResiduals(model_beta)
+plot(res_beta)</code></pre>
+<p><img src="2025-11-30_model_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
+<pre class="r"><code>testDispersion(res_beta)</code></pre>
+<p><img src="2025-11-30_model_files/figure-html/unnamed-chunk-10-2.png" width="90%" /></p>
+<pre><code>## 
+##  DHARMa nonparametric dispersion test via sd of residuals fitted vs.
+##  simulated
+## 
+## data:  simulationOutput
+## dispersion = 0.99925, p-value = 0.968
+## alternative hypothesis: two.sided</code></pre>
+<pre class="r"><code>testZeroInflation(res_beta)</code></pre>
+<p><img src="2025-11-30_model_files/figure-html/unnamed-chunk-10-3.png" width="90%" /></p>
+<pre><code>## 
+##  DHARMa zero-inflation test via comparison to expected zeros with
+##  simulation under H0 = fitted model
+## 
+## data:  simulationOutput
+## ratioObsSim = NaN, p-value = 1
+## alternative hypothesis: two.sided</code></pre>
+<p>We assessed model fit using simulated residuals generated through the
+DHARMa package. No significant deviations from model assumptions were
+detected. The uniform quantile-quantile plot showed no deviations (KS
+test p = 0.98). The dispersion test indicated no overdispersion (p =
+0.97), and the zero-inflation test suggested no excess zeros (p = 1).
+Residuals were evenly distributed across predicted values, with no
+evidence of nonlinearity or heteroskedasticity. Overall, the diagnostic
+results confirm that the beta regression model provides an adequate fit
+to the data.</p>
+</div>
+</div>
+<div id="beta-mixed-model" class="section level1">
+<h1>beta mixed model</h1>
+<pre class="r"><code>model_beta_mixed &lt;- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured +
+    (1 | borough),
+  family = beta_family(link = &quot;logit&quot;),
+  data = df_new
+)</code></pre>
+<pre><code>## Warning in (function (start, objective, gradient = NULL, hessian = NULL, :
+## NA/NaN function evaluation</code></pre>
+<pre class="r"><code>summary(model_beta_mixed)</code></pre>
+<pre><code>##  Family: beta  ( logit )
+## Formula:          
+## p_obesity ~ area_per_capita + poverty + smoking + binge_drink +  
+##     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher +  
+##     uninsured + (1 | borough)
+## Data: df_new
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    -187.7    -164.1     104.8    -209.7        52 
+## 
+## Random effects:
+## 
+## Conditional model:
+##  Groups  Name        Variance  Std.Dev. 
+##  borough (Intercept) 3.925e-11 6.265e-06
+## Number of obs: 63, groups:  borough, 6
+## 
+## Dispersion parameter for beta family (): 84.2 
+## 
+## Conditional model:
+##                                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                   -6.738e-01  3.985e-01  -1.691 0.090885 .  
+## area_per_capita               -3.133e-05  1.409e-04  -0.222 0.824035    
+## poverty                       -2.551e-02  9.293e-03  -2.745 0.006053 ** 
+## smoking                        2.693e-03  9.705e-03   0.278 0.781360    
+## binge_drink                   -5.631e-03  7.047e-03  -0.799 0.424253    
+## sugary_drink                   2.765e-02  5.904e-03   4.683 2.82e-06 ***
+## pedestrian_hosp                1.200e-02  5.757e-03   2.084 0.037144 *  
+## edu_college_degree_and_higher -1.668e-02  4.565e-03  -3.654 0.000258 ***
+## uninsured                     -3.415e-03  7.061e-03  -0.484 0.628651    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div id="beta-mixed-model-diagnostic" class="section level2">
+<h2>beta mixed model diagnostic</h2>
+<pre class="r"><code>anova(model_beta, model_beta_mixed)</code></pre>
+<pre><code>## Data: df_new
+## Models:
+## model_beta: p_obesity ~ area_per_capita + poverty + smoking + binge_drink + , zi=~0, disp=~1
+## model_beta:     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + , zi=~0, disp=~1
+## model_beta:     uninsured, zi=~0, disp=~1
+## model_beta_mixed: p_obesity ~ area_per_capita + poverty + smoking + binge_drink + , zi=~0, disp=~1
+## model_beta_mixed:     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + , zi=~0, disp=~1
+## model_beta_mixed:     uninsured + (1 | borough), zi=~0, disp=~1
+##                  Df     AIC     BIC logLik deviance Chisq Chi Df Pr(&gt;Chisq)
+## model_beta       10 -189.67 -168.24 104.83  -209.67                        
+## model_beta_mixed 11 -187.67 -164.09 104.83  -209.67     0      1          1</code></pre>
+<p>We compared a beta mixed-effects model with a random intercept for
+borough to a marginal beta regression model without random effects,
+using a likelihood ratio test. The random intercept variance was
+essentially zero (≈ 4×10⁻¹¹), and the likelihood ratio test was not
+significant (p = 1). AIC values for the two models were nearly
+identical. These results indicate that little residual variability
+remains between boroughs after adjusting for covariates, so we proceeded
+with the simpler marginal beta regression model.</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

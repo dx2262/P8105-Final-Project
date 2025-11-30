@@ -1,5 +1,5 @@
 ---
-title: "EDA"
+title: "Initial EDA"
 output: 
   html_document:
     theme: cerulean
@@ -66,12 +66,11 @@ full_df =
 
 ```{r fig.height = 15, fig.width = 15}
 full_df |> 
-  group_by(id, neighbourhood) |> 
+  group_by(id, neighbourhood, overall_pop) |> 
   summarize(
-    total_acres = sum(acres, na.rm = TRUE),
-    total_population = sum(overall_pop, na.rm = TRUE)
+    total_acres = sum(acres, na.rm = TRUE)
   ) |> 
-  mutate(acres_per_capita = total_acres / total_population) |> 
+  mutate(acres_per_capita = total_acres / overall_pop) |> 
   ggplot(aes(x = acres_per_capita, y = reorder(neighbourhood, acres_per_capita))) +
   geom_col(color = "forestgreen") +
   labs(
@@ -86,10 +85,10 @@ full_df |>
   group_by(borough) |> 
   summarize(
     total_acres = sum(acres, na.rm = TRUE),
-    total_population = sum(overall_pop, na.rm = TRUE)
+    total_pop = sum(unique(overall_pop)), na.rm = TRUE
   ) |> 
-  mutate(acres_per_capita = total_acres / total_population,
-         label = str_c("Total Acres: ", total_acres, "\nPopulation: ", total_population)) |> 
+  mutate(acres_per_capita = total_acres / total_pop,
+         label = str_c("Total Acres: ", total_acres, "\nPopulation: ", total_pop)) |> 
   plot_ly(
     x = ~acres_per_capita,
     y = ~borough,
@@ -124,10 +123,10 @@ full_df |>
   group_by(neighbourhood) |> 
   summarize(
     total_acres = sum(acres, na.rm = TRUE),
-    total_population = sum(overall_pop, na.rm = TRUE)
+    total_population = sum(unique(overall_pop), na.rm = TRUE)
   ) |> 
   mutate(label = str_c("Neigbourhood: ", neighbourhood,
-    "Total Acres: ", total_acres, 
+    "\nTotal Acres: ", total_acres, 
     "\nPopulation: ", total_population)) |> 
   plot_ly(
     x = ~total_population,
@@ -187,7 +186,7 @@ demo_df |>
     ) |> 
   mutate(race = str_remove(race, "race_")) |> 
   group_by(borough, race) |> 
-  summarize(race_pct = mean(race_pct)) |> 
+  summarize(race_pct = mean(race_pct)) |>
   plot_ly(
     x = ~borough,
     y = ~race_pct,
@@ -233,26 +232,60 @@ demo_df |>
     x = ~poverty,
     y = ~physical_activity,
     type = "scatter"
-  )|> 
+  ) |> 
   layout(
     title = "Relationship Between Poverty and Physical Activity Percentages",
     xaxis = list(title = "Percentage of Population Living in Poverty"),
-    yaxis = list(title = "Percentager of Population Reporting Physical Activity")
+    yaxis = list(title = "Percentage of Population \nReporting Physical Activity")
   )
 ```
 
 ```{r}
 demo_df |> 
   plot_ly(
-    x = ~edu_college_degree_and_higher,
+    x = ~on_time_hs_grad,
     y = ~unemployment,
     type = "scatter"
   )|> 
   layout(
-    title = "Relationship Between Unemployment Rate and Education",
-    xaxis = list(title = "Percentage of Population With College Degree or Higher"),
+    title = "Relationship Between Education and Unemployment Rate",
+    xaxis = list(title = "Percentage of Population Who Graduated HS on Time"),
     yaxis = list(title = "Unemployment Rate")
   )
 ```
+
+```{r}
+demo_df |> 
+  plot_ly(
+    x = ~on_time_hs_grad,
+    y = ~poverty,
+    type = "scatter"
+  ) |> 
+  layout(
+    title = "Relationship Between Education and Poverty",
+    xaxis = list(title = "Percentage of Population Who Graduated HS on Time"),
+    yaxis = list(title = "Percentage of Population Living in Poverty")
+  )
+```
+
+```{r}
+demo_df |> 
+  mutate(uninsured = as.numeric(uninsured)) |> 
+  plot_ly(
+    x = ~on_time_hs_grad,
+    y = ~uninsured,
+    type = "scatter"
+  ) |> 
+  layout(
+    title = "Relationship Between Education and Being Uninsured",
+    xaxis = list(title = "Percentage of Population Who Graduated HS on Time"),
+    yaxis = list(title = "Percentage of Population Who are Uninsured")
+  )
+```
+
+
+
+
+
 
 

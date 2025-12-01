@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Maria Serafini" />
+
+<meta name="date" content="2025-12-01" />
+
+<title>cleaning_eda_model_premature_mortality</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.11.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="EDA.html">EDA</a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">cleaning_eda_model_premature_mortality</h1>
+<h4 class="author">Maria Serafini</h4>
+<h4 class="date">2025-12-01</h4>
+
+</div>
+
+
+<p>We first assembled neighborhood-level measures of health and
+sociodemographic context using the <strong>Community Health Profiles
+(CHP)</strong> dataset. This resource provides demographic,
+socioeconomic, behavioral, and health outcome indicators for New York
+City’s 59 community districts. Because the CHP worksheet includes a
+descriptive header row, we skipped the first line and treated the second
+row as the variable names. We then restricted the data to community
+districts (excluding borough-wide or citywide aggregates) and retained
+premature mortality measures alongside key covariates that our
+exploratory analysis and prior literature suggested would be important
+confounders, including poverty and the percent of Black residents.</p>
+<pre class="r"><code>clean_chp_df &lt;- 
+  read_excel(&quot;data/2022-chp-pud.xlsx&quot;, 
+             sheet = &quot;CHP_all_data&quot;, 
+             skip = 1) |&gt; 
+  clean_names() |&gt; 
+  transmute(
+    cd_id = as.integer(id), 
+    borough = borough, 
+    cd_name = name, 
+    overall_pop = overall_pop, 
+    premature_mort_number = premature_mort_number, 
+    premature_mort_rate = premature_mort_rate, 
+    poverty = poverty, 
+    race_black = race_black) |&gt; 
+  filter(cd_id &gt;= 101)</code></pre>
+<pre><code>## New names:
+## • `lower_95CL` -&gt; `lower_95CL...16`
+## • `upper_95CL` -&gt; `upper_95CL...17`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...18`
+## • `lower_95CL` -&gt; `lower_95CL...20`
+## • `upper_95CL` -&gt; `upper_95CL...21`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...22`
+## • `NYC_comparison` -&gt; `NYC_comparison...24`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...26`
+## • `lower_95CL` -&gt; `lower_95CL...28`
+## • `upper_95CL` -&gt; `upper_95CL...29`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...30`
+## • `lower_95CL` -&gt; `lower_95CL...32`
+## • `upper_95CL` -&gt; `upper_95CL...33`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...34`
+## • `lower_95CL` -&gt; `lower_95CL...36`
+## • `upper_95CL` -&gt; `upper_95CL...37`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...38`
+## • `lower_95CL` -&gt; `lower_95CL...41`
+## • `upper_95CL` -&gt; `upper_95CL...42`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...43`
+## • `lower_95CL` -&gt; `lower_95CL...45`
+## • `upper_95CL` -&gt; `upper_95CL...46`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...47`
+## • `lower_95CL` -&gt; `lower_95CL...50`
+## • `upper_95CL` -&gt; `upper_95CL...51`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...52`
+## • `lower_95CL` -&gt; `lower_95CL...55`
+## • `upper_95CL` -&gt; `upper_95CL...56`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...57`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...58`
+## • `lower_95CL` -&gt; `lower_95CL...63`
+## • `upper_95CL` -&gt; `upper_95CL...64`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...65`
+## • `lower_95CL` -&gt; `lower_95CL...68`
+## • `upper_95CL` -&gt; `upper_95CL...69`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...70`
+## • `NYC_comparison` -&gt; `NYC_comparison...73`
+## • `lower_95CL` -&gt; `lower_95CL...75`
+## • `upper_95CL` -&gt; `upper_95CL...76`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...77`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...81`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...83`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...86`
+## • `lower_95CL` -&gt; `lower_95CL...88`
+## • `upper_95CL` -&gt; `upper_95CL...89`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...90`
+## • `lower_95CL` -&gt; `lower_95CL...93`
+## • `upper_95CL` -&gt; `upper_95CL...94`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...95`
+## • `lower_95CL` -&gt; `lower_95CL...98`
+## • `upper_95CL` -&gt; `upper_95CL...99`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...100`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...101`
+## • `lower_95CL` -&gt; `lower_95CL...104`
+## • `upper_95CL` -&gt; `upper_95CL...105`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...106`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...107`
+## • `lower_95CL` -&gt; `lower_95CL...110`
+## • `upper_95CL` -&gt; `upper_95CL...111`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...112`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...113`
+## • `lower_95CL` -&gt; `lower_95CL...116`
+## • `upper_95CL` -&gt; `upper_95CL...117`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...118`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...119`
+## • `lower_95CL` -&gt; `lower_95CL...122`
+## • `upper_95CL` -&gt; `upper_95CL...123`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...124`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...125`
+## • `lower_95CL` -&gt; `lower_95CL...128`
+## • `upper_95CL` -&gt; `upper_95CL...129`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...130`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...131`
+## • `lower_95CL` -&gt; `lower_95CL...134`
+## • `upper_95CL` -&gt; `upper_95CL...135`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...136`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...137`
+## • `lower_95CL` -&gt; `lower_95CL...139`
+## • `upper_95CL` -&gt; `upper_95CL...140`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...141`
+## • `lower_95CL` -&gt; `lower_95CL...143`
+## • `upper_95CL` -&gt; `upper_95CL...144`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...145`
+## • `lower_95CL` -&gt; `lower_95CL...150`
+## • `upper_95CL` -&gt; `upper_95CL...151`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...152`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...153`
+## • `lower_95CL` -&gt; `lower_95CL...156`
+## • `upper_95CL` -&gt; `upper_95CL...157`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...158`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...159`
+## • `lower_95CL` -&gt; `lower_95CL...162`
+## • `upper_95CL` -&gt; `upper_95CL...163`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...164`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...165`
+## • `lower_95CL` -&gt; `lower_95CL...168`
+## • `upper_95CL` -&gt; `upper_95CL...169`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...170`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...171`
+## • `lower_95CL` -&gt; `lower_95CL...177`
+## • `upper_95CL` -&gt; `upper_95CL...178`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...179`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...180`
+## • `lower_95CL` -&gt; `lower_95CL...182`
+## • `upper_95CL` -&gt; `upper_95CL...183`
+## • `NYC_comparison` -&gt; `NYC_comparison...184`
+## • `lower_95CL` -&gt; `lower_95CL...187`
+## • `upper_95CL` -&gt; `upper_95CL...188`
+## • `NYC_comparison` -&gt; `NYC_comparison...189`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...192`
+## • `lower_95CL` -&gt; `lower_95CL...194`
+## • `upper_95CL` -&gt; `upper_95CL...195`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...196`</code></pre>
+<pre><code>## Warning: There was 1 warning in `transmute()`.
+## ℹ In argument: `cd_id = as.integer(id)`.
+## Caused by warning:
+## ! NAs introduced by coercion</code></pre>
+<p>Next, we imported the <strong>NYC Parks Properties</strong> dataset,
+which includes acreage, administrative, and location information for
+individual parks. Because many parks span multiple community boards, we
+expanded rows so that each community board–park combination appears on
+its own row. We then standardized community board codes and aggregated
+park area to obtain total park acres within each community district.
+These aggregated values form the basis for our main exposure:
+neighborhood park access.</p>
+<pre class="r"><code>clean_parks_df &lt;- 
+  read_csv(&quot;data/Parks_Properties_20251104.csv&quot;) |&gt; 
+  clean_names() |&gt; 
+  mutate(
+    communityboard = as.character(communityboard)
+    ) |&gt;  
+  separate_rows(communityboard, sep = &quot;[/,]&quot;) |&gt; 
+  mutate(
+    communityboard = str_trim(communityboard),
+    cd_id = as.integer(communityboard)
+  ) |&gt; 
+  filter(
+    !is.na(cd_id), 
+    cd_id &gt;= 101, cd_id &lt;= 599, 
+    !is.na(acres),
+    acres &gt; 0
+  ) |&gt; 
+  group_by(cd_id) |&gt; 
+  summarize(
+    total_park_acres = sum(acres, na.rm = TRUE), 
+    n_parks = n(), 
+    .groups = &quot;drop&quot;
+  )</code></pre>
+<pre><code>## Rows: 2054 Columns: 34
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (22): ACQUISITIONDATE, ADDRESS, BOROUGH, CLASS, COUNCILDISTRICT, DEPARTM...
+## dbl  (1): PRECINCT
+## num  (7): ACRES, COMMUNITYBOARD, GISOBJID, NYS_ASSEMBLY, NYS_SENATE, OBJECTI...
+## lgl  (4): PERMIT, PIP_RATABLE, RETIRED, WATERFRONT
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre><code>## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `cd_id = as.integer(communityboard)`.
+## Caused by warning:
+## ! NAs introduced by coercion to integer range</code></pre>
+<p>We then merged the CHP and Parks datasets using community district
+identifiers (cd_id). To make park access comparable across districts of
+very different sizes, we calculated a population-standardized measure of
+park density—park acres per 1,000 residents. Finally, we restricted the
+analytic dataset to community districts with complete data on the
+exposure, outcome, and covariates. This gave us a clean,
+community-district-level dataset for modeling.</p>
+<pre class="r"><code>analysis_df &lt;- 
+  clean_chp_df |&gt; 
+  left_join(clean_parks_df, by = &quot;cd_id&quot;) |&gt; 
+  mutate(
+    park_acres_per_1000 = total_park_acres / (overall_pop / 1000)
+  ) |&gt; 
+  drop_na(park_acres_per_1000, premature_mort_rate) |&gt; 
+  mutate(borough = factor(borough))</code></pre>
+<p>We began our exploratory analysis by summarizing the key features of
+this analytic dataset, including the distributions of premature
+mortality, park density, and major sociodemographic variables. These
+summaries provided a high-level view of variation in both the exposure
+and outcome across community districts and helped us gauge the overall
+scale and heterogeneity of the data.</p>
+<pre class="r"><code>analysis_df |&gt; 
+  summarize(
+    n_cd = n(),
+    mean_park_acres_per_1000 = mean(park_acres_per_1000, na.rm = TRUE),
+    sd_park_acres_per_1000 = sd(park_acres_per_1000, na.rm = TRUE),
+    mean_premort_rate = mean(premature_mort_rate, na.rm = TRUE),
+    sd_premort_rate = sd(premature_mort_rate, na.rm = TRUE),
+    mean_poverty = mean(poverty, na.rm = TRUE),
+    mean_race_black = mean(race_black, na.rm = TRUE)
+    ) |&gt; 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="21%" />
+<col width="19%" />
+<col width="15%" />
+<col width="13%" />
+<col width="11%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">n_cd</th>
+<th align="right">mean_park_acres_per_1000</th>
+<th align="right">sd_park_acres_per_1000</th>
+<th align="right">mean_premort_rate</th>
+<th align="right">sd_premort_rate</th>
+<th align="right">mean_poverty</th>
+<th align="right">mean_race_black</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">59</td>
+<td align="right">1.892</td>
+<td align="right">3.335</td>
+<td align="right">176.112</td>
+<td align="right">72.724</td>
+<td align="right">19.241</td>
+<td align="right">22.573</td>
+</tr>
+</tbody>
+</table>
+<p>We next visualized the marginal distributions of park acres per 1,000
+residents and premature mortality rates. These plots allowed us to
+examine skewness, identify potential outliers, and get an initial sense
+of whether a linear regression framework was a reasonable starting
+point.</p>
+<pre class="r"><code># Premature mortality
+analysis_df |&gt; 
+  ggplot(aes(x = premature_mort_rate)) +
+  geom_density() +
+  labs(
+    x = &quot;Premature mortality rate (per 100,000, age &lt; 65)&quot;,
+    y = &quot;Number of community districts&quot;,
+    title = &quot;Distribution of premature mortality across NYC community districts&quot;
+  )</code></pre>
+<p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<pre class="r"><code># Park density
+analysis_df |&gt; 
+  ggplot(aes(x = park_acres_per_1000)) +
+  geom_density() +
+  labs(
+    x = &quot;Park acres per 1,000 residents&quot;,
+    y = &quot;Number of community districts&quot;,
+    title = &quot;Distribution of park area density across NYC community districts&quot;
+  )</code></pre>
+<p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-5-2.png" width="90%" /></p>
+<p>To investigate the crude relationship between park access and
+premature mortality, we created a scatterplot of premature mortality
+versus park acres per 1,000 residents citywide. Overlaying simple linear
+fits provided an initial visual check on the direction and approximate
+shape of the relationship.</p>
+<pre class="r"><code>analysis_df |&gt;
+  mutate(
+    label = paste0(
+      cd_name, &quot;&lt;br&gt;&quot;,
+      &quot;Park acres per 1,000: &quot;, round(park_acres_per_1000, 2), &quot;&lt;br&gt;&quot;,
+      &quot;Premature mortality: &quot;, round(premature_mort_rate, 1)
+    )
+  ) |&gt;
+  plot_ly(
+    x     = ~park_acres_per_1000,
+    y     = ~premature_mort_rate,
+    color = ~borough,
+    text  = ~label,
+    type  = &quot;scatter&quot;,
+    mode  = &quot;markers&quot;
+  ) |&gt;
+  add_lines(
+    x = ~park_acres_per_1000,
+    y = fitted(lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df)),
+    inherit = FALSE,
+    showlegend = FALSE
+  ) |&gt;
+  layout(
+    title = &quot;Park area density and premature mortality across NYC community districts&quot;,
+    xaxis = list(title = &quot;Park acres per 1,000 residents&quot;),
+    yaxis = list(title = &quot;Premature mortality rate (per 100,000, age &lt; 65)&quot;)
+  )</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-bb766d62466315c8d61c" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-bb766d62466315c8d61c">{"x":{"visdat":{"c24d74703fa2":["function () ","plotlyVisDat"]},"cur_data":"c24d74703fa2","attrs":{"c24d74703fa2":{"x":{},"y":{},"text":{},"mode":"markers","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"},"c24d74703fa2.1":{"x":{},"y":[174.92359655008221,173.38526405654227,174.16178141028419,173.18798445540119,173.66688028221955,173.24510746513135,173.86807230913303,173.30146481339946,174.33375673601333,173.3675411590404,179.96405979095056,177.50528086247007,174.12228409871787,176.07393049678979,175.72102659255293,174.80236136054708,173.22050698133992,173.74904100980726,173.74735171403856,177.81752400797933,176.70839754637092,181.39908864932443,174.76628120644762,173.59873430526477,174.20092309581878,174.25760751291324,173.64940038157096,173.36993043967391,173.87508456179006,174.40976194583166,173.50930194548025,173.78262766727158,173.23002124030853,177.00661208296506,173.21278044082152,173.12558747390926,176.43750900522249,173.42948485674006,173.60745080615172,173.92907196534253,173.13703879651661,177.51957452486886,173.99210976139162,173.42265408615609,173.27709883952741,173.18340907952461,173.88135590955051,173.23786082505254,177.76822263718321,177.31671663502797,173.10766320228765,173.66608037307483,185.43011659034966,174.89766725667786,177.9095493695304,199.80162285410796,181.1247120839553,196.25348559216059,196.00258830139686],"type":"scatter","mode":"lines","showlegend":false,"inherit":false}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Park area density and premature mortality across NYC community districts","xaxis":{"domain":[0,1],"automargin":true,"title":"Park acres per 1,000 residents"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Premature mortality rate (per 100,000, age < 65)"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[0.69302569832679883,1.869081054934939,1.6564223851289146,1.1028378996926698,0.14961793224441836,0.46811070631598556,0.46709274253952632,2.9197644628552655,2.251408700449208,5.0780029048463309,1.0810961238577437,0.37753640700339136],"y":[324,260.69999999999999,308.30000000000001,242.59999999999999,247.90000000000001,319.89999999999998,222.30000000000001,175,215.80000000000001,185.40000000000001,214.19999999999999,212.80000000000001],"text":["Mott Haven and Melrose<br>Park acres per 1,000: 0.69<br>Premature mortality: 324","Hunts Point and Longwood<br>Park acres per 1,000: 1.87<br>Premature mortality: 260.7","Morrisania and Crotona<br>Park acres per 1,000: 1.66<br>Premature mortality: 308.3","Highbridge and Concourse<br>Park acres per 1,000: 1.1<br>Premature mortality: 242.6","Fordham and University Heights<br>Park acres per 1,000: 0.15<br>Premature mortality: 247.9","Belmont and East Tremont<br>Park acres per 1,000: 0.47<br>Premature mortality: 319.9","Kingsbridge Heights and Bedford<br>Park acres per 1,000: 0.47<br>Premature mortality: 222.3","Riverdale and Fieldston<br>Park acres per 1,000: 2.92<br>Premature mortality: 175","Parkchester and Soundview<br>Park acres per 1,000: 2.25<br>Premature mortality: 215.8","Throgs Neck and Co-op City<br>Park acres per 1,000: 5.08<br>Premature mortality: 185.4","Morris Park and Bronxdale<br>Park acres per 1,000: 1.08<br>Premature mortality: 214.2","Williamsbridge and Baychester<br>Park acres per 1,000: 0.38<br>Premature mortality: 212.8"],"mode":"markers","type":"scatter","name":"Bronx","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.74041328547894103,0.77457111879651064,0.40806760901675854,0.23965999045239839,0.54406411397307508,0.86625885282566129,0.32364477689937826,0.48834990971906844,0.15535119172997172,2.4311117468240204,0.14496194570212945,0.092419765982986846,2.0881722042395974,0.27554727580773525,0.38278894023331916,0.57659673627595431,0.099320293304909921,2.7402211367912432],"y":[150.59999999999999,140.90000000000001,260.10000000000002,190.80000000000001,280.80000000000001,137,127.7,227.40000000000001,205.40000000000001,125.90000000000001,131.59999999999999,114.7,210.40000000000001,163.30000000000001,136.5,381.80000000000001,209.69999999999999,181.19999999999999],"text":["Greenpoint and Williamsburg<br>Park acres per 1,000: 0.74<br>Premature mortality: 150.6","Fort Greene and Brooklyn Heights<br>Park acres per 1,000: 0.77<br>Premature mortality: 140.9","Bedford Stuyvesant<br>Park acres per 1,000: 0.41<br>Premature mortality: 260.1","Bushwick<br>Park acres per 1,000: 0.24<br>Premature mortality: 190.8","East New York and Starrett City<br>Park acres per 1,000: 0.54<br>Premature mortality: 280.8","Park Slope and Carroll Gardens<br>Park acres per 1,000: 0.87<br>Premature mortality: 137","Sunset Park<br>Park acres per 1,000: 0.32<br>Premature mortality: 127.7","Crown Heights and Prospect Heights<br>Park acres per 1,000: 0.49<br>Premature mortality: 227.4","South Crown Heights and Lefferts Gardens<br>Park acres per 1,000: 0.16<br>Premature mortality: 205.4","Bay Ridge and Dyker Heights<br>Park acres per 1,000: 2.43<br>Premature mortality: 125.9","Bensonhurst<br>Park acres per 1,000: 0.14<br>Premature mortality: 131.6","Borough Park<br>Park acres per 1,000: 0.09<br>Premature mortality: 114.7","Coney Island<br>Park acres per 1,000: 2.09<br>Premature mortality: 210.4","Flatbush and Midwood<br>Park acres per 1,000: 0.28<br>Premature mortality: 163.3","Sheepshead Bay<br>Park acres per 1,000: 0.38<br>Premature mortality: 136.5","Brownsville<br>Park acres per 1,000: 0.58<br>Premature mortality: 381.8","East Flatbush<br>Park acres per 1,000: 0.1<br>Premature mortality: 209.7","Flatlands and Canarsie<br>Park acres per 1,000: 2.74<br>Premature mortality: 181.2"],"mode":"markers","type":"scatter","name":"Brooklyn","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1.1758938048011089,0.24889997484300616,0.71682664141007213,0.13001997081121919,0.41860093657602959,0.16444209853121408,0.53983855482090137,0.19840284130738373,0.82045837676335831,0.23822021822201978,4.213259487470526,2.73160782536032],"y":[71.5,63,156.80000000000001,106.40000000000001,110.2,90.5,100.40000000000001,80,174.90000000000001,284.89999999999998,284.10000000000002,136.5],"text":["Financial District<br>Park acres per 1,000: 1.18<br>Premature mortality: 71.5","Greenwich Village and Soho<br>Park acres per 1,000: 0.25<br>Premature mortality: 63","Lower East Side and Chinatown<br>Park acres per 1,000: 0.72<br>Premature mortality: 156.8","Clinton and Chelsea<br>Park acres per 1,000: 0.13<br>Premature mortality: 106.4","Midtown<br>Park acres per 1,000: 0.42<br>Premature mortality: 110.2","Stuyvesant Town and Turtle Bay<br>Park acres per 1,000: 0.16<br>Premature mortality: 90.5","Upper West Side<br>Park acres per 1,000: 0.54<br>Premature mortality: 100.4","Upper East Side<br>Park acres per 1,000: 0.2<br>Premature mortality: 80","Morningside Heights and Hamilton Heights<br>Park acres per 1,000: 0.82<br>Premature mortality: 174.9","Central Harlem<br>Park acres per 1,000: 0.24<br>Premature mortality: 284.9","East Harlem<br>Park acres per 1,000: 4.21<br>Premature mortality: 284.1","Washington Heights and Inwood<br>Park acres per 1,000: 2.73<br>Premature mortality: 136.5"],"mode":"markers","type":"scatter","name":"Manhattan","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.6145830937357698,0.27143107712390502,0.1837199898853635,0.12726286516262075,0.54784320640197004,0.16007529833087653,2.8900556276532767,2.6179796753188742,0.08161866201522916,0.41811891409727492,7.5070863737386659,1.160268902445881,2.9752186268384895,16.167306247952531],"y":[133.09999999999999,87.599999999999994,109.5,108.8,150.80000000000001,99.299999999999997,113.09999999999999,110.09999999999999,141.19999999999999,159.5,84.799999999999997,190.5,116.3,274.69999999999999],"text":["Long Island City and Astoria<br>Park acres per 1,000: 0.61<br>Premature mortality: 133.1","Woodside and Sunnyside<br>Park acres per 1,000: 0.27<br>Premature mortality: 87.6","Jackson Heights<br>Park acres per 1,000: 0.18<br>Premature mortality: 109.5","Elmhurst and Corona<br>Park acres per 1,000: 0.13<br>Premature mortality: 108.8","Ridgewood and Maspeth<br>Park acres per 1,000: 0.55<br>Premature mortality: 150.8","Rego Park and Forest Hills<br>Park acres per 1,000: 0.16<br>Premature mortality: 99.3","Flushing and Whitestone<br>Park acres per 1,000: 2.89<br>Premature mortality: 113.1","Hillcrest and Fresh Meadows<br>Park acres per 1,000: 2.62<br>Premature mortality: 110.1","Kew Gardens and Woodhaven<br>Park acres per 1,000: 0.08<br>Premature mortality: 141.2","South Ozone Park and Howard Beach<br>Park acres per 1,000: 0.42<br>Premature mortality: 159.5","Bayside and Little Neck<br>Park acres per 1,000: 7.51<br>Premature mortality: 84.8","Jamaica and Hollis<br>Park acres per 1,000: 1.16<br>Premature mortality: 190.5","Queens Village<br>Park acres per 1,000: 2.98<br>Premature mortality: 116.3","Rockaway and Broad Channel<br>Park acres per 1,000: 16.17<br>Premature mortality: 274.7"],"mode":"markers","type":"scatter","name":"Queens","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[4.9126645373280606,14.029211028953565,13.878021190951833],"y":[231.5,160.69999999999999,155.19999999999999],"text":["St. George and Stapleton<br>Park acres per 1,000: 4.91<br>Premature mortality: 231.5","South Beach and Willowbrook<br>Park acres per 1,000: 14.03<br>Premature mortality: 160.7","Tottenville and Great Kills<br>Park acres per 1,000: 13.88<br>Premature mortality: 155.2"],"mode":"markers","type":"scatter","name":"Staten Island","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.08161866201522916,0.092419765982986846,0.099320293304909921,0.12726286516262075,0.13001997081121919,0.14496194570212945,0.14961793224441836,0.15535119172997172,0.16007529833087653,0.16444209853121408,0.1837199898853635,0.19840284130738373,0.23822021822201978,0.23965999045239839,0.24889997484300616,0.27143107712390502,0.27554727580773525,0.32364477689937826,0.37753640700339136,0.38278894023331916,0.40806760901675854,0.41811891409727492,0.41860093657602959,0.46709274253952632,0.46811070631598556,0.48834990971906844,0.53983855482090137,0.54406411397307508,0.54784320640197004,0.57659673627595431,0.6145830937357698,0.69302569832679883,0.71682664141007213,0.74041328547894103,0.77457111879651064,0.82045837676335831,0.86625885282566129,1.0810961238577437,1.1028378996926698,1.160268902445881,1.1758938048011089,1.6564223851289146,1.869081054934939,2.0881722042395974,2.251408700449208,2.4311117468240204,2.6179796753188742,2.73160782536032,2.7402211367912432,2.8900556276532767,2.9197644628552655,2.9752186268384895,4.213259487470526,4.9126645373280606,5.0780029048463309,7.5070863737386659,13.878021190951833,14.029211028953565,16.167306247952531],"y":[173.10766320228765,173.12558747390926,173.13703879651661,173.18340907952461,173.18798445540119,173.21278044082152,173.22050698133992,173.23002124030853,173.23786082505254,173.24510746513135,173.27709883952741,173.30146481339946,173.3675411590404,173.36993043967391,173.38526405654227,173.42265408615609,173.42948485674006,173.50930194548025,173.59873430526477,173.60745080615172,173.64940038157096,173.66608037307483,173.66688028221955,173.74735171403856,173.74904100980726,173.78262766727158,173.86807230913303,173.87508456179006,173.88135590955051,173.92907196534253,173.99210976139162,174.12228409871787,174.16178141028419,174.20092309581878,174.25760751291324,174.33375673601333,174.40976194583166,174.76628120644762,174.80236136054708,174.89766725667786,174.92359655008221,175.72102659255293,176.07393049678979,176.43750900522249,176.70839754637092,177.00661208296506,177.31671663502797,177.50528086247007,177.51957452486886,177.76822263718321,177.81752400797933,177.9095493695304,179.96405979095056,181.1247120839553,181.39908864932443,185.43011659034966,196.00258830139686,196.25348559216059,199.80162285410796],"type":"scatter","mode":"lines","showlegend":false,"marker":{"color":"rgba(140,86,75,1)","line":{"color":"rgba(140,86,75,1)"}},"error_y":{"color":"rgba(140,86,75,1)"},"error_x":{"color":"rgba(140,86,75,1)"},"line":{"color":"rgba(140,86,75,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>Our modeling began with a simple linear regression using premature
+mortality as the outcome and park acres per 1,000 residents as the sole
+predictor. This “crude” model captures the unadjusted association
+between park density and premature mortality and serves as a baseline
+for comparison with more complex models.</p>
+<pre class="r"><code>model_base &lt;- lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df)
+
+summary(model_base)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = premature_mort_rate ~ park_acres_per_1000, data = analysis_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -110.39  -60.02  -17.36   43.99  207.87 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)          172.972     10.971  15.766   &lt;2e-16 ***
+## park_acres_per_1000    1.659      2.880   0.576    0.567    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 73.15 on 57 degrees of freedom
+## Multiple R-squared:  0.005792,   Adjusted R-squared:  -0.01165 
+## F-statistic: 0.3321 on 1 and 57 DF,  p-value: 0.5667</code></pre>
+<pre class="r"><code>glance(model_base)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1   0.00579       -0.0116  73.1     0.332   0.567     1  -336.  678.  684.
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<p>Because our EDA showed clear borough-level differences in both park
+access and demographic composition, we next extended the model to
+include borough fixed effects. This adjustment helps account for
+systematic differences in the built environment, policy context, and
+health systems across boroughs and focuses the association on
+within-borough variation in park density.</p>
+<pre class="r"><code>model_borough &lt;- lm(premature_mort_rate ~ park_acres_per_1000 + borough, data = analysis_df)
+
+summary(model_borough)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = premature_mort_rate ~ park_acres_per_1000 + borough, 
+##     data = analysis_df)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -74.65 -38.25 -17.66  24.59 194.91 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)            238.11      18.47  12.893  &lt; 2e-16 ***
+## park_acres_per_1000      3.95       3.26   1.212 0.231061    
+## boroughBrooklyn        -53.50      23.12  -2.314 0.024547 *  
+## boroughManhattan      -103.66      25.24  -4.108 0.000139 ***
+## boroughQueens         -113.96      24.50  -4.652 2.23e-05 ***
+## boroughStaten Island   -98.86      50.30  -1.966 0.054601 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 61.66 on 53 degrees of freedom
+## Multiple R-squared:  0.343,  Adjusted R-squared:  0.281 
+## F-statistic: 5.534 on 5 and 53 DF,  p-value: 0.000358</code></pre>
+<pre class="r"><code>glance(model_borough)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.343         0.281  61.7      5.53 0.000358     5  -324.  661.  676.
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<pre class="r"><code>AIC(model_base, model_borough)</code></pre>
+<pre><code>##               df      AIC
+## model_base     3 677.9107
+## model_borough  7 661.4677</code></pre>
+<pre class="r"><code>BIC(model_base, model_borough)</code></pre>
+<pre><code>##               df      BIC
+## model_base     3 684.1434
+## model_borough  7 676.0104</code></pre>
+<p>To build a more rigorous and interpretable model, we then
+incorporated additional covariates from the CHP dataset. Guided by our
+exploratory analysis and public health literature, we focused on
+variables that are both conceptually important and empirically strong
+predictors of premature mortality. Poverty and racial composition
+(captured here as the percent of Black residents) are well-established
+determinants of health and are closely linked to structural inequities
+across New York City. Our final main-effects model therefore includes
+poverty and percent Black residents as key covariates, while retaining
+borough fixed effects and our primary exposure, park density.</p>
+<p>This specification represents a balance between explanatory power and
+parsimony. It adjusts for major confounding pathways without saturating
+the model with highly collinear variables, and it allows us to estimate
+the association between park access and premature mortality in the
+context of neighborhood-level socioeconomic and structural
+conditions.</p>
+<pre class="r"><code>final_model &lt;- lm(premature_mort_rate ~ park_acres_per_1000 + poverty + race_black + borough, 
+                  data = analysis_df)
+
+summary(final_model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = premature_mort_rate ~ park_acres_per_1000 + poverty + 
+##     race_black + borough, data = analysis_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -63.400 -20.554  -0.314  21.383  76.667 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           28.43161   25.55775   1.112  0.27116    
+## park_acres_per_1000    4.95671    1.80694   2.743  0.00838 ** 
+## poverty                6.03437    0.85124   7.089 3.94e-09 ***
+## race_black             1.57316    0.20766   7.576 6.72e-10 ***
+## boroughBrooklyn      -16.38827   14.25219  -1.150  0.25556    
+## boroughManhattan       0.08306   18.00795   0.005  0.99634    
+## boroughQueens        -34.99324   15.93066  -2.197  0.03262 *  
+## boroughStaten Island  -0.54288   29.05802  -0.019  0.98517    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 33.76 on 51 degrees of freedom
+## Multiple R-squared:  0.8105, Adjusted R-squared:  0.7845 
+## F-statistic: 31.16 on 7 and 51 DF,  p-value: 2.684e-16</code></pre>
+<pre class="r"><code>tidy(final_model, conf.int = TRUE)</code></pre>
+<pre><code>## # A tibble: 8 × 7
+##   term                 estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)           28.4       25.6     1.11    2.71e- 1   -22.9      79.7 
+## 2 park_acres_per_1000    4.96       1.81    2.74    8.38e- 3     1.33      8.58
+## 3 poverty                6.03       0.851   7.09    3.94e- 9     4.33      7.74
+## 4 race_black             1.57       0.208   7.58    6.72e-10     1.16      1.99
+## 5 boroughBrooklyn      -16.4       14.3    -1.15    2.56e- 1   -45.0      12.2 
+## 6 boroughManhattan       0.0831    18.0     0.00461 9.96e- 1   -36.1      36.2 
+## 7 boroughQueens        -35.0       15.9    -2.20    3.26e- 2   -67.0      -3.01
+## 8 boroughStaten Island  -0.543     29.1    -0.0187  9.85e- 1   -58.9      57.8</code></pre>
+<pre class="r"><code>glance(final_model)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.810         0.784  33.8      31.2 2.68e-16     7  -287.  592.  611.
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<pre class="r"><code>vif(final_model)</code></pre>
+<pre><code>##                         GVIF Df GVIF^(1/(2*Df))
+## park_acres_per_1000 1.847988  1        1.359407
+## poverty             1.862011  1        1.364555
+## race_black          1.175035  1        1.083990
+## borough             3.471511  4        1.168328</code></pre>
+<p>After fitting the final model, we examined standard regression
+diagnostics to assess model fit and verify assumptions. Specifically, we
+inspected plots of residuals versus fitted values, Normal QQ plots,
+scale–location plots, and residuals versus leverage. These diagnostics
+help us evaluate linearity, homoscedasticity, approximate normality of
+residuals, and the influence of individual community districts on the
+results.</p>
+<pre class="r"><code>par(mfrow = c(2, 2))
+plot(final_model)</code></pre>
+<p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+<p>The diagnostic plots suggested mild heteroskedasticity and a few
+moderately influential observations, which is expected in
+neighborhood-level data, but no evidence of a single district dominating
+the fit. Overall, the assumptions of linear regression appeared
+reasonably well-satisfied for our main-effects model.</p>
+<p>To assess the robustness of our findings to the functional form of
+the outcome, we conducted a sensitivity analysis using a log-transformed
+premature mortality rate. This transformation reduces right-skewness and
+can stabilize variance, potentially improving model fit if the original
+residuals show non-constant variance.</p>
+<pre class="r"><code>analysis_df &lt;- 
+  analysis_df |&gt;
+  mutate(
+    log_premort = log(premature_mort_rate)
+  )
+
+# Fit the log-linear model
+model_log &lt;- lm(log_premort ~ park_acres_per_1000 + poverty + race_black + borough, data = analysis_df)
+
+summary(model_log)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log_premort ~ park_acres_per_1000 + poverty + race_black + 
+##     borough, data = analysis_df)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.38080 -0.13683  0.00652  0.11667  0.40673 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           4.284804   0.140272  30.546  &lt; 2e-16 ***
+## park_acres_per_1000   0.027720   0.009917   2.795  0.00729 ** 
+## poverty               0.033262   0.004672   7.120 3.52e-09 ***
+## race_black            0.008828   0.001140   7.746 3.63e-10 ***
+## boroughBrooklyn      -0.077374   0.078222  -0.989  0.32726    
+## boroughManhattan     -0.082648   0.098836  -0.836  0.40693    
+## boroughQueens        -0.216165   0.087435  -2.472  0.01680 *  
+## boroughStaten Island  0.047097   0.159483   0.295  0.76895    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1853 on 51 degrees of freedom
+## Multiple R-squared:  0.8269, Adjusted R-squared:  0.8031 
+## F-statistic:  34.8 on 7 and 51 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>tidy(model_log, conf.int = TRUE)</code></pre>
+<pre><code>## # A tibble: 8 × 7
+##   term                 estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)           4.28      0.140      30.5   1.90e-34  4.00       4.57  
+## 2 park_acres_per_1000   0.0277    0.00992     2.80  7.29e- 3  0.00781    0.0476
+## 3 poverty               0.0333    0.00467     7.12  3.52e- 9  0.0239     0.0426
+## 4 race_black            0.00883   0.00114     7.75  3.63e-10  0.00654    0.0111
+## 5 boroughBrooklyn      -0.0774    0.0782     -0.989 3.27e- 1 -0.234      0.0797
+## 6 boroughManhattan     -0.0826    0.0988     -0.836 4.07e- 1 -0.281      0.116 
+## 7 boroughQueens        -0.216     0.0874     -2.47  1.68e- 2 -0.392     -0.0406
+## 8 boroughStaten Island  0.0471    0.159       0.295 7.69e- 1 -0.273      0.367</code></pre>
+<pre class="r"><code>glance(model_log)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.827         0.803 0.185      34.8 2.80e-17     7   20.0 -22.1 -3.38
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<pre class="r"><code>par(mfrow = c(2,2))
+plot(model_log)</code></pre>
+<p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
+<pre class="r"><code>par(mfrow = c(1,1))</code></pre>
+<pre class="r"><code>AIC(final_model, model_log)</code></pre>
+<pre><code>##             df      AIC
+## final_model  9 592.1242
+## model_log    9 -22.0788</code></pre>
+<pre class="r"><code>BIC(final_model, model_log)</code></pre>
+<pre><code>##             df        BIC
+## final_model  9 610.821988
+## model_log    9  -3.380963</code></pre>
+<pre class="r"><code>cor(analysis_df$premature_mort_rate,
+    exp(predict(model_log)))^2</code></pre>
+<pre><code>## [1] 0.8204845</code></pre>
+<p>The log-linear model yielded very similar conclusions: park density
+remained positively associated with premature mortality, and poverty and
+percent Black population continued to be the strongest predictors. Model
+fit improved slightly in terms of adjusted R² and diagnostics, but the
+direction and relative magnitude of associations were stable. This
+suggests that our main findings are not sensitive to the choice between
+modeling premature mortality on the original scale versus the log
+scale.</p>
+<p>Motivated by the strong clustering of socioeconomic conditions
+observed in our EDA, we also tested whether the association between park
+density and premature mortality varied by neighborhood poverty level. To
+do this, we added an interaction term between park acres per 1,000
+residents and the poverty rate.</p>
+<pre class="r"><code># Interaction model: Does the effect of park access vary by poverty level?
+model_interaction &lt;- lm(premature_mort_rate ~ park_acres_per_1000 * poverty + race_black + borough, 
+                        data = analysis_df)
+
+summary(model_interaction)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = premature_mort_rate ~ park_acres_per_1000 * poverty + 
+##     race_black + borough, data = analysis_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -57.156 -18.179  -1.973  19.690  80.605 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                  43.9360    26.6084   1.651   0.1050    
+## park_acres_per_1000          -6.8360     7.0163  -0.974   0.3346    
+## poverty                       5.1508     0.9776   5.269 2.92e-06 ***
+## race_black                    1.5601     0.2038   7.655 5.70e-10 ***
+## boroughBrooklyn             -15.1027    13.9980  -1.079   0.2858    
+## boroughManhattan             -4.6619    17.8720  -0.261   0.7953    
+## boroughQueens               -36.2713    15.6419  -2.319   0.0245 *  
+## boroughStaten Island         19.7549    30.8022   0.641   0.5242    
+## park_acres_per_1000:poverty   0.7445     0.4286   1.737   0.0885 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 33.11 on 50 degrees of freedom
+## Multiple R-squared:  0.8213, Adjusted R-squared:  0.7927 
+## F-statistic: 28.72 on 8 and 50 DF,  p-value: 3.762e-16</code></pre>
+<pre class="r"><code>tidy(model_interaction, conf.int = TRUE)</code></pre>
+<pre><code>## # A tibble: 9 × 7
+##   term                  estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)             43.9      26.6       1.65  1.05e- 1   -9.51      97.4 
+## 2 park_acres_per_1000     -6.84      7.02     -0.974 3.35e- 1  -20.9        7.26
+## 3 poverty                  5.15      0.978     5.27  2.92e- 6    3.19       7.11
+## 4 race_black               1.56      0.204     7.65  5.70e-10    1.15       1.97
+## 5 boroughBrooklyn        -15.1      14.0      -1.08  2.86e- 1  -43.2       13.0 
+## 6 boroughManhattan        -4.66     17.9      -0.261 7.95e- 1  -40.6       31.2 
+## 7 boroughQueens          -36.3      15.6      -2.32  2.45e- 2  -67.7       -4.85
+## 8 boroughStaten Island    19.8      30.8       0.641 5.24e- 1  -42.1       81.6 
+## 9 park_acres_per_1000:…    0.745     0.429     1.74  8.85e- 2   -0.116      1.61</code></pre>
+<pre class="r"><code>glance(model_interaction)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.821         0.793  33.1      28.7 3.76e-16     8  -285.  591.  611.
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<pre class="r"><code>par(mfrow = c(2,2))
+plot(model_interaction)</code></pre>
+<p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-15-1.png" width="90%" /></p>
+<pre class="r"><code>par(mfrow = c(1,1))
+
+vif(model_interaction)</code></pre>
+<pre><code>## there are higher-order terms (interactions) in this model
+## consider setting type = &#39;predictor&#39;; see ?vif</code></pre>
+<pre><code>##                                  GVIF Df GVIF^(1/(2*Df))
+## park_acres_per_1000         28.965084  1        5.381922
+## poverty                      2.553157  1        1.597860
+## race_black                   1.176632  1        1.084727
+## borough                      4.552628  4        1.208601
+## park_acres_per_1000:poverty 23.614870  1        4.859513</code></pre>
+<p>The interaction term between park density and poverty was positive
+and marginally significant, suggesting that the association between park
+acreage and premature mortality may be more strongly positive in
+higher-poverty neighborhoods. However, the improvement in overall model
+fit relative to the main-effects model was modest, and the added
+complexity did not substantially change our substantive conclusions. We
+therefore present the interaction model as a complementary sensitivity
+analysis rather than our primary specification.</p>
+<p>Overall, our analysis demonstrates that premature mortality varies
+substantially across NYC community districts and is strongly patterned
+by socioeconomic and racial composition. After adjusting for borough,
+poverty, and racial composition, the association between park acreage
+per 1,000 residents and premature mortality was positive rather than
+negative, and this pattern was robust to alternative model
+specifications. This counterintuitive finding suggests that greater park
+area alone may not be sufficient to reduce premature mortality and that
+structural determinants, including poverty and racial inequities,
+continue to play a dominant role in shaping health outcomes across NYC
+neighborhoods. Future work could incorporate measures of park quality,
+safety, and accessibility, as well as additional features of the built
+and social environment, to better understand when and how green space
+promotes health and how its benefits can be realized more equitably.</p>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

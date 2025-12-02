@@ -1,12 +1,7 @@
 ---
-title: "cleaning_eda_model_premature_mortality"
-author: "Maria Serafini"
-date: "2025-12-01"
-output:
+title: "Premature Mortality Analysis"
+output: 
   html_document:
-    toc: true
-    toc_float: true
-    number_sections: true
 ---
 
 ```{r setup, include=FALSE}

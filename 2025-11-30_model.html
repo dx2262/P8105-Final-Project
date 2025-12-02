@@ -15,7 +15,7 @@
 
 <title>2025-11-30_model</title>
 
-<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
@@ -248,7 +248,19 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="EDA.html">EDA</a>
+  <a href="introduction.html">Introduction</a>
+</li>
+<li>
+  <a href="Initial-EDA.html">EDA</a>
+</li>
+<li>
+  <a href="cleaning_eda_model_premature_mortality.html">Premature Mortality Analysis</a>
+</li>
+<li>
+  <a href="2025-11-30_model.html">Obesity Analysis</a>
+</li>
+<li>
+  <a href="discussion.html">Discussion</a>
 </li>
       </ul>
     </div><!--/.nav-collapse -->
@@ -267,48 +279,8 @@ $(document).ready(function () {
 
 
 <pre class="r"><code>source(&quot;01_datacleaning.R&quot;)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.1     ✔ stringr   1.5.2
-## ✔ ggplot2   4.0.0     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
-## 
-## Attaching package: &#39;plotly&#39;
-## 
-## 
-## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     last_plot
-## 
-## 
-## The following object is masked from &#39;package:stats&#39;:
-## 
-##     filter
-## 
-## 
-## The following object is masked from &#39;package:graphics&#39;:
-## 
-##     layout
-## 
-## 
-## 
-## Attaching package: &#39;janitor&#39;
-## 
-## 
-## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     chisq.test, fisher.test
-## 
-## 
-## Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE
-## 
-## Rows: 2054 Columns: 34
-## ── Column specification ────────────────────────────────────────────────────────
+<pre><code>## Rows: 2054 Columns: 34
+## ── Column specification ──────────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (22): ACQUISITIONDATE, ADDRESS, BOROUGH, CLASS, COUNCILDISTRICT, DEPARTM...
 ## dbl  (1): PRECINCT
@@ -330,13 +302,10 @@ $(document).ready(function () {
 library(readxl)
 library(plotly)
 library(sf)
-library(betareg)</code></pre>
-<pre><code>## Warning: package &#39;betareg&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(lmerTest)</code></pre>
-<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## Loading required package: lme4</code></pre>
-<pre><code>## Warning: package &#39;lme4&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## Loading required package: Matrix
+library(betareg)
+library(lmerTest)</code></pre>
+<pre><code>## Loading required package: lme4
+## Loading required package: Matrix
 ## 
 ## Attaching package: &#39;Matrix&#39;
 ## 
@@ -355,10 +324,8 @@ library(betareg)</code></pre>
 ## 
 ##     step</code></pre>
 <pre class="r"><code>library(car)</code></pre>
-<pre><code>## Warning: package &#39;car&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## Loading required package: carData</code></pre>
-<pre><code>## Warning: package &#39;carData&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## 
+<pre><code>## Loading required package: carData
+## 
 ## Attaching package: &#39;car&#39;
 ## 
 ## The following object is masked from &#39;package:dplyr&#39;:
@@ -369,14 +336,15 @@ library(betareg)</code></pre>
 ## 
 ##     some</code></pre>
 <pre class="r"><code>library(effects)</code></pre>
-<pre><code>## Warning: package &#39;effects&#39; was built under R version 4.5.2</code></pre>
 <pre><code>## lattice theme set by effectsTheme()
 ## See ?effectsTheme for details.</code></pre>
 <pre class="r"><code>library(DHARMa)</code></pre>
-<pre><code>## Warning: package &#39;DHARMa&#39; was built under R version 4.5.2</code></pre>
 <pre><code>## This is DHARMa 0.4.7. For overview type &#39;?DHARMa&#39;. For recent changes, type news(package = &#39;DHARMa&#39;)</code></pre>
 <pre class="r"><code>library(glmmTMB)</code></pre>
-<pre><code>## Warning: package &#39;glmmTMB&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Warning in check_dep_version(dep_pkg = &quot;TMB&quot;): package version mismatch: 
+## glmmTMB was built with TMB package version 1.9.17
+## Current TMB package version is 1.9.18
+## Please re-install glmmTMB from source or restore original &#39;TMB&#39; package (see &#39;?reinstalling&#39; for more information)</code></pre>
 <pre class="r"><code>knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,

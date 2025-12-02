@@ -3,8 +3,16 @@ output_dir: "."
 navbar:
   title: "Home"
   right:
+    - text: "Introduction"
+      href: introduction.html
     - text: "EDA"
-      href: EDA.html
+      href: Initial-EDA.html
+    - text: "Premature Mortality Analysis"
+      href: cleaning_eda_model_premature_mortality.html
+    - text: "Obesity Analysis"
+      href: 2025-11-30_model.html
+    - text: "Discussion"
+      href: discussion.html
 output:
   html_document:
     theme: cerulean

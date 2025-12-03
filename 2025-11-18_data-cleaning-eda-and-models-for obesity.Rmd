@@ -1,0 +1,856 @@
+---
+title: "2025-11-18_first-data-wrangling"
+author: "Chris"
+date: "2025-11-18"
+output: html_document
+---
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(plotly)
+library(readxl)
+library(janitor)
+
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+
+
+
+# read the data
+
+```{r}
+df_parks <- read.csv("data/Parks_Properties_20251104.csv", colClasses = "character", encoding = "UTF-8") |>
+  select(ACQUISITIONDATE: multipolygon) |>
+  clean_names() 
+
+df_chp <- read_excel("data/2022-chp-pud.xlsx", sheet = "CHP_all_data", skip = 1) |>
+  clean_names()
+
+df_prem_death <- read_excel("data/2022-chp-pud.xlsx", sheet = "Cause_of_premature_death") |>
+  clean_names()
+
+df_cancer <- read_excel("data/2022-chp-pud.xlsx", sheet = "Cancer_data_ranked") |>
+  clean_names()
+
+
+```
+
+
+# one park, multiple IDs
+
+```{r}
+df_parks <- 
+  df_parks |>
+  rename(id = communityboard) 
+
+df_parks_community <-
+  df_parks |>
+  mutate(
+    acres = as.numeric(acres),
+    
+    id = as.factor(id)
+  ) |>
+  group_by(id) |>
+  summarise(
+    sum_acres = sum(acres, na.rm = TRUE),
+    mean_acres = mean(acres, na.rm = TRUE),
+    n_parks = n()
+  ) |>
+  filter(sum_acres > 0) |> # only use observations with positive areas
+  mutate(
+    id = as.character(id),
+    n_split = lengths(strsplit(id, ","))
+  ) |>
+  separate_rows(id, sep = ",") |>
+  mutate(
+    id = trimws(id),
+    sum_acres_adj = sum_acres / n_split,
+    n_parks_adj = n_parks / n_split
+  ) |>
+  group_by(id) |>
+  summarise(
+    sum_acres = sum(sum_acres_adj, na.rm = TRUE),
+    n_parks = sum(n_parks_adj, na.rm = TRUE),
+    mean_acres = sum_acres / n_parks
+  ) |>
+  filter(sum_acres != "Inf")
+
+# df_parks_borough <-
+#   df_parks |>
+#   filter(
+#     borough == c("B", "M", "Q", "R", "X")
+#   ) |>
+#   mutate(
+#     borough = as.factor(borough),
+#     acres = as.numeric(acres)
+#   ) |>
+#   group_by(borough) |>
+#   summarise(
+#     sum_acres = sum(acres, na.rm = TRUE),
+#     mean_acres = mean(acres, na.rm = TRUE),
+#     n_parks = n()
+#   ) |>
+#   rename(id = borough)
+# 
+# df_parks_all_dist <-
+#   bind_rows(df_parks_borough, df_parks_community)
+
+```
+
+
+
+```{r}
+# df_parks_split <-
+#   df_parks_all_dist |>
+#   mutate(
+#     id = as.character(id),
+#     n_split = lengths(strsplit(id, ","))
+#   ) |>
+#   separate_rows(id, sep = ",") |>
+#   mutate(
+#     id = trimws(id),
+#     sum_acres_adj = sum_acres / n_split,
+#     n_parks_adj = n_parks / n_split
+#   ) |>
+#   group_by(id) |>
+#   summarise(
+#     sum_acres = sum(sum_acres_adj, na.rm = TRUE),
+#     n_parks = sum(n_parks_adj, na.rm = TRUE),
+#     mean_acres = sum_acres / n_parks
+#   )
+```
+
+
+# combine the area df into the chp-pud
+
+```{r}
+# get rid of reliability index
+
+df_chp_clean <- df_chp |>
+  select(-contains("95cl"), -contains("nyc_comparison"), -contains("reliability_note")) |>
+  filter(id != c(0, 1, 2, 3, 4, 5))
+  #   mutate(
+  #   id = recode(as.character(id),
+  #                    "1" = "M",
+  #                    "2" = "X",
+  #                    "3" = "B",
+  #                    "4" = "Q",
+  #                    "5" = "R"),
+  #  
+  # )
+df_chp_clean <- df_chp_clean |>
+  mutate(uninsured = as.numeric(uninsured),
+         uninsured = round(uninsured, 2))
+  
+  
+```
+
+
+
+```{r}
+# create a variable map for df_chp_clean
+var_map <- tribble(
+  ~variable,                 ~category,
+  
+  "id",                      "geo",
+  "borough",                 "geo",
+  "name",                    "geo",
+  "overall_pop",             "population",
+
+  
+  "race_white",              "demographic_race",
+  "race_black",              "demographic_race",
+  "race_latino",             "demographic_race",
+  "race_asian",              "demographic_race",
+  "race_other",              "demographic_race",
+  "age0to17",                "demographic_age",
+  "age18to24",               "demographic_age",
+  "age25to44",               "demographic_age",
+  "age45to64",               "demographic_age",
+  "age65plus",               "demographic_age",
+  "born_outside_us",         "demographic_migration",
+  "ltd_eng_prof",            "demographic_language",
+
+  
+  "edu_did_not_complete_hs",      "SES_education",
+  "edu_hs_grad_some_college",     "SES_education",
+  "edu_college_degree_and_higher","SES_education",
+  "poverty",                      "SES_economic",
+  "unemployment",                 "SES_economic",
+  "rent_burden",                  "SES_economic",
+  "school_absent",                "education_outcome",
+  "on_time_hs_grad",              "education_outcome",
+
+ 
+  "homes_ac",                     "housing_environment",
+  "homes_no_defects",             "housing_environment",
+  "air_pollution",                "physical_environment",
+  "ratio_bodega_supermarket",     "food_environment",
+  "farmers_markets",              "food_environment",
+
+ 
+  "helpful_neighbor",             "social_environment",
+  "assault_hosp",                 "safety_violence",
+  "jail_incarceration",           "safety_justice",
+  "pedestrian_hosp",              "safety_transport",
+
+ 
+  "physical_activity",            "behavior",
+  "fruit_veg",                    "behavior",
+  "sugary_drink",                 "behavior",
+  "smoking",                      "behavior",
+  "binge_drink",                  "behavior",
+
+  
+  "uninsured",                    "access_care",
+  "unmet_med_care",               "access_care",
+  "hpv_vaccination_all",          "preventive_care",
+  "flu_vaccination",              "preventive_care",
+
+  
+  "preterm_births",               "maternal_child",
+  "teen_births",                  "maternal_child",
+  "child_obesity",                "maternal_child",
+  "infant_mort",                  "maternal_child",
+
+  
+  "obesity",                      "chronic_disease",
+  "diabetes",                     "chronic_disease",
+  "hypertension",                 "chronic_disease",
+  "hiv_diagnoses",                "infectious_disease",
+  "hep_c_reports",                "infectious_disease",
+  "avoidable_child_hosp",         "hospitalization",
+  "avoidable_adult_hosp",         "hospitalization",
+  "falls_hosp",                   "injury_hospitalization",
+  "psych_hosp",                   "mental_health",
+
+  
+  "avertable_death",              "mortality",
+  "premature_mort_rate",          "mortality",
+  "premature_mort_number",        "mortality",
+  "life_expectancy",              "global_health",
+  "self_rep_health",              "global_health"
+)
+
+```
+
+
+```{r}
+
+# demographic data
+var_demo <- var_map |>
+  filter(category %in% c("geo", "population", "demographic_race", "demographic_age","demographic_migration", "demographic_language")) |>
+  pull(variable)
+
+df_demographic <-
+  df_chp_clean |>
+  select(all_of(var_demo)) |>
+  mutate(
+    age0to24 = age0to17 + age18to24,
+    age25to64 = age25to44 + age45to64,
+    race_others = race_asian + race_other
+  ) |>
+  select(-race_asian, -race_other, -age0to17, -age18to24, -age25to44, -age45to64) |>
+  relocate(
+    c(age0to24, age25to64), .before = age65plus
+  ) |>
+  relocate(race_others, .after = race_latino)
+
+
+# education condition
+var_edu <- var_map |>
+  filter(category %in% c("geo", "SES_education")) |>
+  pull(variable)
+  
+df_education <- df_chp_clean |>
+  select(all_of(var_edu)) |>
+  mutate(edu_no_college_degree = edu_did_not_complete_hs + edu_hs_grad_some_college) |>
+  select(-edu_did_not_complete_hs, -edu_hs_grad_some_college)
+
+
+# economic condition
+var_eco <- var_map |>
+  filter(category %in% c("geo","SES_economic"))|>
+  pull(variable)
+
+df_economy <- df_chp_clean |>
+  select(all_of(var_eco)) |>
+  select(-rent_burden)
+
+
+# food condition
+var_food <- var_map |>
+  filter(category %in% c("geo", "food_environment", "behavior")) |>
+  pull(variable)
+
+df_food <- df_chp_clean |>
+  select(all_of(var_food))|>
+  select(-ratio_bodega_supermarket, -physical_activity, -smoking, -binge_drink)
+
+
+# smoking and drinking
+df_smoke_drink <- df_chp_clean |>
+  select(id, borough, name, smoking, binge_drink)
+
+
+# activity
+df_activity <- df_chp_clean |>
+  select(id, borough, name, physical_activity)
+
+
+# safety condition
+var_safety <- var_map |>
+  filter(category %in% c("geo", "safety_violence", "social_environment", "safety_transport")) |>
+  pull(variable)
+
+df_safety <- df_chp_clean |>
+  select(all_of(var_safety))
+
+
+# medical availability
+df_med_avail <- df_chp_clean |>
+  select(id, borough, name, uninsured) 
+
+
+# health conditions
+df_health <- df_chp_clean |>
+  select(id, obesity, life_expectancy)
+
+
+dfs <- list(df_demographic, df_health, df_parks_community, df_education, df_economy, df_food, df_smoke_drink, df_activity, df_safety, df_med_avail)
+
+
+# get a final dataframe for analysis
+df_analysis <- reduce(dfs, left_join, by = "id") |>
+  select(-contains("borough.x.x"), -contains("name.x.x"), -contains("borough.y"), -contains("name.y")) |>
+  rename(
+    borough = borough.x,
+    name = name.x
+  ) |>
+  filter(overall_pop != 0) |>
+  mutate(
+    area_per_capita = (sum_acres / overall_pop) * 100000,
+    log_area = log(area_per_capita + 1)) 
+  
+
+```
+
+
+```{r}
+library(patchwork)
+library(sf)
+library(betareg)
+library(lmerTest)
+library(car)
+library(effects)
+library(DHARMa)
+library(glmmTMB)
+```
+
+# descriptive analysis
+
+```{r}
+summary(df_analysis)
+```
+
+## linear relationship or not?
+
+```{r}
+# df_analysis |>
+#   ggplot(aes(x = log_area, y = obesity)) +
+#   geom_point(color = "#6a5acd")
+# 
+# lm1 <- lm(obesity ~ log_area, data = df_analysis)
+# plot(lm1)
+# summary(lm1)
+
+```
+
+There are no obvious relationships between log_area and obesity.
+
+
+```{r}
+plot_ly(
+  df_analysis, 
+  x = ~log_area, 
+  y = ~obesity,
+  type = 'scatter', 
+  mode = 'markers',
+  color = ~borough,
+  text = ~paste("Community: ", name,
+               "<br>Borough: ", borough,
+               "<br>Log Area: ", log_area,
+               "<br>Obesity: ", obesity, "%")
+  ) |>
+  layout(title = "Obesity vs Park Access",
+         xaxis = list(title = "Log Area"),
+         yaxis = list(title = "Obesity"))
+
+```
+
+
+
+## obesity eda for other variables
+
+
+obesity ~ poverty
+```{r}
+# ggplot(df_analysis, aes(obesity)) + geom_histogram()
+
+plot_ly(
+  df_analysis, 
+  x = ~poverty, 
+  y = ~obesity,
+  type = 'scatter', mode = 'markers',
+  color = ~borough,
+  text = ~paste("Community: ", name,
+               "<br>Borough: ", borough,
+               "<br>Poverty Rate: ", poverty, "%",
+               "<br>Obesity: ", obesity, "%")) |>
+  layout(
+    title = "Obesity vs Poverty",
+    xaxis = list(title = "Poverty Rate"),
+    yaxis = list(title = "Obesity Rate"))
+
+
+
+```
+
+
+obesity ~ borough
+```{r}
+# ggplot(df_analysis, aes(borough, obesity)) + geom_boxplot()
+
+df_analysis |>
+  filter(id != 0) |>
+  plot_ly(
+  x = ~borough, 
+  y = ~obesity, 
+  type = 'box',
+  fillcolor = ~borough,
+  text= ~paste("<br>Borough: ", borough)
+  ) |>
+  layout(
+    title = "Obesity vs Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Obesity")
+  )
+
+```
+
+`borough` is a confounding factor.
+
+
+obesity ~ food
+
+```{r eda_behavior_scatter, fig.width = 8, fig.asp = 0.9}
+
+base_theme <- theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    legend.position = "right",
+    legend.title = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+# 1. Obesity vs Farmers' Market
+p_farm <- ggplot(df_analysis, aes(x = farmers_markets, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Farmers' Markets",
+       x = "Farmers' markets per 10,000 residents",
+       y = "Obesity (%)") +
+  base_theme
+
+# 2. Obesity vs Sugary Drink
+p_sugary <- ggplot(df_analysis, aes(x = sugary_drink, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Sugary Drink Consumption",
+       x = "Sugary drink consumption (%)",
+       y = "Obesity (%)") +
+  base_theme
+
+# 3. Obesity vs Smoking
+p_smoke <- ggplot(df_analysis, aes(x = smoking, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Smoking Prevalence",
+       x = "Smoking prevalence (%)",
+       y = "Obesity (%)") +
+  base_theme
+
+# 4. Obesity vs Binge Drinking
+p_binge <- ggplot(df_analysis, aes(x = binge_drink, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Binge Drinking",
+       x = "Binge drinking (%)",
+       y = "Obesity (%)") +
+  base_theme
+
+# ---- Combine 4 plots: shared legend automatically ----
+combined_plot <- (p_farm + p_sugary) / (p_smoke + p_binge)
+
+combined_plot
+```
+
+
+
+obesity ~ education
+
+```{r}
+# ggplot(df_analysis, aes(edu_college_degree_and_higher, obesity)) + 
+#     geom_point() + geom_smooth(method="lm")
+
+
+plot_ly(
+  df_analysis, 
+  x = ~edu_college_degree_and_higher,
+  y = ~obesity,
+  mode = "markers",
+  type = "scatter",
+  color = ~borough,
+  text= ~paste("Community: ", name,
+               "<br>Borough: ", borough,
+               "<br>Obesity: ", obesity, "%",
+               "<br>High Education Rate: ", edu_college_degree_and_higher, "%")
+  ) |>
+  layout(
+    title = "Obesity vs Education",
+    xaxis = list(title = "High Education Rate"),
+    yaxis = list(title = "Obesity")
+  )
+
+```
+
+
+
+obesity ~ safety
+
+```{r}
+fig_bubble <- plot_ly(
+  df_analysis,
+  x = ~assault_hosp,
+  y = ~pedestrian_hosp,
+  size = ~obesity,
+  color = ~borough,
+  colors = "Set2",
+  type = "scatter",
+  mode = "markers",
+  marker = list(
+    sizemode = "area",
+    sizeref = 2 * max(df_analysis$obesity) / 60^2, 
+    opacity = 0.7
+  ),
+  text = ~paste(
+    "CD:", id,
+    "<br>Name:", name,
+    "<br>Assault hosp:", assault_hosp,
+    "<br>Pedestrian hosp:", pedestrian_hosp,
+    "<br>Obesity:", round(obesity,1), "%"
+  ),
+  hoverinfo = "text"
+) |>
+  layout(
+    title = "Safety Indicators and Obesity (Bubble Plot)",
+    xaxis = list(title = "Assault-related hospitalizations"),
+    yaxis = list(title = "Pedestrian injury hospitalizations")
+  )
+
+fig_bubble
+
+```
+
+
+
+## some maps
+
+```{r}
+nycd <- st_read("data/nycd_25d/nycd.shp") |>
+  mutate(BoroCD = as.character(BoroCD))
+
+df_map <- nycd %>%
+  left_join(df_analysis, by = c("BoroCD" = "id")) |>
+  st_transform(4326)
+
+ 
+# make_cd_map <- function(sf_data, z_var, z_title, colorscale = "Viridis") {
+#   plot_ly(
+#     sf_data,
+#     type = "choroplethmapbox",
+#     geojson = sf_data,        
+#     locations = ~BoroCD,       
+#     z = sf_data[[z_var]],
+#     colorscale = colorscale,
+#     marker = list(line = list(width = 0.2, color = "white")),
+#     text = ~paste0(
+#       "CD: ", BoroCD,
+#       "<br>Name: ", if ("Name" %in% names(sf_data)) Name else "",
+#       "<br>", z_title, ": ", round(sf_data[[z_var]], 2)
+#     ),
+#     hoverinfo = "text"
+#   ) %>%
+#     layout(
+#       mapbox = list(
+#         style = "carto-positron",
+#         zoom = 9.5,
+#         center = list(lon = -74.0, lat = 40.7)
+#       ),
+#       margin = list(l = 0, r = 0, t = 40, b = 0),
+#       title = paste("NYC Community District", z_title)
+#     )
+# }
+
+# fig_obesity <- make_cd_map(
+#   sf_data = df_map,
+#   z_var   = "obesity",
+#   z_title = "Obesity (%)",
+#   colorscale = "Reds"
+# )
+# fig_obesity
+
+p_obesity <- 
+  ggplot(df_map) +
+  geom_sf(aes(fill = obesity), color = NA) +
+  scale_fill_viridis_c(option = "A") +
+  labs(
+    title = "NYC Community District Obesity (%)",
+    fill  = "Obesity (%)"
+  ) +
+  theme_minimal()
+p_obesity
+
+p_poverty <- ggplot(df_map) +
+  geom_sf(aes(fill = poverty), color = NA) +
+  scale_fill_viridis_c(option = "Blues", direction = 1) +
+  labs(
+    title = "Poverty Rate by Community District",
+    fill  = "Poverty (%)"
+  ) +
+  theme_minimal()
+
+p_poverty
+
+
+p_parks <- ggplot(df_map) +
+  geom_sf(aes(fill = area_per_capita), color = NA) +
+  scale_fill_viridis_c(option = "Greens", direction = 1) +
+  labs(
+    title = "Per-Capita Park Area",
+    fill  = "log-area / capita"
+  ) +
+  theme_minimal()
+
+p_parks
+
+# fig <- plot_ly(df_map,
+#                type = "choroplethmapbox",
+#                geojson = df_map,
+#                locations = ~BoroCD,
+#                z = ~obesity,
+#                colorscale = "Reds",
+#                text = ~paste("CD:", BoroCD,
+#                              "<br>Obesity:", round(obesity,1),"%"),
+#                hoverinfo = "text") %>%
+#   layout(mapbox = list(style = "carto-positron",
+#                        zoom = 9.5,
+#                        center = list(lon = -74, lat = 40.7)),
+#          title = "NYC Community District Obesity Rate")
+# 
+# fig
+```
+
+
+# MLR 
+
+
+## fitting the MLR
+
+```{r}
+df_analysis <- 
+  df_analysis |>
+  mutate(
+    obesity = as.numeric(obesity),
+    poverty = as.numeric(poverty),
+    smoking = as.numeric(smoking),
+    binge_drink = as.numeric(binge_drink),
+    sugary_drink = as.numeric(sugary_drink),
+    pedestrian_hosp = as.numeric(pedestrian_hosp),
+    uninsured = as.numeric(uninsured)
+  )
+model_mlr <- lm(
+  obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  data = df_analysis
+)
+
+summary(model_mlr)
+```
+
+
+## MLR Diagnostic
+
+
+linear relationship and equal variances
+
+```{r}
+plot(model_mlr, which = 1)
+```
+
+
+heavy tail comparaed with normal distribution
+```{r}
+plot(model_mlr, which = 2)
+```
+
+
+There are some outliers.
+
+```{r}
+influencePlot(model_mlr)
+```
+
+
+No Obvious Multicollinearity 
+
+```{r}
+vif(model_mlr)
+```
+
+
+Theoretically, poverty and sugary_drink should have strong linear relationships, however in this dataset, they don't. Besides, the effect of poverty on obesity in this dataset is also not significant. Maybe we should pay more attention on the origin of this poverty data.   
+
+
+No Autocorrelation Between Residuals
+
+```{r}
+lmtest::dwtest(model_mlr)
+```
+
+
+## Analysing Stability (sensitivity analysis)
+
+```{r}
+df <- df_analysis
+influential_points <- c(34, 60, 61, 64, 65)
+
+df_no_inf <- df[-influential_points, ]
+
+model_mlr_no_inf <- lm(formula(model_mlr), data = df_no_inf)
+
+summary(model_mlr_no_inf)
+
+```
+
+
+
+Overall, after removing the outliers, the outcome is very similar to the former one, so mlr model is stable enough for analysing obesity.  
+Only the coefficient for pedestrian_hosp showed noticeable sensitivity, suggesting that its effect may be driven by a few extreme communities.  
+
+Influence diagnostics identified several observations with high leverage (IDs 34, 60, 61, 64, 65).
+To assess the robustness of our findings, we re-estimated the multivariable linear model after removing these influential points.
+
+The direction and significance of the main predictors remained unchanged, and p-values exhibited minimal variation.
+This indicates that the observed associations are not driven by a few extreme communities.
+
+Therefore, all observations were retained in the final analysis.  
+
+
+# Beta Regression
+
+
+## Fitting the Model
+
+
+```{r}
+n <- nrow(df_analysis)
+df_new <- df_analysis |>
+  mutate(p_obesity = (obesity/100)*(n-1)/n + 0.5/n)
+
+model_beta <- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  family = beta_family(link = "logit"),
+  data = df_new
+)
+summary(model_beta)
+```
+
+
+
+## Beta Regression Diagnostic
+
+```{r}
+res_beta <- simulateResiduals(model_beta)
+plot(res_beta)
+testDispersion(res_beta)
+testZeroInflation(res_beta)
+```
+
+
+We assessed model fit using simulated residuals generated through the DHARMa package.
+No significant deviations from model assumptions were detected. The uniform quantile-quantile plot showed no deviations (KS test p = 0.98).
+The dispersion test indicated no overdispersion (p = 0.97), and the zero-inflation test suggested no excess zeros (p = 1).
+Residuals were evenly distributed across predicted values, with no evidence of nonlinearity or heteroskedasticity.
+Overall, the diagnostic results confirm that the beta regression model provides an adequate fit to the data. 
+
+
+# Beta Mixed Model
+
+
+```{r}
+model_beta_mixed <- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured +
+    (1 | borough),
+  family = beta_family(link = "logit"),
+  data = df_new
+)
+
+summary(model_beta_mixed)
+```
+
+
+
+## Testing Whether a Mixed Model is Necessary
+
+
+```{r}
+anova(model_beta, model_beta_mixed)
+```
+
+
+We compared a beta mixed-effects model with a random intercept for borough
+to a marginal beta regression model without random effects, using a likelihood ratio test.
+The random intercept variance was essentially zero (≈ 4×10⁻¹¹), and the likelihood ratio test was not significant (p = 1).
+AIC values for the two models were nearly identical.
+These results indicate that little residual variability remains between boroughs after adjusting for covariates, so we proceeded with the simpler marginal beta regression model. 
+
+
+
+
+
+
+
+
+
+
+

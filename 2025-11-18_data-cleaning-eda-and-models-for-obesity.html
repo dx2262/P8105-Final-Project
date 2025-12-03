@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Chris" />
+
+<meta name="date" content="2025-11-18" />
+
+<title>2025-11-18_first-data-wrangling</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.11.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="introduction.html">Introduction</a>
+</li>
+<li>
+  <a href="Initial-EDA.html">EDA</a>
+</li>
+<li>
+  <a href="cleaning_eda_model_premature_mortality.html">Premature Mortality Analysis</a>
+</li>
+<li>
+  <a href="2025-11-30_model.html">Obesity Analysis</a>
+</li>
+<li>
+  <a href="discussion.html">Discussion</a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">2025-11-18_first-data-wrangling</h1>
+<h4 class="author">Chris</h4>
+<h4 class="date">2025-11-18</h4>
+
+</div>
+
+
+<div id="read-the-data" class="section level1">
+<h1>read the data</h1>
+<pre class="r"><code>df_parks &lt;- read.csv(&quot;data/Parks_Properties_20251104.csv&quot;, colClasses = &quot;character&quot;, encoding = &quot;UTF-8&quot;) |&gt;
+  select(ACQUISITIONDATE: multipolygon) |&gt;
+  clean_names() 
+
+df_chp &lt;- read_excel(&quot;data/2022-chp-pud.xlsx&quot;, sheet = &quot;CHP_all_data&quot;, skip = 1) |&gt;
+  clean_names()</code></pre>
+<pre><code>## New names:
+## • `lower_95CL` -&gt; `lower_95CL...16`
+## • `upper_95CL` -&gt; `upper_95CL...17`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...18`
+## • `lower_95CL` -&gt; `lower_95CL...20`
+## • `upper_95CL` -&gt; `upper_95CL...21`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...22`
+## • `NYC_comparison` -&gt; `NYC_comparison...24`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...26`
+## • `lower_95CL` -&gt; `lower_95CL...28`
+## • `upper_95CL` -&gt; `upper_95CL...29`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...30`
+## • `lower_95CL` -&gt; `lower_95CL...32`
+## • `upper_95CL` -&gt; `upper_95CL...33`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...34`
+## • `lower_95CL` -&gt; `lower_95CL...36`
+## • `upper_95CL` -&gt; `upper_95CL...37`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...38`
+## • `lower_95CL` -&gt; `lower_95CL...41`
+## • `upper_95CL` -&gt; `upper_95CL...42`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...43`
+## • `lower_95CL` -&gt; `lower_95CL...45`
+## • `upper_95CL` -&gt; `upper_95CL...46`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...47`
+## • `lower_95CL` -&gt; `lower_95CL...50`
+## • `upper_95CL` -&gt; `upper_95CL...51`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...52`
+## • `lower_95CL` -&gt; `lower_95CL...55`
+## • `upper_95CL` -&gt; `upper_95CL...56`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...57`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...58`
+## • `lower_95CL` -&gt; `lower_95CL...63`
+## • `upper_95CL` -&gt; `upper_95CL...64`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...65`
+## • `lower_95CL` -&gt; `lower_95CL...68`
+## • `upper_95CL` -&gt; `upper_95CL...69`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...70`
+## • `NYC_comparison` -&gt; `NYC_comparison...73`
+## • `lower_95CL` -&gt; `lower_95CL...75`
+## • `upper_95CL` -&gt; `upper_95CL...76`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...77`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...81`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...83`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...86`
+## • `lower_95CL` -&gt; `lower_95CL...88`
+## • `upper_95CL` -&gt; `upper_95CL...89`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...90`
+## • `lower_95CL` -&gt; `lower_95CL...93`
+## • `upper_95CL` -&gt; `upper_95CL...94`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...95`
+## • `lower_95CL` -&gt; `lower_95CL...98`
+## • `upper_95CL` -&gt; `upper_95CL...99`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...100`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...101`
+## • `lower_95CL` -&gt; `lower_95CL...104`
+## • `upper_95CL` -&gt; `upper_95CL...105`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...106`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...107`
+## • `lower_95CL` -&gt; `lower_95CL...110`
+## • `upper_95CL` -&gt; `upper_95CL...111`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...112`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...113`
+## • `lower_95CL` -&gt; `lower_95CL...116`
+## • `upper_95CL` -&gt; `upper_95CL...117`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...118`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...119`
+## • `lower_95CL` -&gt; `lower_95CL...122`
+## • `upper_95CL` -&gt; `upper_95CL...123`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...124`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...125`
+## • `lower_95CL` -&gt; `lower_95CL...128`
+## • `upper_95CL` -&gt; `upper_95CL...129`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...130`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...131`
+## • `lower_95CL` -&gt; `lower_95CL...134`
+## • `upper_95CL` -&gt; `upper_95CL...135`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...136`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...137`
+## • `lower_95CL` -&gt; `lower_95CL...139`
+## • `upper_95CL` -&gt; `upper_95CL...140`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...141`
+## • `lower_95CL` -&gt; `lower_95CL...143`
+## • `upper_95CL` -&gt; `upper_95CL...144`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...145`
+## • `lower_95CL` -&gt; `lower_95CL...150`
+## • `upper_95CL` -&gt; `upper_95CL...151`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...152`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...153`
+## • `lower_95CL` -&gt; `lower_95CL...156`
+## • `upper_95CL` -&gt; `upper_95CL...157`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...158`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...159`
+## • `lower_95CL` -&gt; `lower_95CL...162`
+## • `upper_95CL` -&gt; `upper_95CL...163`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...164`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...165`
+## • `lower_95CL` -&gt; `lower_95CL...168`
+## • `upper_95CL` -&gt; `upper_95CL...169`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...170`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...171`
+## • `lower_95CL` -&gt; `lower_95CL...177`
+## • `upper_95CL` -&gt; `upper_95CL...178`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...179`
+## • `NYC_Comparison_Pvalues` -&gt; `NYC_Comparison_Pvalues...180`
+## • `lower_95CL` -&gt; `lower_95CL...182`
+## • `upper_95CL` -&gt; `upper_95CL...183`
+## • `NYC_comparison` -&gt; `NYC_comparison...184`
+## • `lower_95CL` -&gt; `lower_95CL...187`
+## • `upper_95CL` -&gt; `upper_95CL...188`
+## • `NYC_comparison` -&gt; `NYC_comparison...189`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...192`
+## • `lower_95CL` -&gt; `lower_95CL...194`
+## • `upper_95CL` -&gt; `upper_95CL...195`
+## • `NYC_Comparison` -&gt; `NYC_Comparison...196`</code></pre>
+<pre class="r"><code>df_prem_death &lt;- read_excel(&quot;data/2022-chp-pud.xlsx&quot;, sheet = &quot;Cause_of_premature_death&quot;) |&gt;
+  clean_names()
+
+df_cancer &lt;- read_excel(&quot;data/2022-chp-pud.xlsx&quot;, sheet = &quot;Cancer_data_ranked&quot;) |&gt;
+  clean_names()</code></pre>
+</div>
+<div id="one-park-multiple-ids" class="section level1">
+<h1>one park, multiple IDs</h1>
+<pre class="r"><code>df_parks &lt;- 
+  df_parks |&gt;
+  rename(id = communityboard) 
+
+df_parks_community &lt;-
+  df_parks |&gt;
+  mutate(
+    acres = as.numeric(acres),
+    
+    id = as.factor(id)
+  ) |&gt;
+  group_by(id) |&gt;
+  summarise(
+    sum_acres = sum(acres, na.rm = TRUE),
+    mean_acres = mean(acres, na.rm = TRUE),
+    n_parks = n()
+  ) |&gt;
+  filter(sum_acres &gt; 0) |&gt; # only use observations with positive areas
+  mutate(
+    id = as.character(id),
+    n_split = lengths(strsplit(id, &quot;,&quot;))
+  ) |&gt;
+  separate_rows(id, sep = &quot;,&quot;) |&gt;
+  mutate(
+    id = trimws(id),
+    sum_acres_adj = sum_acres / n_split,
+    n_parks_adj = n_parks / n_split
+  ) |&gt;
+  group_by(id) |&gt;
+  summarise(
+    sum_acres = sum(sum_acres_adj, na.rm = TRUE),
+    n_parks = sum(n_parks_adj, na.rm = TRUE),
+    mean_acres = sum_acres / n_parks
+  ) |&gt;
+  filter(sum_acres != &quot;Inf&quot;)</code></pre>
+<pre><code>## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `acres = as.numeric(acres)`.
+## Caused by warning:
+## ! NAs introduced by coercion</code></pre>
+<pre class="r"><code># df_parks_borough &lt;-
+#   df_parks |&gt;
+#   filter(
+#     borough == c(&quot;B&quot;, &quot;M&quot;, &quot;Q&quot;, &quot;R&quot;, &quot;X&quot;)
+#   ) |&gt;
+#   mutate(
+#     borough = as.factor(borough),
+#     acres = as.numeric(acres)
+#   ) |&gt;
+#   group_by(borough) |&gt;
+#   summarise(
+#     sum_acres = sum(acres, na.rm = TRUE),
+#     mean_acres = mean(acres, na.rm = TRUE),
+#     n_parks = n()
+#   ) |&gt;
+#   rename(id = borough)
+# 
+# df_parks_all_dist &lt;-
+#   bind_rows(df_parks_borough, df_parks_community)</code></pre>
+<pre class="r"><code># df_parks_split &lt;-
+#   df_parks_all_dist |&gt;
+#   mutate(
+#     id = as.character(id),
+#     n_split = lengths(strsplit(id, &quot;,&quot;))
+#   ) |&gt;
+#   separate_rows(id, sep = &quot;,&quot;) |&gt;
+#   mutate(
+#     id = trimws(id),
+#     sum_acres_adj = sum_acres / n_split,
+#     n_parks_adj = n_parks / n_split
+#   ) |&gt;
+#   group_by(id) |&gt;
+#   summarise(
+#     sum_acres = sum(sum_acres_adj, na.rm = TRUE),
+#     n_parks = sum(n_parks_adj, na.rm = TRUE),
+#     mean_acres = sum_acres / n_parks
+#   )</code></pre>
+</div>
+<div id="combine-the-area-df-into-the-chp-pud" class="section level1">
+<h1>combine the area df into the chp-pud</h1>
+<pre class="r"><code># get rid of reliability index
+
+df_chp_clean &lt;- df_chp |&gt;
+  select(-contains(&quot;95cl&quot;), -contains(&quot;nyc_comparison&quot;), -contains(&quot;reliability_note&quot;)) |&gt;
+  filter(id != c(0, 1, 2, 3, 4, 5))</code></pre>
+<pre><code>## Warning: There was 1 warning in `filter()`.
+## ℹ In argument: `id != c(0, 1, 2, 3, 4, 5)`.
+## Caused by warning in `id != c(0, 1, 2, 3, 4, 5)`:
+## ! longer object length is not a multiple of shorter object length</code></pre>
+<pre class="r"><code>  #   mutate(
+  #   id = recode(as.character(id),
+  #                    &quot;1&quot; = &quot;M&quot;,
+  #                    &quot;2&quot; = &quot;X&quot;,
+  #                    &quot;3&quot; = &quot;B&quot;,
+  #                    &quot;4&quot; = &quot;Q&quot;,
+  #                    &quot;5&quot; = &quot;R&quot;),
+  #  
+  # )
+df_chp_clean &lt;- df_chp_clean |&gt;
+  mutate(uninsured = as.numeric(uninsured),
+         uninsured = round(uninsured, 2))</code></pre>
+<pre><code>## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `uninsured = as.numeric(uninsured)`.
+## Caused by warning:
+## ! NAs introduced by coercion</code></pre>
+<pre class="r"><code># create a variable map for df_chp_clean
+var_map &lt;- tribble(
+  ~variable,                 ~category,
+  
+  &quot;id&quot;,                      &quot;geo&quot;,
+  &quot;borough&quot;,                 &quot;geo&quot;,
+  &quot;name&quot;,                    &quot;geo&quot;,
+  &quot;overall_pop&quot;,             &quot;population&quot;,
+
+  
+  &quot;race_white&quot;,              &quot;demographic_race&quot;,
+  &quot;race_black&quot;,              &quot;demographic_race&quot;,
+  &quot;race_latino&quot;,             &quot;demographic_race&quot;,
+  &quot;race_asian&quot;,              &quot;demographic_race&quot;,
+  &quot;race_other&quot;,              &quot;demographic_race&quot;,
+  &quot;age0to17&quot;,                &quot;demographic_age&quot;,
+  &quot;age18to24&quot;,               &quot;demographic_age&quot;,
+  &quot;age25to44&quot;,               &quot;demographic_age&quot;,
+  &quot;age45to64&quot;,               &quot;demographic_age&quot;,
+  &quot;age65plus&quot;,               &quot;demographic_age&quot;,
+  &quot;born_outside_us&quot;,         &quot;demographic_migration&quot;,
+  &quot;ltd_eng_prof&quot;,            &quot;demographic_language&quot;,
+
+  
+  &quot;edu_did_not_complete_hs&quot;,      &quot;SES_education&quot;,
+  &quot;edu_hs_grad_some_college&quot;,     &quot;SES_education&quot;,
+  &quot;edu_college_degree_and_higher&quot;,&quot;SES_education&quot;,
+  &quot;poverty&quot;,                      &quot;SES_economic&quot;,
+  &quot;unemployment&quot;,                 &quot;SES_economic&quot;,
+  &quot;rent_burden&quot;,                  &quot;SES_economic&quot;,
+  &quot;school_absent&quot;,                &quot;education_outcome&quot;,
+  &quot;on_time_hs_grad&quot;,              &quot;education_outcome&quot;,
+
+ 
+  &quot;homes_ac&quot;,                     &quot;housing_environment&quot;,
+  &quot;homes_no_defects&quot;,             &quot;housing_environment&quot;,
+  &quot;air_pollution&quot;,                &quot;physical_environment&quot;,
+  &quot;ratio_bodega_supermarket&quot;,     &quot;food_environment&quot;,
+  &quot;farmers_markets&quot;,              &quot;food_environment&quot;,
+
+ 
+  &quot;helpful_neighbor&quot;,             &quot;social_environment&quot;,
+  &quot;assault_hosp&quot;,                 &quot;safety_violence&quot;,
+  &quot;jail_incarceration&quot;,           &quot;safety_justice&quot;,
+  &quot;pedestrian_hosp&quot;,              &quot;safety_transport&quot;,
+
+ 
+  &quot;physical_activity&quot;,            &quot;behavior&quot;,
+  &quot;fruit_veg&quot;,                    &quot;behavior&quot;,
+  &quot;sugary_drink&quot;,                 &quot;behavior&quot;,
+  &quot;smoking&quot;,                      &quot;behavior&quot;,
+  &quot;binge_drink&quot;,                  &quot;behavior&quot;,
+
+  
+  &quot;uninsured&quot;,                    &quot;access_care&quot;,
+  &quot;unmet_med_care&quot;,               &quot;access_care&quot;,
+  &quot;hpv_vaccination_all&quot;,          &quot;preventive_care&quot;,
+  &quot;flu_vaccination&quot;,              &quot;preventive_care&quot;,
+
+  
+  &quot;preterm_births&quot;,               &quot;maternal_child&quot;,
+  &quot;teen_births&quot;,                  &quot;maternal_child&quot;,
+  &quot;child_obesity&quot;,                &quot;maternal_child&quot;,
+  &quot;infant_mort&quot;,                  &quot;maternal_child&quot;,
+
+  
+  &quot;obesity&quot;,                      &quot;chronic_disease&quot;,
+  &quot;diabetes&quot;,                     &quot;chronic_disease&quot;,
+  &quot;hypertension&quot;,                 &quot;chronic_disease&quot;,
+  &quot;hiv_diagnoses&quot;,                &quot;infectious_disease&quot;,
+  &quot;hep_c_reports&quot;,                &quot;infectious_disease&quot;,
+  &quot;avoidable_child_hosp&quot;,         &quot;hospitalization&quot;,
+  &quot;avoidable_adult_hosp&quot;,         &quot;hospitalization&quot;,
+  &quot;falls_hosp&quot;,                   &quot;injury_hospitalization&quot;,
+  &quot;psych_hosp&quot;,                   &quot;mental_health&quot;,
+
+  
+  &quot;avertable_death&quot;,              &quot;mortality&quot;,
+  &quot;premature_mort_rate&quot;,          &quot;mortality&quot;,
+  &quot;premature_mort_number&quot;,        &quot;mortality&quot;,
+  &quot;life_expectancy&quot;,              &quot;global_health&quot;,
+  &quot;self_rep_health&quot;,              &quot;global_health&quot;
+)</code></pre>
+<pre class="r"><code># demographic data
+var_demo &lt;- var_map |&gt;
+  filter(category %in% c(&quot;geo&quot;, &quot;population&quot;, &quot;demographic_race&quot;, &quot;demographic_age&quot;,&quot;demographic_migration&quot;, &quot;demographic_language&quot;)) |&gt;
+  pull(variable)
+
+df_demographic &lt;-
+  df_chp_clean |&gt;
+  select(all_of(var_demo)) |&gt;
+  mutate(
+    age0to24 = age0to17 + age18to24,
+    age25to64 = age25to44 + age45to64,
+    race_others = race_asian + race_other
+  ) |&gt;
+  select(-race_asian, -race_other, -age0to17, -age18to24, -age25to44, -age45to64) |&gt;
+  relocate(
+    c(age0to24, age25to64), .before = age65plus
+  ) |&gt;
+  relocate(race_others, .after = race_latino)
+
+
+# education condition
+var_edu &lt;- var_map |&gt;
+  filter(category %in% c(&quot;geo&quot;, &quot;SES_education&quot;)) |&gt;
+  pull(variable)
+  
+df_education &lt;- df_chp_clean |&gt;
+  select(all_of(var_edu)) |&gt;
+  mutate(edu_no_college_degree = edu_did_not_complete_hs + edu_hs_grad_some_college) |&gt;
+  select(-edu_did_not_complete_hs, -edu_hs_grad_some_college)
+
+
+# economic condition
+var_eco &lt;- var_map |&gt;
+  filter(category %in% c(&quot;geo&quot;,&quot;SES_economic&quot;))|&gt;
+  pull(variable)
+
+df_economy &lt;- df_chp_clean |&gt;
+  select(all_of(var_eco)) |&gt;
+  select(-rent_burden)
+
+
+# food condition
+var_food &lt;- var_map |&gt;
+  filter(category %in% c(&quot;geo&quot;, &quot;food_environment&quot;, &quot;behavior&quot;)) |&gt;
+  pull(variable)
+
+df_food &lt;- df_chp_clean |&gt;
+  select(all_of(var_food))|&gt;
+  select(-ratio_bodega_supermarket, -physical_activity, -smoking, -binge_drink)
+
+
+# smoking and drinking
+df_smoke_drink &lt;- df_chp_clean |&gt;
+  select(id, borough, name, smoking, binge_drink)
+
+
+# activity
+df_activity &lt;- df_chp_clean |&gt;
+  select(id, borough, name, physical_activity)
+
+
+# safety condition
+var_safety &lt;- var_map |&gt;
+  filter(category %in% c(&quot;geo&quot;, &quot;safety_violence&quot;, &quot;social_environment&quot;, &quot;safety_transport&quot;)) |&gt;
+  pull(variable)
+
+df_safety &lt;- df_chp_clean |&gt;
+  select(all_of(var_safety))
+
+
+# medical availability
+df_med_avail &lt;- df_chp_clean |&gt;
+  select(id, borough, name, uninsured) 
+
+
+# health conditions
+df_health &lt;- df_chp_clean |&gt;
+  select(id, obesity, life_expectancy)
+
+
+dfs &lt;- list(df_demographic, df_health, df_parks_community, df_education, df_economy, df_food, df_smoke_drink, df_activity, df_safety, df_med_avail)
+
+
+# get a final dataframe for analysis
+df_analysis &lt;- reduce(dfs, left_join, by = &quot;id&quot;) |&gt;
+  select(-contains(&quot;borough.x.x&quot;), -contains(&quot;name.x.x&quot;), -contains(&quot;borough.y&quot;), -contains(&quot;name.y&quot;)) |&gt;
+  rename(
+    borough = borough.x,
+    name = name.x
+  ) |&gt;
+  filter(overall_pop != 0) |&gt;
+  mutate(
+    area_per_capita = (sum_acres / overall_pop) * 100000,
+    log_area = log(area_per_capita + 1)) </code></pre>
+<pre class="r"><code>library(patchwork)
+library(sf)</code></pre>
+<pre><code>## Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE</code></pre>
+<pre class="r"><code>library(betareg)</code></pre>
+<pre><code>## Warning: package &#39;betareg&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(lmerTest)</code></pre>
+<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Loading required package: lme4</code></pre>
+<pre><code>## Warning: package &#39;lme4&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lmerTest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:lme4&#39;:
+## 
+##     lmer</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     step</code></pre>
+<pre class="r"><code>library(car)</code></pre>
+<pre><code>## Warning: package &#39;car&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## Warning: package &#39;carData&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     some</code></pre>
+<pre class="r"><code>library(effects)</code></pre>
+<pre><code>## Warning: package &#39;effects&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## lattice theme set by effectsTheme()
+## See ?effectsTheme for details.</code></pre>
+<pre class="r"><code>library(DHARMa)</code></pre>
+<pre><code>## Warning: package &#39;DHARMa&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## This is DHARMa 0.4.7. For overview type &#39;?DHARMa&#39;. For recent changes, type news(package = &#39;DHARMa&#39;)</code></pre>
+<pre class="r"><code>library(glmmTMB)</code></pre>
+<pre><code>## Warning: package &#39;glmmTMB&#39; was built under R version 4.5.2</code></pre>
+</div>
+<div id="descriptive-analysis" class="section level1">
+<h1>descriptive analysis</h1>
+<pre class="r"><code>summary(df_analysis)</code></pre>
+<pre><code>##       id              borough              name            overall_pop    
+##  Length:59          Length:59          Length:59          Min.   : 55096  
+##  Class :character   Class :character   Class :character   1st Qu.:110992  
+##  Mode  :character   Mode  :character   Mode  :character   Median :144859  
+##                                                           Mean   :143458  
+##                                                           3rd Qu.:178309  
+##                                                           Max.   :265650  
+##                                                                           
+##    race_white       race_black      race_latino      race_others    
+##  Min.   : 0.942   Min.   : 0.660   Min.   : 6.669   Min.   : 1.471  
+##  1st Qu.: 8.523   1st Qu.: 3.659   1st Qu.:12.876   1st Qu.: 7.019  
+##  Median :25.185   Median :12.481   Median :22.468   Median :10.972  
+##  Mean   :31.113   Mean   :22.573   Mean   :30.247   Mean   :16.067  
+##  3rd Qu.:54.306   3rd Qu.:30.701   3rd Qu.:44.953   3rd Qu.:20.788  
+##  Max.   :81.072   Max.   :87.757   Max.   :77.135   Max.   :56.085  
+##                                                                     
+##     age0to24       age25to64       age65plus      born_outside_us
+##  Min.   :16.09   Min.   :44.86   Min.   : 9.112   Min.   :16.00  
+##  1st Qu.:25.02   1st Qu.:52.73   1st Qu.:13.354   1st Qu.:27.00  
+##  Median :29.00   Median :54.42   Median :15.366   Median :34.00  
+##  Mean   :28.80   Mean   :55.22   Mean   :15.978   Mean   :35.92  
+##  3rd Qu.:32.45   3rd Qu.:56.68   3rd Qu.:18.676   3rd Qu.:43.50  
+##  Max.   :43.41   Max.   :67.89   Max.   :25.290   Max.   :63.00  
+##                                                                  
+##   ltd_eng_prof      obesity       life_expectancy   sum_acres      
+##  Min.   : 5.00   Min.   : 7.865   Min.   :75.98   Min.   :  14.99  
+##  1st Qu.:10.50   1st Qu.:18.070   1st Qu.:80.67   1st Qu.: 138.86  
+##  Median :22.00   Median :25.914   Median :82.56   Median : 253.33  
+##  Mean   :21.97   Mean   :25.231   Mean   :82.57   Mean   : 450.30  
+##  3rd Qu.:29.00   3rd Qu.:32.273   3rd Qu.:84.90   3rd Qu.: 477.96  
+##  Max.   :53.00   Max.   :40.870   Max.   :87.74   Max.   :3473.98  
+##                                                                    
+##     n_parks         mean_acres      edu_college_degree_and_higher
+##  Min.   : 9.167   Min.   : 0.6856   Min.   :18.00                
+##  1st Qu.:21.708   1st Qu.: 3.5769   1st Qu.:32.50                
+##  Median :32.000   Median : 9.8681   Median :40.00                
+##  Mean   :34.695   Mean   :13.7477   Mean   :43.83                
+##  3rd Qu.:44.500   3rd Qu.:19.7653   3rd Qu.:49.00                
+##  Max.   :83.000   Max.   :85.7410   Max.   :85.00                
+##                                                                  
+##  edu_no_college_degree    poverty       unemployment    farmers_markets
+##  Min.   :15.00         Min.   : 6.10   Min.   : 3.000   Min.   :0.000  
+##  1st Qu.:51.00         1st Qu.:14.10   1st Qu.: 5.000   1st Qu.:1.000  
+##  Median :60.00         Median :19.20   Median : 6.000   Median :2.000  
+##  Mean   :56.24         Mean   :19.24   Mean   : 6.661   Mean   :2.305  
+##  3rd Qu.:67.50         3rd Qu.:23.35   3rd Qu.: 8.000   3rd Qu.:3.000  
+##  Max.   :82.00         Max.   :35.40   Max.   :13.000   Max.   :8.000  
+##                                                                        
+##    fruit_veg      sugary_drink       smoking        binge_drink    
+##  Min.   :76.03   Min.   : 6.796   Min.   : 4.256   Min.   : 5.838  
+##  1st Qu.:86.74   1st Qu.:17.318   1st Qu.: 8.784   1st Qu.:14.643  
+##  Median :89.27   Median :23.089   Median :11.338   Median :18.505  
+##  Mean   :89.17   Mean   :23.074   Mean   :11.838   Mean   :18.247  
+##  3rd Qu.:92.79   3rd Qu.:28.691   3rd Qu.:14.756   3rd Qu.:21.360  
+##  Max.   :98.74   Max.   :42.444   Max.   :24.827   Max.   :31.417  
+##                                                                    
+##  physical_activity helpful_neighbor  assault_hosp    pedestrian_hosp
+##  Min.   :59.46     Min.   :65.62    Min.   :  8.00   Min.   : 9.00  
+##  1st Qu.:69.84     1st Qu.:73.27    1st Qu.: 25.00   1st Qu.:17.00  
+##  Median :73.24     Median :77.39    Median : 42.00   Median :21.00  
+##  Mean   :73.76     Mean   :76.72    Mean   : 60.97   Mean   :22.22  
+##  3rd Qu.:76.35     3rd Qu.:81.35    3rd Qu.: 83.50   3rd Qu.:26.00  
+##  Max.   :86.98     Max.   :85.79    Max.   :186.00   Max.   :47.00  
+##                                                                     
+##    uninsured      area_per_capita       log_area    
+##  Min.   : 3.430   Min.   :   9.932   Min.   :2.392  
+##  1st Qu.: 8.975   1st Qu.:  92.026   1st Qu.:4.532  
+##  Median :12.190   Median : 189.513   Median :5.250  
+##  Mean   :13.137   Mean   : 315.987   Mean   :5.171  
+##  3rd Qu.:16.795   3rd Qu.: 347.163   3rd Qu.:5.853  
+##  Max.   :32.830   Max.   :2278.411   Max.   :7.732  
+##  NA&#39;s   :1</code></pre>
+<div id="linear-relationship-or-not" class="section level2">
+<h2>linear relationship or not?</h2>
+<pre class="r"><code># df_analysis |&gt;
+#   ggplot(aes(x = log_area, y = obesity)) +
+#   geom_point(color = &quot;#6a5acd&quot;)
+# 
+# lm1 &lt;- lm(obesity ~ log_area, data = df_analysis)
+# plot(lm1)
+# summary(lm1)</code></pre>
+<p>There are no obvious relationships between log_area and obesity.</p>
+<pre class="r"><code>plot_ly(
+  df_analysis, 
+  x = ~log_area, 
+  y = ~obesity,
+  type = &#39;scatter&#39;, 
+  mode = &#39;markers&#39;,
+  color = ~borough,
+  text = ~paste(&quot;Community: &quot;, name,
+               &quot;&lt;br&gt;Borough: &quot;, borough,
+               &quot;&lt;br&gt;Log Area: &quot;, log_area,
+               &quot;&lt;br&gt;Obesity: &quot;, obesity, &quot;%&quot;)
+  ) |&gt;
+  layout(title = &quot;Obesity vs Park Access&quot;,
+         xaxis = list(title = &quot;Log Area&quot;),
+         yaxis = list(title = &quot;Obesity&quot;))</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-501a37ec2d9192e7d7fd" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-501a37ec2d9192e7d7fd">{"x":{"visdat":{"286433c1581e":["function () ","plotlyVisDat"]},"cur_data":"286433c1581e","attrs":{"286433c1581e":{"x":{},"y":{},"mode":"markers","text":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Obesity vs Park Access","xaxis":{"domain":[0,1],"automargin":true,"title":"Log Area"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Obesity"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[4.252808353378648,5.2359530427614871,5.1519240425704647,4.7344710214085568,3.0962545528742611,5.846036893996561,5.3108614186345848,5.8081004613544298,5.5753868602270096,6.4036416542556118,5.9084950532424907,5.3085237710712363],"y":[35.7515359043187,35.7515359043187,40.8701068972046,28.163586279087902,40.203512975758798,40.8701068972046,32.510821715117899,23.274867116352699,40.275979214357498,27.7006964593104,31.940126936306001,32.575168501672302],"mode":"markers","text":["Community:  Mott Haven and Melrose <br>Borough:  Bronx <br>Log Area:  4.25280835337865 <br>Obesity:  35.7515359043187 %","Community:  Hunts Point and Longwood <br>Borough:  Bronx <br>Log Area:  5.23595304276149 <br>Obesity:  35.7515359043187 %","Community:  Morrisania and Crotona <br>Borough:  Bronx <br>Log Area:  5.15192404257046 <br>Obesity:  40.8701068972046 %","Community:  Highbridge and Concourse <br>Borough:  Bronx <br>Log Area:  4.73447102140856 <br>Obesity:  28.1635862790879 %","Community:  Fordham and University Heights <br>Borough:  Bronx <br>Log Area:  3.09625455287426 <br>Obesity:  40.2035129757588 %","Community:  Belmont and East Tremont <br>Borough:  Bronx <br>Log Area:  5.84603689399656 <br>Obesity:  40.8701068972046 %","Community:  Kingsbridge Heights and Bedford <br>Borough:  Bronx <br>Log Area:  5.31086141863458 <br>Obesity:  32.5108217151179 %","Community:  Riverdale and Fieldston <br>Borough:  Bronx <br>Log Area:  5.80810046135443 <br>Obesity:  23.2748671163527 %","Community:  Parkchester and Soundview <br>Borough:  Bronx <br>Log Area:  5.57538686022701 <br>Obesity:  40.2759792143575 %","Community:  Throgs Neck and Co-op City <br>Borough:  Bronx <br>Log Area:  6.40364165425561 <br>Obesity:  27.7006964593104 %","Community:  Morris Park and Bronxdale <br>Borough:  Bronx <br>Log Area:  5.90849505324249 <br>Obesity:  31.940126936306 %","Community:  Williamsbridge and Baychester <br>Borough:  Bronx <br>Log Area:  5.30852377107124 <br>Obesity:  32.5751685016723 %"],"type":"scatter","name":"Bronx","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[4.3180390090707519,4.4583051638906293,3.7330580705107814,3.7507444149395295,5.6096601396674952,5.2886987048713561,4.9142545091321992,5.4486829464130802,5.2363318269802752,5.7655145164565162,4.2086691267323895,3.1749888574556513,6.2458391942956304,4.7032859998228904,6.1118457839015266,4.0931388746005917,2.3916969510562756,6.295601092551582],"y":[18.264978384760099,12.378870288005601,32.035993247390401,15.3490155588885,30.5925488247156,16.6516171647501,19.022352160356601,18.978393305737502,29.975612846479201,17.874952019509902,16.251983604530398,23.850030247638198,28.487883419800099,27.637187453657202,23.255476297166801,40.601539137270301,34.4294323359074,40.7183724911798],"mode":"markers","text":["Community:  Greenpoint and Williamsburg <br>Borough:  Brooklyn <br>Log Area:  4.31803900907075 <br>Obesity:  18.2649783847601 %","Community:  Fort Greene and Brooklyn Heights <br>Borough:  Brooklyn <br>Log Area:  4.45830516389063 <br>Obesity:  12.3788702880056 %","Community:  Bedford Stuyvesant <br>Borough:  Brooklyn <br>Log Area:  3.73305807051078 <br>Obesity:  32.0359932473904 %","Community:  Bushwick <br>Borough:  Brooklyn <br>Log Area:  3.75074441493953 <br>Obesity:  15.3490155588885 %","Community:  East New York and Starrett City <br>Borough:  Brooklyn <br>Log Area:  5.6096601396675 <br>Obesity:  30.5925488247156 %","Community:  Park Slope and Carroll Gardens <br>Borough:  Brooklyn <br>Log Area:  5.28869870487136 <br>Obesity:  16.6516171647501 %","Community:  Sunset Park <br>Borough:  Brooklyn <br>Log Area:  4.9142545091322 <br>Obesity:  19.0223521603566 %","Community:  Crown Heights and Prospect Heights <br>Borough:  Brooklyn <br>Log Area:  5.44868294641308 <br>Obesity:  18.9783933057375 %","Community:  South Crown Heights and Lefferts Gardens <br>Borough:  Brooklyn <br>Log Area:  5.23633182698028 <br>Obesity:  29.9756128464792 %","Community:  Bay Ridge and Dyker Heights <br>Borough:  Brooklyn <br>Log Area:  5.76551451645652 <br>Obesity:  17.8749520195099 %","Community:  Bensonhurst <br>Borough:  Brooklyn <br>Log Area:  4.20866912673239 <br>Obesity:  16.2519836045304 %","Community:  Borough Park <br>Borough:  Brooklyn <br>Log Area:  3.17498885745565 <br>Obesity:  23.8500302476382 %","Community:  Coney Island <br>Borough:  Brooklyn <br>Log Area:  6.24583919429563 <br>Obesity:  28.4878834198001 %","Community:  Flatbush and Midwood <br>Borough:  Brooklyn <br>Log Area:  4.70328599982289 <br>Obesity:  27.6371874536572 %","Community:  Sheepshead Bay <br>Borough:  Brooklyn <br>Log Area:  6.11184578390153 <br>Obesity:  23.2554762971668 %","Community:  Brownsville <br>Borough:  Brooklyn <br>Log Area:  4.09313887460059 <br>Obesity:  40.6015391372703 %","Community:  East Flatbush <br>Borough:  Brooklyn <br>Log Area:  2.39169695105628 <br>Obesity:  34.4294323359074 %","Community:  Flatlands and Canarsie <br>Borough:  Brooklyn <br>Log Area:  6.29560109255158 <br>Obesity:  40.7183724911798 %"],"type":"scatter","name":"Brooklyn","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[4.7756669419147482,3.3972923314582779,4.2861028986212615,2.920303064864946,5.663162969959302,4.8101970586424292,5.2370174948611439,4.5038642439976924,5.4076256432713077,5.4385698934328062,6.3275722233817007,5.7819371102271973],"y":[7.8649414223059599,7.8649414223059599,13.779410535816,12.137498196609799,12.137498196609799,10.375919016240999,21.113832443754301,10.266908965344401,22.819808386303102,34.856031479297997,30.251108900109401,25.9802358484195],"mode":"markers","text":["Community:  Financial District <br>Borough:  Manhattan <br>Log Area:  4.77566694191475 <br>Obesity:  7.86494142230596 %","Community:  Greenwich Village and Soho <br>Borough:  Manhattan <br>Log Area:  3.39729233145828 <br>Obesity:  7.86494142230596 %","Community:  Lower East Side and Chinatown <br>Borough:  Manhattan <br>Log Area:  4.28610289862126 <br>Obesity:  13.779410535816 %","Community:  Clinton and Chelsea <br>Borough:  Manhattan <br>Log Area:  2.92030306486495 <br>Obesity:  12.1374981966098 %","Community:  Midtown <br>Borough:  Manhattan <br>Log Area:  5.6631629699593 <br>Obesity:  12.1374981966098 %","Community:  Stuyvesant Town and Turtle Bay <br>Borough:  Manhattan <br>Log Area:  4.81019705864243 <br>Obesity:  10.375919016241 %","Community:  Upper West Side <br>Borough:  Manhattan <br>Log Area:  5.23701749486114 <br>Obesity:  21.1138324437543 %","Community:  Upper East Side <br>Borough:  Manhattan <br>Log Area:  4.50386424399769 <br>Obesity:  10.2669089653444 %","Community:  Morningside Heights and Hamilton Heights <br>Borough:  Manhattan <br>Log Area:  5.40762564327131 <br>Obesity:  22.8198083863031 %","Community:  Central Harlem <br>Borough:  Manhattan <br>Log Area:  5.43856989343281 <br>Obesity:  34.856031479298 %","Community:  East Harlem <br>Borough:  Manhattan <br>Log Area:  6.3275722233817 <br>Obesity:  30.2511089001094 %","Community:  Washington Heights and Inwood <br>Borough:  Manhattan <br>Log Area:  5.7819371102272 <br>Obesity:  25.9802358484195 %"],"type":"scatter","name":"Manhattan","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[4.5841412913105719,3.5537713795393411,5.0288018339320102,4.9484963155928856,5.2497201647947787,5.8592598852031301,5.9872931510931444,6.0567165311214879,4.5610789083139904,5.4223555341889407,6.8100322201607675,4.9852551367022775,6.0343148128292654,7.3887795972285062],"y":[20.479535086196801,17.084649386526301,25.0081397823175,25.914341973611599,27.729358856325302,18.728412363637599,11.935570358634701,22.624446813968898,26.345822422710999,34.537537001853003,10.969053959003899,24.817491194969801,40.127530433086498,30.779159696201901],"mode":"markers","text":["Community:  Long Island City and Astoria <br>Borough:  Queens <br>Log Area:  4.58414129131057 <br>Obesity:  20.4795350861968 %","Community:  Woodside and Sunnyside <br>Borough:  Queens <br>Log Area:  3.55377137953934 <br>Obesity:  17.0846493865263 %","Community:  Jackson Heights <br>Borough:  Queens <br>Log Area:  5.02880183393201 <br>Obesity:  25.0081397823175 %","Community:  Elmhurst and Corona <br>Borough:  Queens <br>Log Area:  4.94849631559289 <br>Obesity:  25.9143419736116 %","Community:  Ridgewood and Maspeth <br>Borough:  Queens <br>Log Area:  5.24972016479478 <br>Obesity:  27.7293588563253 %","Community:  Rego Park and Forest Hills <br>Borough:  Queens <br>Log Area:  5.85925988520313 <br>Obesity:  18.7284123636376 %","Community:  Flushing and Whitestone <br>Borough:  Queens <br>Log Area:  5.98729315109314 <br>Obesity:  11.9355703586347 %","Community:  Hillcrest and Fresh Meadows <br>Borough:  Queens <br>Log Area:  6.05671653112149 <br>Obesity:  22.6244468139689 %","Community:  Kew Gardens and Woodhaven <br>Borough:  Queens <br>Log Area:  4.56107890831399 <br>Obesity:  26.345822422711 %","Community:  South Ozone Park and Howard Beach <br>Borough:  Queens <br>Log Area:  5.42235553418894 <br>Obesity:  34.537537001853 %","Community:  Bayside and Little Neck <br>Borough:  Queens <br>Log Area:  6.81003222016077 <br>Obesity:  10.9690539590039 %","Community:  Jamaica and Hollis <br>Borough:  Queens <br>Log Area:  4.98525513670228 <br>Obesity:  24.8174911949698 %","Community:  Queens Village <br>Borough:  Queens <br>Log Area:  6.03431481282927 <br>Obesity:  40.1275304330865 %","Community:  Rockaway and Broad Channel <br>Borough:  Queens <br>Log Area:  7.38877959722851 <br>Obesity:  30.7791596962019 %"],"type":"scatter","name":"Queens","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[6.2674041104095632,7.7316723387392097,7.6803555686841687],"y":[33.533867040159997,24.041819480036299,28.2624703959812],"mode":"markers","text":["Community:  St. George and Stapleton <br>Borough:  Staten Island <br>Log Area:  6.26740411040956 <br>Obesity:  33.53386704016 %","Community:  South Beach and Willowbrook <br>Borough:  Staten Island <br>Log Area:  7.73167233873921 <br>Obesity:  24.0418194800363 %","Community:  Tottenville and Great Kills <br>Borough:  Staten Island <br>Log Area:  7.68035556868417 <br>Obesity:  28.2624703959812 %"],"type":"scatter","name":"Staten Island","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="obesity-eda-for-other-variables" class="section level2">
+<h2>obesity eda for other variables</h2>
+<p>obesity ~ poverty</p>
+<pre class="r"><code># ggplot(df_analysis, aes(obesity)) + geom_histogram()
+
+plot_ly(
+  df_analysis, 
+  x = ~poverty, 
+  y = ~obesity,
+  type = &#39;scatter&#39;, mode = &#39;markers&#39;,
+  color = ~borough,
+  text = ~paste(&quot;Community: &quot;, name,
+               &quot;&lt;br&gt;Borough: &quot;, borough,
+               &quot;&lt;br&gt;Poverty Rate: &quot;, poverty, &quot;%&quot;,
+               &quot;&lt;br&gt;Obesity: &quot;, obesity, &quot;%&quot;)) |&gt;
+  layout(
+    title = &quot;Obesity vs Poverty&quot;,
+    xaxis = list(title = &quot;Poverty Rate&quot;),
+    yaxis = list(title = &quot;Obesity Rate&quot;))</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-a5efdec03ad5aad6381f" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-a5efdec03ad5aad6381f">{"x":{"visdat":{"28645b9e617e":["function () ","plotlyVisDat"]},"cur_data":"28645b9e617e","attrs":{"28645b9e617e":{"x":{},"y":{},"mode":"markers","text":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Obesity vs Poverty","xaxis":{"domain":[0,1],"automargin":true,"title":"Poverty Rate"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Obesity Rate"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[31.5,31.5,30.899999999999999,33.600000000000001,35.399999999999999,30.899999999999999,28.699999999999999,18.600000000000001,29,15.800000000000001,19.899999999999999,21.899999999999999],"y":[35.7515359043187,35.7515359043187,40.8701068972046,28.163586279087902,40.203512975758798,40.8701068972046,32.510821715117899,23.274867116352699,40.275979214357498,27.7006964593104,31.940126936306001,32.575168501672302],"mode":"markers","text":["Community:  Mott Haven and Melrose <br>Borough:  Bronx <br>Poverty Rate:  31.5 % <br>Obesity:  35.7515359043187 %","Community:  Hunts Point and Longwood <br>Borough:  Bronx <br>Poverty Rate:  31.5 % <br>Obesity:  35.7515359043187 %","Community:  Morrisania and Crotona <br>Borough:  Bronx <br>Poverty Rate:  30.9 % <br>Obesity:  40.8701068972046 %","Community:  Highbridge and Concourse <br>Borough:  Bronx <br>Poverty Rate:  33.6 % <br>Obesity:  28.1635862790879 %","Community:  Fordham and University Heights <br>Borough:  Bronx <br>Poverty Rate:  35.4 % <br>Obesity:  40.2035129757588 %","Community:  Belmont and East Tremont <br>Borough:  Bronx <br>Poverty Rate:  30.9 % <br>Obesity:  40.8701068972046 %","Community:  Kingsbridge Heights and Bedford <br>Borough:  Bronx <br>Poverty Rate:  28.7 % <br>Obesity:  32.5108217151179 %","Community:  Riverdale and Fieldston <br>Borough:  Bronx <br>Poverty Rate:  18.6 % <br>Obesity:  23.2748671163527 %","Community:  Parkchester and Soundview <br>Borough:  Bronx <br>Poverty Rate:  29 % <br>Obesity:  40.2759792143575 %","Community:  Throgs Neck and Co-op City <br>Borough:  Bronx <br>Poverty Rate:  15.8 % <br>Obesity:  27.7006964593104 %","Community:  Morris Park and Bronxdale <br>Borough:  Bronx <br>Poverty Rate:  19.9 % <br>Obesity:  31.940126936306 %","Community:  Williamsbridge and Baychester <br>Borough:  Bronx <br>Poverty Rate:  21.9 % <br>Obesity:  32.5751685016723 %"],"type":"scatter","name":"Bronx","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[16.199999999999999,12.300000000000001,21.199999999999999,25,27.699999999999999,9.5,23.300000000000001,20.5,20.5,16.699999999999999,23,26.899999999999999,24.399999999999999,19.399999999999999,16.5,28.5,16.300000000000001,13.9],"y":[18.264978384760099,12.378870288005601,32.035993247390401,15.3490155588885,30.5925488247156,16.6516171647501,19.022352160356601,18.978393305737502,29.975612846479201,17.874952019509902,16.251983604530398,23.850030247638198,28.487883419800099,27.637187453657202,23.255476297166801,40.601539137270301,34.4294323359074,40.7183724911798],"mode":"markers","text":["Community:  Greenpoint and Williamsburg <br>Borough:  Brooklyn <br>Poverty Rate:  16.2 % <br>Obesity:  18.2649783847601 %","Community:  Fort Greene and Brooklyn Heights <br>Borough:  Brooklyn <br>Poverty Rate:  12.3 % <br>Obesity:  12.3788702880056 %","Community:  Bedford Stuyvesant <br>Borough:  Brooklyn <br>Poverty Rate:  21.2 % <br>Obesity:  32.0359932473904 %","Community:  Bushwick <br>Borough:  Brooklyn <br>Poverty Rate:  25 % <br>Obesity:  15.3490155588885 %","Community:  East New York and Starrett City <br>Borough:  Brooklyn <br>Poverty Rate:  27.7 % <br>Obesity:  30.5925488247156 %","Community:  Park Slope and Carroll Gardens <br>Borough:  Brooklyn <br>Poverty Rate:  9.5 % <br>Obesity:  16.6516171647501 %","Community:  Sunset Park <br>Borough:  Brooklyn <br>Poverty Rate:  23.3 % <br>Obesity:  19.0223521603566 %","Community:  Crown Heights and Prospect Heights <br>Borough:  Brooklyn <br>Poverty Rate:  20.5 % <br>Obesity:  18.9783933057375 %","Community:  South Crown Heights and Lefferts Gardens <br>Borough:  Brooklyn <br>Poverty Rate:  20.5 % <br>Obesity:  29.9756128464792 %","Community:  Bay Ridge and Dyker Heights <br>Borough:  Brooklyn <br>Poverty Rate:  16.7 % <br>Obesity:  17.8749520195099 %","Community:  Bensonhurst <br>Borough:  Brooklyn <br>Poverty Rate:  23 % <br>Obesity:  16.2519836045304 %","Community:  Borough Park <br>Borough:  Brooklyn <br>Poverty Rate:  26.9 % <br>Obesity:  23.8500302476382 %","Community:  Coney Island <br>Borough:  Brooklyn <br>Poverty Rate:  24.4 % <br>Obesity:  28.4878834198001 %","Community:  Flatbush and Midwood <br>Borough:  Brooklyn <br>Poverty Rate:  19.4 % <br>Obesity:  27.6371874536572 %","Community:  Sheepshead Bay <br>Borough:  Brooklyn <br>Poverty Rate:  16.5 % <br>Obesity:  23.2554762971668 %","Community:  Brownsville <br>Borough:  Brooklyn <br>Poverty Rate:  28.5 % <br>Obesity:  40.6015391372703 %","Community:  East Flatbush <br>Borough:  Brooklyn <br>Poverty Rate:  16.3 % <br>Obesity:  34.4294323359074 %","Community:  Flatlands and Canarsie <br>Borough:  Brooklyn <br>Poverty Rate:  13.9 % <br>Obesity:  40.7183724911798 %"],"type":"scatter","name":"Brooklyn","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[7.5999999999999996,7.5999999999999996,22,11.199999999999999,11.199999999999999,8.6999999999999993,9.5,6.0999999999999996,19.899999999999999,20.5,23.399999999999999,18.199999999999999],"y":[7.8649414223059599,7.8649414223059599,13.779410535816,12.137498196609799,12.137498196609799,10.375919016240999,21.113832443754301,10.266908965344401,22.819808386303102,34.856031479297997,30.251108900109401,25.9802358484195],"mode":"markers","text":["Community:  Financial District <br>Borough:  Manhattan <br>Poverty Rate:  7.6 % <br>Obesity:  7.86494142230596 %","Community:  Greenwich Village and Soho <br>Borough:  Manhattan <br>Poverty Rate:  7.6 % <br>Obesity:  7.86494142230596 %","Community:  Lower East Side and Chinatown <br>Borough:  Manhattan <br>Poverty Rate:  22 % <br>Obesity:  13.779410535816 %","Community:  Clinton and Chelsea <br>Borough:  Manhattan <br>Poverty Rate:  11.2 % <br>Obesity:  12.1374981966098 %","Community:  Midtown <br>Borough:  Manhattan <br>Poverty Rate:  11.2 % <br>Obesity:  12.1374981966098 %","Community:  Stuyvesant Town and Turtle Bay <br>Borough:  Manhattan <br>Poverty Rate:  8.7 % <br>Obesity:  10.375919016241 %","Community:  Upper West Side <br>Borough:  Manhattan <br>Poverty Rate:  9.5 % <br>Obesity:  21.1138324437543 %","Community:  Upper East Side <br>Borough:  Manhattan <br>Poverty Rate:  6.1 % <br>Obesity:  10.2669089653444 %","Community:  Morningside Heights and Hamilton Heights <br>Borough:  Manhattan <br>Poverty Rate:  19.9 % <br>Obesity:  22.8198083863031 %","Community:  Central Harlem <br>Borough:  Manhattan <br>Poverty Rate:  20.5 % <br>Obesity:  34.856031479298 %","Community:  East Harlem <br>Borough:  Manhattan <br>Poverty Rate:  23.4 % <br>Obesity:  30.2511089001094 %","Community:  Washington Heights and Inwood <br>Borough:  Manhattan <br>Poverty Rate:  18.2 % <br>Obesity:  25.9802358484195 %"],"type":"scatter","name":"Manhattan","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[16.100000000000001,14.300000000000001,22.300000000000001,20.699999999999999,15.4,13.6,23.699999999999999,18.199999999999999,19.199999999999999,15,13.1,16.899999999999999,10.699999999999999,17.199999999999999],"y":[20.479535086196801,17.084649386526301,25.0081397823175,25.914341973611599,27.729358856325302,18.728412363637599,11.935570358634701,22.624446813968898,26.345822422710999,34.537537001853003,10.969053959003899,24.817491194969801,40.127530433086498,30.779159696201901],"mode":"markers","text":["Community:  Long Island City and Astoria <br>Borough:  Queens <br>Poverty Rate:  16.1 % <br>Obesity:  20.4795350861968 %","Community:  Woodside and Sunnyside <br>Borough:  Queens <br>Poverty Rate:  14.3 % <br>Obesity:  17.0846493865263 %","Community:  Jackson Heights <br>Borough:  Queens <br>Poverty Rate:  22.3 % <br>Obesity:  25.0081397823175 %","Community:  Elmhurst and Corona <br>Borough:  Queens <br>Poverty Rate:  20.7 % <br>Obesity:  25.9143419736116 %","Community:  Ridgewood and Maspeth <br>Borough:  Queens <br>Poverty Rate:  15.4 % <br>Obesity:  27.7293588563253 %","Community:  Rego Park and Forest Hills <br>Borough:  Queens <br>Poverty Rate:  13.6 % <br>Obesity:  18.7284123636376 %","Community:  Flushing and Whitestone <br>Borough:  Queens <br>Poverty Rate:  23.7 % <br>Obesity:  11.9355703586347 %","Community:  Hillcrest and Fresh Meadows <br>Borough:  Queens <br>Poverty Rate:  18.2 % <br>Obesity:  22.6244468139689 %","Community:  Kew Gardens and Woodhaven <br>Borough:  Queens <br>Poverty Rate:  19.2 % <br>Obesity:  26.345822422711 %","Community:  South Ozone Park and Howard Beach <br>Borough:  Queens <br>Poverty Rate:  15 % <br>Obesity:  34.537537001853 %","Community:  Bayside and Little Neck <br>Borough:  Queens <br>Poverty Rate:  13.1 % <br>Obesity:  10.9690539590039 %","Community:  Jamaica and Hollis <br>Borough:  Queens <br>Poverty Rate:  16.9 % <br>Obesity:  24.8174911949698 %","Community:  Queens Village <br>Borough:  Queens <br>Poverty Rate:  10.7 % <br>Obesity:  40.1275304330865 %","Community:  Rockaway and Broad Channel <br>Borough:  Queens <br>Poverty Rate:  17.2 % <br>Obesity:  30.7791596962019 %"],"type":"scatter","name":"Queens","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[19.699999999999999,12.199999999999999,11.5],"y":[33.533867040159997,24.041819480036299,28.2624703959812],"mode":"markers","text":["Community:  St. George and Stapleton <br>Borough:  Staten Island <br>Poverty Rate:  19.7 % <br>Obesity:  33.53386704016 %","Community:  South Beach and Willowbrook <br>Borough:  Staten Island <br>Poverty Rate:  12.2 % <br>Obesity:  24.0418194800363 %","Community:  Tottenville and Great Kills <br>Borough:  Staten Island <br>Poverty Rate:  11.5 % <br>Obesity:  28.2624703959812 %"],"type":"scatter","name":"Staten Island","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>obesity ~ borough</p>
+<pre class="r"><code># ggplot(df_analysis, aes(borough, obesity)) + geom_boxplot()
+
+df_analysis |&gt;
+  filter(id != 0) |&gt;
+  plot_ly(
+  x = ~borough, 
+  y = ~obesity, 
+  type = &#39;box&#39;,
+  fillcolor = ~borough,
+  text= ~paste(&quot;&lt;br&gt;Borough: &quot;, borough)
+  ) |&gt;
+  layout(
+    title = &quot;Obesity vs Borough&quot;,
+    xaxis = list(title = &quot;Borough&quot;),
+    yaxis = list(title = &quot;Obesity&quot;)
+  )</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-a8c111e5c9b16532e722" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-a8c111e5c9b16532e722">{"x":{"visdat":{"28642d024eb":["function () ","plotlyVisDat"]},"cur_data":"28642d024eb","attrs":{"28642d024eb":{"x":{},"y":{},"fillcolor":{},"text":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"box"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Obesity vs Borough","xaxis":{"domain":[0,1],"automargin":true,"title":"Borough","type":"category","categoryorder":"array","categoryarray":["Bronx","Brooklyn","Manhattan","Queens","Staten Island"]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Obesity"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"fillcolor":"Bronx","x":["Bronx","Bronx","Bronx","Bronx","Bronx","Bronx","Bronx","Bronx","Bronx","Bronx","Bronx","Bronx"],"y":[35.7515359043187,35.7515359043187,40.8701068972046,28.163586279087902,40.203512975758798,40.8701068972046,32.510821715117899,23.274867116352699,40.275979214357498,27.7006964593104,31.940126936306001,32.575168501672302],"text":["<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx","<br>Borough:  Bronx"],"type":"box","name":"Bronx","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"line":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"Brooklyn","x":["Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn","Brooklyn"],"y":[18.264978384760099,12.378870288005601,32.035993247390401,15.3490155588885,30.5925488247156,16.6516171647501,19.022352160356601,18.978393305737502,29.975612846479201,17.874952019509902,16.251983604530398,23.850030247638198,28.487883419800099,27.637187453657202,23.255476297166801,40.601539137270301,34.4294323359074,40.7183724911798],"text":["<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn","<br>Borough:  Brooklyn"],"type":"box","name":"Brooklyn","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"Manhattan","x":["Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan","Manhattan"],"y":[7.8649414223059599,7.8649414223059599,13.779410535816,12.137498196609799,12.137498196609799,10.375919016240999,21.113832443754301,10.266908965344401,22.819808386303102,34.856031479297997,30.251108900109401,25.9802358484195],"text":["<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan","<br>Borough:  Manhattan"],"type":"box","name":"Manhattan","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"Queens","x":["Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens","Queens"],"y":[20.479535086196801,17.084649386526301,25.0081397823175,25.914341973611599,27.729358856325302,18.728412363637599,11.935570358634701,22.624446813968898,26.345822422710999,34.537537001853003,10.969053959003899,24.817491194969801,40.127530433086498,30.779159696201901],"text":["<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens","<br>Borough:  Queens"],"type":"box","name":"Queens","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"Staten Island","x":["Staten Island","Staten Island","Staten Island"],"y":[33.533867040159997,24.041819480036299,28.2624703959812],"text":["<br>Borough:  Staten Island","<br>Borough:  Staten Island","<br>Borough:  Staten Island"],"type":"box","name":"Staten Island","marker":{"color":"rgba(148,103,189,1)","line":{"color":"rgba(148,103,189,1)"}},"line":{"color":"rgba(148,103,189,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p><code>borough</code> is a confounding factor.</p>
+<p>obesity ~ food</p>
+<pre class="r"><code>base_theme &lt;- theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = &quot;bold&quot;, size = 14, hjust = 0.5),
+    legend.position = &quot;right&quot;,
+    legend.title = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+# 1. Obesity vs Farmers&#39; Market
+p_farm &lt;- ggplot(df_analysis, aes(x = farmers_markets, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;gray20&quot;, linewidth = 1) +
+  labs(title = &quot;Obesity vs Farmers&#39; Markets&quot;,
+       x = &quot;Farmers&#39; markets per 10,000 residents&quot;,
+       y = &quot;Obesity (%)&quot;) +
+  base_theme
+
+# 2. Obesity vs Sugary Drink
+p_sugary &lt;- ggplot(df_analysis, aes(x = sugary_drink, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;gray20&quot;, linewidth = 1) +
+  labs(title = &quot;Obesity vs Sugary Drink Consumption&quot;,
+       x = &quot;Sugary drink consumption (%)&quot;,
+       y = &quot;Obesity (%)&quot;) +
+  base_theme
+
+# 3. Obesity vs Smoking
+p_smoke &lt;- ggplot(df_analysis, aes(x = smoking, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;gray20&quot;, linewidth = 1) +
+  labs(title = &quot;Obesity vs Smoking Prevalence&quot;,
+       x = &quot;Smoking prevalence (%)&quot;,
+       y = &quot;Obesity (%)&quot;) +
+  base_theme
+
+# 4. Obesity vs Binge Drinking
+p_binge &lt;- ggplot(df_analysis, aes(x = binge_drink, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;gray20&quot;, linewidth = 1) +
+  labs(title = &quot;Obesity vs Binge Drinking&quot;,
+       x = &quot;Binge drinking (%)&quot;,
+       y = &quot;Obesity (%)&quot;) +
+  base_theme
+
+# ---- Combine 4 plots: shared legend automatically ----
+combined_plot &lt;- (p_farm + p_sugary) / (p_smoke + p_binge)
+
+combined_plot</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;
+## `geom_smooth()` using formula = &#39;y ~ x&#39;
+## `geom_smooth()` using formula = &#39;y ~ x&#39;
+## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/eda_behavior_scatter-1.png" width="90%" /></p>
+<p>obesity ~ education</p>
+<pre class="r"><code># ggplot(df_analysis, aes(edu_college_degree_and_higher, obesity)) + 
+#     geom_point() + geom_smooth(method=&quot;lm&quot;)
+
+
+plot_ly(
+  df_analysis, 
+  x = ~edu_college_degree_and_higher,
+  y = ~obesity,
+  mode = &quot;markers&quot;,
+  type = &quot;scatter&quot;,
+  color = ~borough,
+  text= ~paste(&quot;Community: &quot;, name,
+               &quot;&lt;br&gt;Borough: &quot;, borough,
+               &quot;&lt;br&gt;Obesity: &quot;, obesity, &quot;%&quot;,
+               &quot;&lt;br&gt;High Education Rate: &quot;, edu_college_degree_and_higher, &quot;%&quot;)
+  ) |&gt;
+  layout(
+    title = &quot;Obesity vs Education&quot;,
+    xaxis = list(title = &quot;High Education Rate&quot;),
+    yaxis = list(title = &quot;Obesity&quot;)
+  )</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-6685bccd6174b293435e" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-6685bccd6174b293435e">{"x":{"visdat":{"28646ff84102":["function () ","plotlyVisDat"]},"cur_data":"28646ff84102","attrs":{"28646ff84102":{"x":{},"y":{},"mode":"markers","text":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Obesity vs Education","xaxis":{"domain":[0,1],"automargin":true,"title":"High Education Rate"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Obesity"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[18,18,20,22,20,20,22,46,26,38,34,32],"y":[35.7515359043187,35.7515359043187,40.8701068972046,28.163586279087902,40.203512975758798,40.8701068972046,32.510821715117899,23.274867116352699,40.275979214357498,27.7006964593104,31.940126936306001,32.575168501672302],"mode":"markers","text":["Community:  Mott Haven and Melrose <br>Borough:  Bronx <br>Obesity:  35.7515359043187 % <br>High Education Rate:  18 %","Community:  Hunts Point and Longwood <br>Borough:  Bronx <br>Obesity:  35.7515359043187 % <br>High Education Rate:  18 %","Community:  Morrisania and Crotona <br>Borough:  Bronx <br>Obesity:  40.8701068972046 % <br>High Education Rate:  20 %","Community:  Highbridge and Concourse <br>Borough:  Bronx <br>Obesity:  28.1635862790879 % <br>High Education Rate:  22 %","Community:  Fordham and University Heights <br>Borough:  Bronx <br>Obesity:  40.2035129757588 % <br>High Education Rate:  20 %","Community:  Belmont and East Tremont <br>Borough:  Bronx <br>Obesity:  40.8701068972046 % <br>High Education Rate:  20 %","Community:  Kingsbridge Heights and Bedford <br>Borough:  Bronx <br>Obesity:  32.5108217151179 % <br>High Education Rate:  22 %","Community:  Riverdale and Fieldston <br>Borough:  Bronx <br>Obesity:  23.2748671163527 % <br>High Education Rate:  46 %","Community:  Parkchester and Soundview <br>Borough:  Bronx <br>Obesity:  40.2759792143575 % <br>High Education Rate:  26 %","Community:  Throgs Neck and Co-op City <br>Borough:  Bronx <br>Obesity:  27.7006964593104 % <br>High Education Rate:  38 %","Community:  Morris Park and Bronxdale <br>Borough:  Bronx <br>Obesity:  31.940126936306 % <br>High Education Rate:  34 %","Community:  Williamsbridge and Baychester <br>Borough:  Bronx <br>Obesity:  32.5751685016723 % <br>High Education Rate:  32 %"],"type":"scatter","name":"Bronx","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[54,69,42,36,21,77,34,49,40,49,38,35,48,46,47,23,33,41],"y":[18.264978384760099,12.378870288005601,32.035993247390401,15.3490155588885,30.5925488247156,16.6516171647501,19.022352160356601,18.978393305737502,29.975612846479201,17.874952019509902,16.251983604530398,23.850030247638198,28.487883419800099,27.637187453657202,23.255476297166801,40.601539137270301,34.4294323359074,40.7183724911798],"mode":"markers","text":["Community:  Greenpoint and Williamsburg <br>Borough:  Brooklyn <br>Obesity:  18.2649783847601 % <br>High Education Rate:  54 %","Community:  Fort Greene and Brooklyn Heights <br>Borough:  Brooklyn <br>Obesity:  12.3788702880056 % <br>High Education Rate:  69 %","Community:  Bedford Stuyvesant <br>Borough:  Brooklyn <br>Obesity:  32.0359932473904 % <br>High Education Rate:  42 %","Community:  Bushwick <br>Borough:  Brooklyn <br>Obesity:  15.3490155588885 % <br>High Education Rate:  36 %","Community:  East New York and Starrett City <br>Borough:  Brooklyn <br>Obesity:  30.5925488247156 % <br>High Education Rate:  21 %","Community:  Park Slope and Carroll Gardens <br>Borough:  Brooklyn <br>Obesity:  16.6516171647501 % <br>High Education Rate:  77 %","Community:  Sunset Park <br>Borough:  Brooklyn <br>Obesity:  19.0223521603566 % <br>High Education Rate:  34 %","Community:  Crown Heights and Prospect Heights <br>Borough:  Brooklyn <br>Obesity:  18.9783933057375 % <br>High Education Rate:  49 %","Community:  South Crown Heights and Lefferts Gardens <br>Borough:  Brooklyn <br>Obesity:  29.9756128464792 % <br>High Education Rate:  40 %","Community:  Bay Ridge and Dyker Heights <br>Borough:  Brooklyn <br>Obesity:  17.8749520195099 % <br>High Education Rate:  49 %","Community:  Bensonhurst <br>Borough:  Brooklyn <br>Obesity:  16.2519836045304 % <br>High Education Rate:  38 %","Community:  Borough Park <br>Borough:  Brooklyn <br>Obesity:  23.8500302476382 % <br>High Education Rate:  35 %","Community:  Coney Island <br>Borough:  Brooklyn <br>Obesity:  28.4878834198001 % <br>High Education Rate:  48 %","Community:  Flatbush and Midwood <br>Borough:  Brooklyn <br>Obesity:  27.6371874536572 % <br>High Education Rate:  46 %","Community:  Sheepshead Bay <br>Borough:  Brooklyn <br>Obesity:  23.2554762971668 % <br>High Education Rate:  47 %","Community:  Brownsville <br>Borough:  Brooklyn <br>Obesity:  40.6015391372703 % <br>High Education Rate:  23 %","Community:  East Flatbush <br>Borough:  Brooklyn <br>Obesity:  34.4294323359074 % <br>High Education Rate:  33 %","Community:  Flatlands and Canarsie <br>Borough:  Brooklyn <br>Obesity:  40.7183724911798 % <br>High Education Rate:  41 %"],"type":"scatter","name":"Brooklyn","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[85,85,47,79,79,84,80,83,51,45,37,40],"y":[7.8649414223059599,7.8649414223059599,13.779410535816,12.137498196609799,12.137498196609799,10.375919016240999,21.113832443754301,10.266908965344401,22.819808386303102,34.856031479297997,30.251108900109401,25.9802358484195],"mode":"markers","text":["Community:  Financial District <br>Borough:  Manhattan <br>Obesity:  7.86494142230596 % <br>High Education Rate:  85 %","Community:  Greenwich Village and Soho <br>Borough:  Manhattan <br>Obesity:  7.86494142230596 % <br>High Education Rate:  85 %","Community:  Lower East Side and Chinatown <br>Borough:  Manhattan <br>Obesity:  13.779410535816 % <br>High Education Rate:  47 %","Community:  Clinton and Chelsea <br>Borough:  Manhattan <br>Obesity:  12.1374981966098 % <br>High Education Rate:  79 %","Community:  Midtown <br>Borough:  Manhattan <br>Obesity:  12.1374981966098 % <br>High Education Rate:  79 %","Community:  Stuyvesant Town and Turtle Bay <br>Borough:  Manhattan <br>Obesity:  10.375919016241 % <br>High Education Rate:  84 %","Community:  Upper West Side <br>Borough:  Manhattan <br>Obesity:  21.1138324437543 % <br>High Education Rate:  80 %","Community:  Upper East Side <br>Borough:  Manhattan <br>Obesity:  10.2669089653444 % <br>High Education Rate:  83 %","Community:  Morningside Heights and Hamilton Heights <br>Borough:  Manhattan <br>Obesity:  22.8198083863031 % <br>High Education Rate:  51 %","Community:  Central Harlem <br>Borough:  Manhattan <br>Obesity:  34.856031479298 % <br>High Education Rate:  45 %","Community:  East Harlem <br>Borough:  Manhattan <br>Obesity:  30.2511089001094 % <br>High Education Rate:  37 %","Community:  Washington Heights and Inwood <br>Borough:  Manhattan <br>Obesity:  25.9802358484195 % <br>High Education Rate:  40 %"],"type":"scatter","name":"Manhattan","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[54,48,27,29,38,65,36,49,35,30,52,30,40,37],"y":[20.479535086196801,17.084649386526301,25.0081397823175,25.914341973611599,27.729358856325302,18.728412363637599,11.935570358634701,22.624446813968898,26.345822422710999,34.537537001853003,10.969053959003899,24.817491194969801,40.127530433086498,30.779159696201901],"mode":"markers","text":["Community:  Long Island City and Astoria <br>Borough:  Queens <br>Obesity:  20.4795350861968 % <br>High Education Rate:  54 %","Community:  Woodside and Sunnyside <br>Borough:  Queens <br>Obesity:  17.0846493865263 % <br>High Education Rate:  48 %","Community:  Jackson Heights <br>Borough:  Queens <br>Obesity:  25.0081397823175 % <br>High Education Rate:  27 %","Community:  Elmhurst and Corona <br>Borough:  Queens <br>Obesity:  25.9143419736116 % <br>High Education Rate:  29 %","Community:  Ridgewood and Maspeth <br>Borough:  Queens <br>Obesity:  27.7293588563253 % <br>High Education Rate:  38 %","Community:  Rego Park and Forest Hills <br>Borough:  Queens <br>Obesity:  18.7284123636376 % <br>High Education Rate:  65 %","Community:  Flushing and Whitestone <br>Borough:  Queens <br>Obesity:  11.9355703586347 % <br>High Education Rate:  36 %","Community:  Hillcrest and Fresh Meadows <br>Borough:  Queens <br>Obesity:  22.6244468139689 % <br>High Education Rate:  49 %","Community:  Kew Gardens and Woodhaven <br>Borough:  Queens <br>Obesity:  26.345822422711 % <br>High Education Rate:  35 %","Community:  South Ozone Park and Howard Beach <br>Borough:  Queens <br>Obesity:  34.537537001853 % <br>High Education Rate:  30 %","Community:  Bayside and Little Neck <br>Borough:  Queens <br>Obesity:  10.9690539590039 % <br>High Education Rate:  52 %","Community:  Jamaica and Hollis <br>Borough:  Queens <br>Obesity:  24.8174911949698 % <br>High Education Rate:  30 %","Community:  Queens Village <br>Borough:  Queens <br>Obesity:  40.1275304330865 % <br>High Education Rate:  40 %","Community:  Rockaway and Broad Channel <br>Borough:  Queens <br>Obesity:  30.7791596962019 % <br>High Education Rate:  37 %"],"type":"scatter","name":"Queens","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[39,41,43],"y":[33.533867040159997,24.041819480036299,28.2624703959812],"mode":"markers","text":["Community:  St. George and Stapleton <br>Borough:  Staten Island <br>Obesity:  33.53386704016 % <br>High Education Rate:  39 %","Community:  South Beach and Willowbrook <br>Borough:  Staten Island <br>Obesity:  24.0418194800363 % <br>High Education Rate:  41 %","Community:  Tottenville and Great Kills <br>Borough:  Staten Island <br>Obesity:  28.2624703959812 % <br>High Education Rate:  43 %"],"type":"scatter","name":"Staten Island","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>obesity ~ safety</p>
+<pre class="r"><code>fig_bubble &lt;- plot_ly(
+  df_analysis,
+  x = ~assault_hosp,
+  y = ~pedestrian_hosp,
+  size = ~obesity,
+  color = ~borough,
+  colors = &quot;Set2&quot;,
+  type = &quot;scatter&quot;,
+  mode = &quot;markers&quot;,
+  marker = list(
+    sizemode = &quot;area&quot;,
+    sizeref = 2 * max(df_analysis$obesity) / 60^2, 
+    opacity = 0.7
+  ),
+  text = ~paste(
+    &quot;CD:&quot;, id,
+    &quot;&lt;br&gt;Name:&quot;, name,
+    &quot;&lt;br&gt;Assault hosp:&quot;, assault_hosp,
+    &quot;&lt;br&gt;Pedestrian hosp:&quot;, pedestrian_hosp,
+    &quot;&lt;br&gt;Obesity:&quot;, round(obesity,1), &quot;%&quot;
+  ),
+  hoverinfo = &quot;text&quot;
+) |&gt;
+  layout(
+    title = &quot;Safety Indicators and Obesity (Bubble Plot)&quot;,
+    xaxis = list(title = &quot;Assault-related hospitalizations&quot;),
+    yaxis = list(title = &quot;Pedestrian injury hospitalizations&quot;)
+  )
+
+fig_bubble</code></pre>
+<pre><code>## Warning: `line.width` does not currently support multiple values.
+## Warning: `line.width` does not currently support multiple values.
+## Warning: `line.width` does not currently support multiple values.
+## Warning: `line.width` does not currently support multiple values.
+## Warning: `line.width` does not currently support multiple values.</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-6aba5dc73ab7c4c0f6b7" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-6aba5dc73ab7c4c0f6b7">{"x":{"visdat":{"2864577d4519":["function () ","plotlyVisDat"]},"cur_data":"2864577d4519","attrs":{"2864577d4519":{"x":{},"y":{},"mode":"markers","marker":{"sizemode":"area","sizeref":0.022705614942891444,"opacity":0.69999999999999996},"text":{},"hoverinfo":"text","color":{},"size":{},"colors":"Set2","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Safety Indicators and Obesity (Bubble Plot)","xaxis":{"domain":[0,1],"automargin":true,"title":"Assault-related hospitalizations"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Pedestrian injury hospitalizations"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[186,151,161,123,126,152,97,40,100,53,64,82],"y":[43,36,34,27,28,34,26,17,26,17,18,23],"mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":[86.04244569808067,86.04244569808067,100,65.351276408529657,98.182301101451856,100,77.205517513312415,52.020492626191434,98.379905366724927,64.089047203478145,75.649320798221439,77.380981284106113],"sizemode":"area","sizeref":0.022705614942891444,"opacity":0.69999999999999996,"line":{"color":"rgba(102,194,165,1)"}},"text":["CD: 201 <br>Name: Mott Haven and Melrose <br>Assault hosp: 186 <br>Pedestrian hosp: 43 <br>Obesity: 35.8 %","CD: 202 <br>Name: Hunts Point and Longwood <br>Assault hosp: 151 <br>Pedestrian hosp: 36 <br>Obesity: 35.8 %","CD: 203 <br>Name: Morrisania and Crotona <br>Assault hosp: 161 <br>Pedestrian hosp: 34 <br>Obesity: 40.9 %","CD: 204 <br>Name: Highbridge and Concourse <br>Assault hosp: 123 <br>Pedestrian hosp: 27 <br>Obesity: 28.2 %","CD: 205 <br>Name: Fordham and University Heights <br>Assault hosp: 126 <br>Pedestrian hosp: 28 <br>Obesity: 40.2 %","CD: 206 <br>Name: Belmont and East Tremont <br>Assault hosp: 152 <br>Pedestrian hosp: 34 <br>Obesity: 40.9 %","CD: 207 <br>Name: Kingsbridge Heights and Bedford <br>Assault hosp: 97 <br>Pedestrian hosp: 26 <br>Obesity: 32.5 %","CD: 208 <br>Name: Riverdale and Fieldston <br>Assault hosp: 40 <br>Pedestrian hosp: 17 <br>Obesity: 23.3 %","CD: 209 <br>Name: Parkchester and Soundview <br>Assault hosp: 100 <br>Pedestrian hosp: 26 <br>Obesity: 40.3 %","CD: 210 <br>Name: Throgs Neck and Co-op City <br>Assault hosp: 53 <br>Pedestrian hosp: 17 <br>Obesity: 27.7 %","CD: 211 <br>Name: Morris Park and Bronxdale <br>Assault hosp: 64 <br>Pedestrian hosp: 18 <br>Obesity: 31.9 %","CD: 212 <br>Name: Williamsbridge and Baychester <br>Assault hosp: 82 <br>Pedestrian hosp: 23 <br>Obesity: 32.6 %"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"Bronx","textfont":{"color":"rgba(102,194,165,1)","size":[86.04244569808067,86.04244569808067,100,65.351276408529657,98.182301101451856,100,77.205517513312415,52.020492626191434,98.379905366724927,64.089047203478145,75.649320798221439,77.380981284106113]},"error_y":{"color":"rgba(102,194,165,1)","width":[]},"error_x":{"color":"rgba(102,194,165,1)","width":[]},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[34,40,117,72,113,30,37,85,73,23,23,19,51,42,22,175,80,46],"y":[17,11,25,22,26,18,23,27,30,15,20,25,22,26,20,32,26,20],"mode":"markers","marker":{"color":"rgba(252,141,98,1)","size":[38.359298102375199,22.308788399256322,75.910733455102616,30.407916839704832,71.974682955991128,33.959910681902166,40.42453967359306,40.304670651311447,70.292393616054213,37.295756309221218,32.870171548579926,53.588873849883939,66.235584735548798,63.915867932096063,51.967616850487232,99.267657106204496,82.43727300935376,99.586243657750543],"sizemode":"area","sizeref":0.022705614942891444,"opacity":0.69999999999999996,"line":{"color":"rgba(252,141,98,1)"}},"text":["CD: 301 <br>Name: Greenpoint and Williamsburg <br>Assault hosp: 34 <br>Pedestrian hosp: 17 <br>Obesity: 18.3 %","CD: 302 <br>Name: Fort Greene and Brooklyn Heights <br>Assault hosp: 40 <br>Pedestrian hosp: 11 <br>Obesity: 12.4 %","CD: 303 <br>Name: Bedford Stuyvesant <br>Assault hosp: 117 <br>Pedestrian hosp: 25 <br>Obesity: 32 %","CD: 304 <br>Name: Bushwick <br>Assault hosp: 72 <br>Pedestrian hosp: 22 <br>Obesity: 15.3 %","CD: 305 <br>Name: East New York and Starrett City <br>Assault hosp: 113 <br>Pedestrian hosp: 26 <br>Obesity: 30.6 %","CD: 306 <br>Name: Park Slope and Carroll Gardens <br>Assault hosp: 30 <br>Pedestrian hosp: 18 <br>Obesity: 16.7 %","CD: 307 <br>Name: Sunset Park <br>Assault hosp: 37 <br>Pedestrian hosp: 23 <br>Obesity: 19 %","CD: 308 <br>Name: Crown Heights and Prospect Heights <br>Assault hosp: 85 <br>Pedestrian hosp: 27 <br>Obesity: 19 %","CD: 309 <br>Name: South Crown Heights and Lefferts Gardens <br>Assault hosp: 73 <br>Pedestrian hosp: 30 <br>Obesity: 30 %","CD: 310 <br>Name: Bay Ridge and Dyker Heights <br>Assault hosp: 23 <br>Pedestrian hosp: 15 <br>Obesity: 17.9 %","CD: 311 <br>Name: Bensonhurst <br>Assault hosp: 23 <br>Pedestrian hosp: 20 <br>Obesity: 16.3 %","CD: 312 <br>Name: Borough Park <br>Assault hosp: 19 <br>Pedestrian hosp: 25 <br>Obesity: 23.9 %","CD: 313 <br>Name: Coney Island <br>Assault hosp: 51 <br>Pedestrian hosp: 22 <br>Obesity: 28.5 %","CD: 314 <br>Name: Flatbush and Midwood <br>Assault hosp: 42 <br>Pedestrian hosp: 26 <br>Obesity: 27.6 %","CD: 315 <br>Name: Sheepshead Bay <br>Assault hosp: 22 <br>Pedestrian hosp: 20 <br>Obesity: 23.3 %","CD: 316 <br>Name: Brownsville <br>Assault hosp: 175 <br>Pedestrian hosp: 32 <br>Obesity: 40.6 %","CD: 317 <br>Name: East Flatbush <br>Assault hosp: 80 <br>Pedestrian hosp: 26 <br>Obesity: 34.4 %","CD: 318 <br>Name: Flatlands and Canarsie <br>Assault hosp: 46 <br>Pedestrian hosp: 20 <br>Obesity: 40.7 %"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"Brooklyn","textfont":{"color":"rgba(252,141,98,1)","size":[38.359298102375199,22.308788399256322,75.910733455102616,30.407916839704832,71.974682955991128,33.959910681902166,40.42453967359306,40.304670651311447,70.292393616054213,37.295756309221218,32.870171548579926,53.588873849883939,66.235584735548798,63.915867932096063,51.967616850487232,99.267657106204496,82.43727300935376,99.586243657750543]},"error_y":{"color":"rgba(252,141,98,1)","width":[]},"error_x":{"color":"rgba(252,141,98,1)","width":[]},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[24,10,42,34,25,35,25,15,57,116,130,43],"y":[10,9,20,15,18,20,16,19,21,32,29,17],"mode":"markers","marker":{"color":"rgba(141,160,203,1)","size":[10,10,26.127845825246187,21.650603902585843,21.650603902585843,16.847048945293846,46.127684099545107,16.549795335456459,50.779617596020437,83.6005431324608,71.043628899076054,59.397616248588903],"sizemode":"area","sizeref":0.022705614942891444,"opacity":0.69999999999999996,"line":{"color":"rgba(141,160,203,1)"}},"text":["CD: 101 <br>Name: Financial District <br>Assault hosp: 24 <br>Pedestrian hosp: 10 <br>Obesity: 7.9 %","CD: 102 <br>Name: Greenwich Village and Soho <br>Assault hosp: 10 <br>Pedestrian hosp: 9 <br>Obesity: 7.9 %","CD: 103 <br>Name: Lower East Side and Chinatown <br>Assault hosp: 42 <br>Pedestrian hosp: 20 <br>Obesity: 13.8 %","CD: 104 <br>Name: Clinton and Chelsea <br>Assault hosp: 34 <br>Pedestrian hosp: 15 <br>Obesity: 12.1 %","CD: 105 <br>Name: Midtown <br>Assault hosp: 25 <br>Pedestrian hosp: 18 <br>Obesity: 12.1 %","CD: 106 <br>Name: Stuyvesant Town and Turtle Bay <br>Assault hosp: 35 <br>Pedestrian hosp: 20 <br>Obesity: 10.4 %","CD: 107 <br>Name: Upper West Side <br>Assault hosp: 25 <br>Pedestrian hosp: 16 <br>Obesity: 21.1 %","CD: 108 <br>Name: Upper East Side <br>Assault hosp: 15 <br>Pedestrian hosp: 19 <br>Obesity: 10.3 %","CD: 109 <br>Name: Morningside Heights and Hamilton Heights <br>Assault hosp: 57 <br>Pedestrian hosp: 21 <br>Obesity: 22.8 %","CD: 110 <br>Name: Central Harlem <br>Assault hosp: 116 <br>Pedestrian hosp: 32 <br>Obesity: 34.9 %","CD: 111 <br>Name: East Harlem <br>Assault hosp: 130 <br>Pedestrian hosp: 29 <br>Obesity: 30.3 %","CD: 112 <br>Name: Washington Heights and Inwood <br>Assault hosp: 43 <br>Pedestrian hosp: 17 <br>Obesity: 26 %"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"Manhattan","textfont":{"color":"rgba(141,160,203,1)","size":[10,10,26.127845825246187,21.650603902585843,21.650603902585843,16.847048945293846,46.127684099545107,16.549795335456459,50.779617596020437,83.6005431324608,71.043628899076054,59.397616248588903]},"error_y":{"color":"rgba(141,160,203,1)","width":[]},"error_x":{"color":"rgba(141,160,203,1)","width":[]},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[56,19,33,34,19,14,17,22,43,32,8,68,29,71],"y":[14,10,20,21,16,13,24,23,25,21,10,26,13,17],"mode":"markers","marker":{"color":"rgba(231,138,195,1)","size":[44.398052953669136,35.140722818399354,56.746860080869709,59.217933806541424,64.167205143128626,39.623011145434958,21.099977806450063,50.24689669439519,60.394514498084384,82.732057773953827,18.464436529345186,56.226990763009681,97.975108416848968,72.483542044927987],"sizemode":"area","sizeref":0.022705614942891444,"opacity":0.69999999999999996,"line":{"color":"rgba(231,138,195,1)"}},"text":["CD: 401 <br>Name: Long Island City and Astoria <br>Assault hosp: 56 <br>Pedestrian hosp: 14 <br>Obesity: 20.5 %","CD: 402 <br>Name: Woodside and Sunnyside <br>Assault hosp: 19 <br>Pedestrian hosp: 10 <br>Obesity: 17.1 %","CD: 403 <br>Name: Jackson Heights <br>Assault hosp: 33 <br>Pedestrian hosp: 20 <br>Obesity: 25 %","CD: 404 <br>Name: Elmhurst and Corona <br>Assault hosp: 34 <br>Pedestrian hosp: 21 <br>Obesity: 25.9 %","CD: 405 <br>Name: Ridgewood and Maspeth <br>Assault hosp: 19 <br>Pedestrian hosp: 16 <br>Obesity: 27.7 %","CD: 406 <br>Name: Rego Park and Forest Hills <br>Assault hosp: 14 <br>Pedestrian hosp: 13 <br>Obesity: 18.7 %","CD: 407 <br>Name: Flushing and Whitestone <br>Assault hosp: 17 <br>Pedestrian hosp: 24 <br>Obesity: 11.9 %","CD: 408 <br>Name: Hillcrest and Fresh Meadows <br>Assault hosp: 22 <br>Pedestrian hosp: 23 <br>Obesity: 22.6 %","CD: 409 <br>Name: Kew Gardens and Woodhaven <br>Assault hosp: 43 <br>Pedestrian hosp: 25 <br>Obesity: 26.3 %","CD: 410 <br>Name: South Ozone Park and Howard Beach <br>Assault hosp: 32 <br>Pedestrian hosp: 21 <br>Obesity: 34.5 %","CD: 411 <br>Name: Bayside and Little Neck <br>Assault hosp: 8 <br>Pedestrian hosp: 10 <br>Obesity: 11 %","CD: 412 <br>Name: Jamaica and Hollis <br>Assault hosp: 68 <br>Pedestrian hosp: 26 <br>Obesity: 24.8 %","CD: 413 <br>Name: Queens Village <br>Assault hosp: 29 <br>Pedestrian hosp: 13 <br>Obesity: 40.1 %","CD: 414 <br>Name: Rockaway and Broad Channel <br>Assault hosp: 71 <br>Pedestrian hosp: 17 <br>Obesity: 30.8 %"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"type":"scatter","name":"Queens","textfont":{"color":"rgba(231,138,195,1)","size":[44.398052953669136,35.140722818399354,56.746860080869709,59.217933806541424,64.167205143128626,39.623011145434958,21.099977806450063,50.24689669439519,60.394514498084384,82.732057773953827,18.464436529345186,56.226990763009681,97.975108416848968,72.483542044927987]},"error_y":{"color":"rgba(231,138,195,1)","width":[]},"error_x":{"color":"rgba(231,138,195,1)","width":[]},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[94,40,25],"y":[47,32,19],"mode":"markers","marker":{"color":"rgba(166,216,84,1)","size":[79.995204458642633,54.11185353101768,65.620918156793735],"sizemode":"area","sizeref":0.022705614942891444,"opacity":0.69999999999999996,"line":{"color":"rgba(166,216,84,1)"}},"text":["CD: 501 <br>Name: St. George and Stapleton <br>Assault hosp: 94 <br>Pedestrian hosp: 47 <br>Obesity: 33.5 %","CD: 502 <br>Name: South Beach and Willowbrook <br>Assault hosp: 40 <br>Pedestrian hosp: 32 <br>Obesity: 24 %","CD: 503 <br>Name: Tottenville and Great Kills <br>Assault hosp: 25 <br>Pedestrian hosp: 19 <br>Obesity: 28.3 %"],"hoverinfo":["text","text","text"],"type":"scatter","name":"Staten Island","textfont":{"color":"rgba(166,216,84,1)","size":[79.995204458642633,54.11185353101768,65.620918156793735]},"error_y":{"color":"rgba(166,216,84,1)","width":[]},"error_x":{"color":"rgba(166,216,84,1)","width":[]},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="some-maps" class="section level2">
+<h2>some maps</h2>
+<pre class="r"><code>nycd &lt;- st_read(&quot;data/nycd_25d/nycd.shp&quot;) |&gt;
+  mutate(BoroCD = as.character(BoroCD))</code></pre>
+<pre><code>## Reading layer `nycd&#39; from data source 
+##   `D:\Master_Semester_One\P8105 Data Science\final-project_starting-2025-11-03\P8105-Final-Project\data\nycd_25d\nycd.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 71 features and 3 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 913175.1 ymin: 120128.4 xmax: 1067383 ymax: 272844.3
+## Projected CRS: NAD83 / New York Long Island (ftUS)</code></pre>
+<pre class="r"><code>df_map &lt;- nycd %&gt;%
+  left_join(df_analysis, by = c(&quot;BoroCD&quot; = &quot;id&quot;)) |&gt;
+  st_transform(4326)
+
+ 
+# make_cd_map &lt;- function(sf_data, z_var, z_title, colorscale = &quot;Viridis&quot;) {
+#   plot_ly(
+#     sf_data,
+#     type = &quot;choroplethmapbox&quot;,
+#     geojson = sf_data,        
+#     locations = ~BoroCD,       
+#     z = sf_data[[z_var]],
+#     colorscale = colorscale,
+#     marker = list(line = list(width = 0.2, color = &quot;white&quot;)),
+#     text = ~paste0(
+#       &quot;CD: &quot;, BoroCD,
+#       &quot;&lt;br&gt;Name: &quot;, if (&quot;Name&quot; %in% names(sf_data)) Name else &quot;&quot;,
+#       &quot;&lt;br&gt;&quot;, z_title, &quot;: &quot;, round(sf_data[[z_var]], 2)
+#     ),
+#     hoverinfo = &quot;text&quot;
+#   ) %&gt;%
+#     layout(
+#       mapbox = list(
+#         style = &quot;carto-positron&quot;,
+#         zoom = 9.5,
+#         center = list(lon = -74.0, lat = 40.7)
+#       ),
+#       margin = list(l = 0, r = 0, t = 40, b = 0),
+#       title = paste(&quot;NYC Community District&quot;, z_title)
+#     )
+# }
+
+# fig_obesity &lt;- make_cd_map(
+#   sf_data = df_map,
+#   z_var   = &quot;obesity&quot;,
+#   z_title = &quot;Obesity (%)&quot;,
+#   colorscale = &quot;Reds&quot;
+# )
+# fig_obesity
+
+p_obesity &lt;- 
+  ggplot(df_map) +
+  geom_sf(aes(fill = obesity), color = NA) +
+  scale_fill_viridis_c(option = &quot;A&quot;) +
+  labs(
+    title = &quot;NYC Community District Obesity (%)&quot;,
+    fill  = &quot;Obesity (%)&quot;
+  ) +
+  theme_minimal()
+p_obesity</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-16-1.png" width="90%" /></p>
+<pre class="r"><code>p_poverty &lt;- ggplot(df_map) +
+  geom_sf(aes(fill = poverty), color = NA) +
+  scale_fill_viridis_c(option = &quot;Blues&quot;, direction = 1) +
+  labs(
+    title = &quot;Poverty Rate by Community District&quot;,
+    fill  = &quot;Poverty (%)&quot;
+  ) +
+  theme_minimal()</code></pre>
+<pre><code>## Warning in viridisLite::viridis(n, alpha, begin, end, direction, option):
+## Option &#39;Blues&#39; does not exist. Defaulting to &#39;viridis&#39;.</code></pre>
+<pre class="r"><code>p_poverty</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-16-2.png" width="90%" /></p>
+<pre class="r"><code>p_parks &lt;- ggplot(df_map) +
+  geom_sf(aes(fill = area_per_capita), color = NA) +
+  scale_fill_viridis_c(option = &quot;Greens&quot;, direction = 1) +
+  labs(
+    title = &quot;Per-Capita Park Area&quot;,
+    fill  = &quot;log-area / capita&quot;
+  ) +
+  theme_minimal()</code></pre>
+<pre><code>## Warning in viridisLite::viridis(n, alpha, begin, end, direction, option):
+## Option &#39;Greens&#39; does not exist. Defaulting to &#39;viridis&#39;.</code></pre>
+<pre class="r"><code>p_parks</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-16-3.png" width="90%" /></p>
+<pre class="r"><code># fig &lt;- plot_ly(df_map,
+#                type = &quot;choroplethmapbox&quot;,
+#                geojson = df_map,
+#                locations = ~BoroCD,
+#                z = ~obesity,
+#                colorscale = &quot;Reds&quot;,
+#                text = ~paste(&quot;CD:&quot;, BoroCD,
+#                              &quot;&lt;br&gt;Obesity:&quot;, round(obesity,1),&quot;%&quot;),
+#                hoverinfo = &quot;text&quot;) %&gt;%
+#   layout(mapbox = list(style = &quot;carto-positron&quot;,
+#                        zoom = 9.5,
+#                        center = list(lon = -74, lat = 40.7)),
+#          title = &quot;NYC Community District Obesity Rate&quot;)
+# 
+# fig</code></pre>
+</div>
+</div>
+<div id="mlr" class="section level1">
+<h1>MLR</h1>
+<div id="fitting-the-mlr" class="section level2">
+<h2>fitting the MLR</h2>
+<pre class="r"><code>df_analysis &lt;- 
+  df_analysis |&gt;
+  mutate(
+    obesity = as.numeric(obesity),
+    poverty = as.numeric(poverty),
+    smoking = as.numeric(smoking),
+    binge_drink = as.numeric(binge_drink),
+    sugary_drink = as.numeric(sugary_drink),
+    pedestrian_hosp = as.numeric(pedestrian_hosp),
+    uninsured = as.numeric(uninsured)
+  )
+model_mlr &lt;- lm(
+  obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  data = df_analysis
+)
+
+summary(model_mlr)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = obesity ~ area_per_capita + poverty + smoking + 
+##     binge_drink + sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + 
+##     uninsured, data = df_analysis)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -11.5243  -2.9448  -0.3908   3.5950  12.5679 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                    2.732e+01  8.910e+00   3.067  0.00352 ** 
+## area_per_capita                5.923e-06  2.117e-03   0.003  0.99778    
+## poverty                       -4.557e-01  2.241e-01  -2.033  0.04744 *  
+## smoking                        5.258e-02  2.117e-01   0.248  0.80488    
+## binge_drink                   -7.716e-02  1.466e-01  -0.526  0.60108    
+## sugary_drink                   5.788e-01  1.334e-01   4.340 7.11e-05 ***
+## pedestrian_hosp                2.586e-01  1.314e-01   1.967  0.05480 .  
+## edu_college_degree_and_higher -2.496e-01  9.557e-02  -2.612  0.01192 *  
+## uninsured                     -4.922e-02  1.526e-01  -0.323  0.74833    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 5.3 on 49 degrees of freedom
+##   (1 observation deleted due to missingness)
+## Multiple R-squared:  0.7243, Adjusted R-squared:  0.6793 
+## F-statistic: 16.09 on 8 and 49 DF,  p-value: 2.398e-11</code></pre>
+</div>
+<div id="mlr-diagnostic" class="section level2">
+<h2>MLR Diagnostic</h2>
+<p>linear relationship and equal variances</p>
+<pre class="r"><code>plot(model_mlr, which = 1)</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-18-1.png" width="90%" /></p>
+<p>heavy tail comparaed with normal distribution</p>
+<pre class="r"><code>plot(model_mlr, which = 2)</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-19-1.png" width="90%" /></p>
+<p>There are some outliers.</p>
+<pre class="r"><code>influencePlot(model_mlr)</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-20-1.png" width="90%" /></p>
+<pre><code>##       StudRes       Hat      CookD
+## 28 -2.7847421 0.3062689 0.33431290
+## 55  2.8537860 0.2088937 0.20853684
+## 58 -1.4467720 0.4176663 0.16316721
+## 59  0.6445915 0.3831879 0.02902667</code></pre>
+<p>No Obvious Multicollinearity</p>
+<pre class="r"><code>vif(model_mlr)</code></pre>
+<pre><code>##               area_per_capita                       poverty 
+##                      1.790198                      5.036061 
+##                       smoking                   binge_drink 
+##                      2.065023                      1.469724 
+##                  sugary_drink               pedestrian_hosp 
+##                      2.637359                      2.157010 
+## edu_college_degree_and_higher                     uninsured 
+##                      6.013029                      1.981866</code></pre>
+<p>Theoretically, poverty and sugary_drink should have strong linear
+relationships, however in this dataset, they don’t. Besides, the effect
+of poverty on obesity in this dataset is also not significant. Maybe we
+should pay more attention on the origin of this poverty data.</p>
+<p>No Autocorrelation Between Residuals</p>
+<pre class="r"><code>lmtest::dwtest(model_mlr)</code></pre>
+<pre><code>## 
+##  Durbin-Watson test
+## 
+## data:  model_mlr
+## DW = 2.013, p-value = 0.3793
+## alternative hypothesis: true autocorrelation is greater than 0</code></pre>
+</div>
+<div id="analysing-stability-sensitivity-analysis"
+class="section level2">
+<h2>Analysing Stability (sensitivity analysis)</h2>
+<pre class="r"><code>df &lt;- df_analysis
+influential_points &lt;- c(34, 60, 61, 64, 65)
+
+df_no_inf &lt;- df[-influential_points, ]
+
+model_mlr_no_inf &lt;- lm(formula(model_mlr), data = df_no_inf)
+
+summary(model_mlr_no_inf)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = formula(model_mlr), data = df_no_inf)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -11.589  -3.176  -0.311   3.744  12.487 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                    2.755e+01  9.067e+00   3.039 0.003839 ** 
+## area_per_capita               -2.675e-05  2.144e-03  -0.012 0.990097    
+## poverty                       -4.563e-01  2.264e-01  -2.016 0.049417 *  
+## smoking                        5.893e-02  2.160e-01   0.273 0.786206    
+## binge_drink                   -7.842e-02  1.482e-01  -0.529 0.599158    
+## sugary_drink                   5.750e-01  1.360e-01   4.229 0.000105 ***
+## pedestrian_hosp                2.553e-01  1.337e-01   1.909 0.062261 .  
+## edu_college_degree_and_higher -2.510e-01  9.676e-02  -2.594 0.012533 *  
+## uninsured                     -5.051e-02  1.542e-01  -0.328 0.744666    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 5.353 on 48 degrees of freedom
+##   (1 observation deleted due to missingness)
+## Multiple R-squared:  0.7213, Adjusted R-squared:  0.6748 
+## F-statistic: 15.53 on 8 and 48 DF,  p-value: 5.557e-11</code></pre>
+<p>Overall, after removing the outliers, the outcome is very similar to
+the former one, so mlr model is stable enough for analysing
+obesity.<br />
+Only the coefficient for pedestrian_hosp showed noticeable sensitivity,
+suggesting that its effect may be driven by a few extreme
+communities.</p>
+<p>Influence diagnostics identified several observations with high
+leverage (IDs 34, 60, 61, 64, 65). To assess the robustness of our
+findings, we re-estimated the multivariable linear model after removing
+these influential points.</p>
+<p>The direction and significance of the main predictors remained
+unchanged, and p-values exhibited minimal variation. This indicates that
+the observed associations are not driven by a few extreme
+communities.</p>
+<p>Therefore, all observations were retained in the final analysis.</p>
+</div>
+</div>
+<div id="beta-regression" class="section level1">
+<h1>Beta Regression</h1>
+<div id="fitting-the-model" class="section level2">
+<h2>Fitting the Model</h2>
+<pre class="r"><code>n &lt;- nrow(df_analysis)
+df_new &lt;- df_analysis |&gt;
+  mutate(p_obesity = (obesity/100)*(n-1)/n + 0.5/n)
+
+model_beta &lt;- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured,
+  family = beta_family(link = &quot;logit&quot;),
+  data = df_new
+)
+summary(model_beta)</code></pre>
+<pre><code>##  Family: beta  ( logit )
+## Formula:          
+## p_obesity ~ area_per_capita + poverty + smoking + binge_drink +  
+##     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher +  
+##     uninsured
+## Data: df_new
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    -168.9    -148.3      94.5    -188.9        48 
+## 
+## 
+## Dispersion parameter for beta family (): 78.1 
+## 
+## Conditional model:
+##                                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                   -7.499e-01  4.841e-01  -1.549  0.12134    
+## area_per_capita                1.789e-05  1.668e-04   0.107  0.91462    
+## poverty                       -2.407e-02  1.161e-02  -2.073  0.03816 *  
+## smoking                        1.150e-03  1.121e-02   0.103  0.91826    
+## binge_drink                   -4.970e-03  7.687e-03  -0.647  0.51794    
+## sugary_drink                   2.802e-02  6.276e-03   4.465    8e-06 ***
+## pedestrian_hosp                1.214e-02  6.201e-03   1.957  0.05029 .  
+## edu_college_degree_and_higher -1.612e-02  5.062e-03  -3.184  0.00145 ** 
+## uninsured                     -2.597e-03  7.504e-03  -0.346  0.72928    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="beta-regression-diagnostic" class="section level2">
+<h2>Beta Regression Diagnostic</h2>
+<pre class="r"><code>res_beta &lt;- simulateResiduals(model_beta)
+plot(res_beta)</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-25-1.png" width="90%" /></p>
+<pre class="r"><code>testDispersion(res_beta)</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-25-2.png" width="90%" /></p>
+<pre><code>## 
+##  DHARMa nonparametric dispersion test via sd of residuals fitted vs.
+##  simulated
+## 
+## data:  simulationOutput
+## dispersion = 1.0119, p-value = 0.872
+## alternative hypothesis: two.sided</code></pre>
+<pre class="r"><code>testZeroInflation(res_beta)</code></pre>
+<p><img src="2025-11-18_data-cleaning-eda-and-models-for-obesity_files/figure-html/unnamed-chunk-25-3.png" width="90%" /></p>
+<pre><code>## 
+##  DHARMa zero-inflation test via comparison to expected zeros with
+##  simulation under H0 = fitted model
+## 
+## data:  simulationOutput
+## ratioObsSim = NaN, p-value = 1
+## alternative hypothesis: two.sided</code></pre>
+<p>We assessed model fit using simulated residuals generated through the
+DHARMa package. No significant deviations from model assumptions were
+detected. The uniform quantile-quantile plot showed no deviations (KS
+test p = 0.98). The dispersion test indicated no overdispersion (p =
+0.97), and the zero-inflation test suggested no excess zeros (p = 1).
+Residuals were evenly distributed across predicted values, with no
+evidence of nonlinearity or heteroskedasticity. Overall, the diagnostic
+results confirm that the beta regression model provides an adequate fit
+to the data.</p>
+</div>
+</div>
+<div id="beta-mixed-model" class="section level1">
+<h1>Beta Mixed Model</h1>
+<pre class="r"><code>model_beta_mixed &lt;- glmmTMB(
+  p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
+    sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured +
+    (1 | borough),
+  family = beta_family(link = &quot;logit&quot;),
+  data = df_new
+)</code></pre>
+<pre><code>## Warning in (function (start, objective, gradient = NULL, hessian = NULL, :
+## NA/NaN function evaluation</code></pre>
+<pre class="r"><code>summary(model_beta_mixed)</code></pre>
+<pre><code>##  Family: beta  ( logit )
+## Formula:          
+## p_obesity ~ area_per_capita + poverty + smoking + binge_drink +  
+##     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher +  
+##     uninsured + (1 | borough)
+## Data: df_new
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    -166.9    -144.2      94.5    -188.9        47 
+## 
+## Random effects:
+## 
+## Conditional model:
+##  Groups  Name        Variance  Std.Dev. 
+##  borough (Intercept) 3.239e-11 5.691e-06
+## Number of obs: 58, groups:  borough, 5
+## 
+## Dispersion parameter for beta family (): 78.1 
+## 
+## Conditional model:
+##                                 Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)                   -7.499e-01        NaN     NaN      NaN
+## area_per_capita                1.789e-05        NaN     NaN      NaN
+## poverty                       -2.407e-02        NaN     NaN      NaN
+## smoking                        1.150e-03        NaN     NaN      NaN
+## binge_drink                   -4.970e-03        NaN     NaN      NaN
+## sugary_drink                   2.802e-02        NaN     NaN      NaN
+## pedestrian_hosp                1.214e-02        NaN     NaN      NaN
+## edu_college_degree_and_higher -1.612e-02        NaN     NaN      NaN
+## uninsured                     -2.597e-03        NaN     NaN      NaN</code></pre>
+<div id="testing-whether-a-mixed-model-is-necessary"
+class="section level2">
+<h2>Testing Whether a Mixed Model is Necessary</h2>
+<pre class="r"><code>anova(model_beta, model_beta_mixed)</code></pre>
+<pre><code>## Data: df_new
+## Models:
+## model_beta: p_obesity ~ area_per_capita + poverty + smoking + binge_drink + , zi=~0, disp=~1
+## model_beta:     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + , zi=~0, disp=~1
+## model_beta:     uninsured, zi=~0, disp=~1
+## model_beta_mixed: p_obesity ~ area_per_capita + poverty + smoking + binge_drink + , zi=~0, disp=~1
+## model_beta_mixed:     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + , zi=~0, disp=~1
+## model_beta_mixed:     uninsured + (1 | borough), zi=~0, disp=~1
+##                  Df     AIC     BIC logLik deviance Chisq Chi Df Pr(&gt;Chisq)
+## model_beta       10 -168.91 -148.31 94.457  -188.91                        
+## model_beta_mixed 11 -166.91 -144.25 94.457  -188.91     0      1          1</code></pre>
+<p>We compared a beta mixed-effects model with a random intercept for
+borough to a marginal beta regression model without random effects,
+using a likelihood ratio test. The random intercept variance was
+essentially zero (≈ 4×10⁻¹¹), and the likelihood ratio test was not
+significant (p = 1). AIC values for the two models were nearly
+identical. These results indicate that little residual variability
+remains between boroughs after adjusting for covariates, so we proceeded
+with the simpler marginal beta regression model.</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

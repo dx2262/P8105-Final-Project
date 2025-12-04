@@ -8,10 +8,12 @@ navbar:
       href: introduction.html
     - text: "EDA"
       href: Initial-EDA.html
-    - text: "Premature Mortality Analysis"
-      href: cleaning_eda_model_premature_mortality.html
-    - text: "Obesity Analysis"
-      href: 2025-11-18_data-cleaning-eda-and-models-for-obesity.html
+    - text: "Analysis"
+      menu:
+      - text: "Premature Mortality Analysis"
+        href: cleaning_eda_model_premature_mortality.html
+      - text: "Obesity Analysis"
+        href: 2025-11-18_data-cleaning-eda-and-models-for-obesity.html
     - text: "Discussion"
       href: discussion.html
     - text: "Report"

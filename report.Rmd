@@ -1,9 +1,8 @@
 ---
-title: "Report"
+title: "Where the Grass is Greener: Linking Demographic and Health Outcome Data to Urban Green Space in NYC
+"
 output: html_document
 ---
-
-## Where the Grass is Greener: Linking Demographic and Health Outcome Data to Urban Green Space in NYC
 
 ## Motivation
 

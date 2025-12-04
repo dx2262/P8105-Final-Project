@@ -1,7 +1,6 @@
 ---
 title: "Report"
-output: 
-  html_document:
+output: html_document
 ---
 
 ## Where the Grass is Greener: Linking Demographic and Health Outcome Data to Urban Green Space in NYC

@@ -2,6 +2,7 @@ name: "Website"
 output_dir: "."
 navbar:
   title: "Home"
+  type: "inverse"
   right:
     - text: "Introduction"
       href: introduction.html
@@ -17,4 +18,4 @@ navbar:
       href: report.html      
 output:
   html_document:
-    theme: cerulean
+    theme: sandstone

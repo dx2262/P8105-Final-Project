@@ -1,6 +1,5 @@
 ---
 title: "Discussion"
-output: 
-  html_document:
+output: html_document
 ---
 

@@ -1,7 +1,6 @@
 ---
 title: "Introduction"
-output: 
-  html_document:
+output: html_document
 ---
 
 Access to quality green space is increasingly recognized as a key determinant of public health in urban environments. Parks and other green areas promote physical activity, social interaction, and stress reduction, all of which contribute to improved physical and mental health outcomes. However, as New York City become increasingly dense, disparities in the availability, quality, and accessibility of parks raise important questions about environmental equity and community well-being.

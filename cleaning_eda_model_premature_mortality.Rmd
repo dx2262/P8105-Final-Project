@@ -1,7 +1,6 @@
 ---
 title: "Premature Mortality Analysis"
-output: 
-  html_document:
+output: html_document
 ---
 
 ```{r setup, include=FALSE}

@@ -50,8 +50,10 @@ parks_df =
 
 To clean the park data for initial EDA, we selected the variables that we thought would be of interest and gave them meaningful names. The most important variables in this data set mainly consisted of:
 
-`acres`: size of park property in acres
-`communityboard`: community board in which property is located (matches up to `id` in NYC health profile data)
+`acres`: size of park property in acres   
+
+`communityboard`: community board in which property is located (matches up to `id` in NYC health profile data)   
+
 
 An issue we ran into with this data is that some parks belonged to multiple communities, so we had to decide how to handle these observations. We did not have any information about how many acres of each park belonged to each community, so we could not divide the acres proportionately. We decided that summing the total acreage of parks within each community would likely overestimate the actual amount of green space available, since parks that span multiple communities are generally too large to be fully utilized by all of the communities. As a result, we decided to split the number of acres evenly across the multiple communities.
 
@@ -69,20 +71,34 @@ demo_df =
 
 To clean the community health profile data for EDA, we imported and filtered only the rows of the data that corresponded to one community, named `id`. We removed the columns with the upper and lower confidence intervals along with variables we did not think would be useful for our analysis. As mentioned above, this data set contained many variables, but some of the notable variables include:
 
-`id`: community board for which data was collected
-`borough`: borough in which community board is located
-neighbourhood: name of neighbourhood corresponding to community board/ ID
-`overall_pop`: total population
-`race_`: percentage of population belonging to given race
-`age`: percentage of population belonging to given age group
-`on_time_hs_grad`: percentage of population graduating HS on time
-`edu_did_not_complete_hs`: percentage of population who did not graduate HS
-`poverty`: percentage of population living in poverty
-`unemployment`: unemployment rate
-`physical_activity`: percentage of population reporting physical activity
-`uninsured`: percentage of population uninsured
-`obesity`: percentage of population with obesity
-`premature_mort_rate`: rate of premature mortality
+`id`: community board for which data was collected   
+
+`borough`: borough in which community board is located   
+
+`neighbourhood`: name of neighbourhood corresponding to community board/ ID  
+
+`overall_pop`: total population    
+
+`race_`: percentage of population belonging to given race    
+
+`age`: percentage of population belonging to given age group   
+
+`on_time_hs_grad`: percentage of population graduating HS on time   
+
+`edu_did_not_complete_hs`: percentage of population who did not graduate HS   
+
+`poverty`: percentage of population living in poverty   
+
+`unemployment`: unemployment rate   
+
+`physical_activity`: percentage of population reporting physical activity   
+
+`uninsured`: percentage of population uninsured   
+
+`obesity`: percentage of population with obesity   
+
+`premature_mort_rate`: rate of premature mortality   
+
 
 ```{r}
 full_df =
@@ -199,6 +215,8 @@ full_df |>
   )
 ```
 
+The distribution of park sizes in each borough shows that Staten Island's park sizes tend to be much larger than the park sizes in the other boroughs. It also has the widest distribution, meaning it has large variety of park sizes. The Bronx, Brooklyn, and Manhattan all have parks of similar sizes, but Manhattan appears to have the smallest parks. Every borough aside from Staten Island has outliers on the upper end, indicating they still do have a range of park sizes even though most of them are on the smaller end.
+
 ```{r}
 full_df |> 
   mutate(geometry = st_as_sfc(multipolygon)) |> 
@@ -211,6 +229,9 @@ full_df |>
     title = "Layout of Green Spaces in NYC"
   )
 ```
+
+This map shows a visual of green spaces by borough. We can see that Manhattan definitely has the lowest area of green space, but interestingly, all the other boroughs appear to have a similar amount of green space. However, we know this is not the case based on total acres shown in the green space per capita of NYC boroughs plot. 
+
 
 ```{r}
 demo_df |> 
@@ -236,6 +257,9 @@ demo_df |>
   )
 ```
 
+Next, we did some EDA for the community health profiles data. We first looked at the distribution of race in each NYC borough. The most common race in Staten Island, Manhattan, and Brooklyn is white, and the most common in the Bronx and Queens is Latino.
+
+
 ```{r}
 demo_df |> 
   pivot_longer(
@@ -260,6 +284,10 @@ demo_df |>
     yaxis = list(title = "Percentage")
   )
 ```
+
+Similarly, we observed age distributions for each NYC borough. The most common age group is 0-17 in the Bronx, 25-44 in Manhattan, Queens, and Brooklyn, and 45-65 in Staten Island.
+
+Since the goal of our project was to determine how health outcomes are affected by green space accessibility, we wanted to observe some possible relationships within the health data itself to see if they show what we would expect.
 
 ```{r}
 demo_df |> 
@@ -319,6 +347,7 @@ demo_df |>
 ```
 
 
+The percentage of population living in poverty appears to be negatively correlated with phyisical activity levels. There is an inverse relationship between finishing high school on time and the unemployment rate, poverty, and percentage of people who are uninsured. These are all relationships that we would expect. As a result of this analysis, we observe several consistent correlations between socioeconomic indicators and health or education-related outcomes. These patterns suggest that communities with higher socioeconomic disadvantage tend to exhibit lower physical activity levels and less favorable educational and health metrics. While these findings do not imply causation, they highlight meaningful associations worth further exploration.
 
 
 

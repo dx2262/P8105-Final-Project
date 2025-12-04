@@ -1,6 +1,9 @@
 ---
 title: "Initial EDA"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
+    always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -28,7 +31,7 @@ scale_fill_discrete = scale_fill_viridis_d
 Our two data sources were the [NYC Community Health Profiles](https://www.nyc.gov/site/doh/data/data-publications/profiles.page) and [NYC Park Properties](https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn). The NYC community health profiles capture the health of 59 community districts across the city. They
 contain over 50 measures of neighborhood health. The part data identifies property managed partially or solely by NYC Parks.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 parks_df =
   read.csv("data/Parks_Properties_20251104.csv") |> 
   janitor::clean_names() |> 
@@ -57,7 +60,7 @@ To clean the park data for initial EDA, we selected the variables that we though
 
 An issue we ran into with this data is that some parks belonged to multiple communities, so we had to decide how to handle these observations. We did not have any information about how many acres of each park belonged to each community, so we could not divide the acres proportionately. We decided that summing the total acreage of parks within each community would likely overestimate the actual amount of green space available, since parks that span multiple communities are generally too large to be fully utilized by all of the communities. As a result, we decided to split the number of acres evenly across the multiple communities.
 
-```{r, message = FALSE}
+```{r message = FALSE, warning = FALSE}
 demo_df =
   read_excel("data/2022-chp-pud.xlsx", sheet = 4, range = cell_rows(2:67)) |> 
   janitor::clean_names() |> 
@@ -100,14 +103,14 @@ To clean the community health profile data for EDA, we imported and filtered onl
 `premature_mort_rate`: rate of premature mortality   
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 full_df =
   inner_join(parks_df, demo_df)
 ```
 
 The data sets were joined by the community board/ ID variable.
 
-```{r fig.height = 15, fig.width = 15}
+```{r message = FALSE, warning = FALSE, fig.height = 15, fig.width = 15}
 full_df |> 
   group_by(id, neighbourhood, overall_pop) |> 
   summarize(
@@ -125,7 +128,7 @@ full_df |>
 
 The plot above shows acres per capita of green space in NYC neighbourhoods. The data was grouped by ID and population. The number of acres per neighbourhood was found by summing acres after grouping by neighbourhood. This was then divided by neighbourhood population to find acres per capita. The plot shows that the neighbourhood with the highest acres per capita of green space is South Beach and Willowbrook. The neighbourhood with the lowest acres per capita of green space is East Flatbush.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 full_df |> 
   group_by(borough) |> 
   summarize(
@@ -151,7 +154,7 @@ full_df |>
 
 A similar plot was made for acres per capita of green space, but this time the data was grouped by borough. We found acres per capita in the same way as above, and found that Staten Island has the highest acres per capita and Manhattan has the lowest. This is what we would expect as Manhattan has the largest population of NYC boroughs and Staten Island had the smallest.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 full_df |> 
   arrange(acres) |> 
   filter(row_number() < 10) |>
@@ -168,7 +171,7 @@ full_df |>
 We then wanted to look at which parks were the smallest and largest. The smallest parks belong to Queens and Brooklyn, and the largest parks are in every borough besides Manhattan.
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 full_df |> 
   group_by(neighbourhood) |> 
   summarize(
@@ -194,7 +197,7 @@ full_df |>
 ```
 After determining that Staten Island had the most green space per capita and Manhattan had the lowest, we wanted to try to observe if there was any potential relationship between neighbourhood population and acres of green space. We would not expect to find one as Manhattan, the borough with the largest population, had the smallest acres per capita, and vice versa for Staten Island. The plot indicates there may be a slight positive relationship between population and green space, but it does not appear to be substantial. 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 full_df |> 
   mutate(label = str_c("Park: ", park_name,
     "\nAcres: ", acres, 
@@ -217,7 +220,7 @@ full_df |>
 
 The distribution of park sizes in each borough shows that Staten Island's park sizes tend to be much larger than the park sizes in the other boroughs. It also has the widest distribution, meaning it has large variety of park sizes. The Bronx, Brooklyn, and Manhattan all have parks of similar sizes, but Manhattan appears to have the smallest parks. Every borough aside from Staten Island has outliers on the upper end, indicating they still do have a range of park sizes even though most of them are on the smaller end.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 full_df |> 
   mutate(geometry = st_as_sfc(multipolygon)) |> 
   st_as_sf() |> 
@@ -233,7 +236,7 @@ full_df |>
 This map shows a visual of green spaces by borough. We can see that Manhattan definitely has the lowest area of green space, but interestingly, all the other boroughs appear to have a similar amount of green space. However, we know this is not the case based on total acres shown in the green space per capita of NYC boroughs plot. 
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 demo_df |> 
   pivot_longer(
     cols = starts_with("race_"),
@@ -260,7 +263,7 @@ demo_df |>
 Next, we did some EDA for the community health profiles data. We first looked at the distribution of race in each NYC borough. The most common race in Staten Island, Manhattan, and Brooklyn is white, and the most common in the Bronx and Queens is Latino.
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 demo_df |> 
   pivot_longer(
     cols = starts_with("age"),
@@ -289,7 +292,7 @@ Similarly, we observed age distributions for each NYC borough. The most common a
 
 Since the goal of our project was to determine how health outcomes are affected by green space accessibility, we wanted to observe some possible relationships within the health data itself to see if they show what we would expect.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 demo_df |> 
   plot_ly(
     x = ~poverty,
@@ -303,7 +306,7 @@ demo_df |>
   )
 ```
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 demo_df |> 
   plot_ly(
     x = ~on_time_hs_grad,
@@ -317,7 +320,7 @@ demo_df |>
   )
 ```
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 demo_df |> 
   plot_ly(
     x = ~on_time_hs_grad,
@@ -331,7 +334,7 @@ demo_df |>
   )
 ```
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 demo_df |> 
   mutate(uninsured = as.numeric(uninsured)) |> 
   plot_ly(

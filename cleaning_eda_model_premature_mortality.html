@@ -382,6 +382,9 @@ div.tocify {
 </div>
 
 
+<hr />
+<div id="data-cleaning-and-exploratory-analysis" class="section level2">
+<h2>Data Cleaning and Exploratory Analysis</h2>
 <p>We first assembled neighborhood-level measures of health and
 sociodemographic context using the <strong>Community Health Profiles
 (CHP)</strong> dataset. This resource provides demographic,
@@ -470,7 +473,7 @@ scale and heterogeneity of the data.</p>
     mean_poverty = mean(poverty, na.rm = TRUE),
     mean_race_black = mean(race_black, na.rm = TRUE)
     ) |&gt; 
-  knitr::kable(digits = 3)</code></pre>
+  kable(digits = 3)</code></pre>
 <table>
 <colgroup>
 <col width="4%" />
@@ -561,8 +564,12 @@ shape of the relationship.</p>
     xaxis = list(title = &quot;Park acres per 1,000 residents&quot;),
     yaxis = list(title = &quot;Premature mortality rate (per 100,000, age &lt; 65)&quot;)
   )</code></pre>
-<div class="plotly html-widget html-fill-item" id="htmlwidget-fd669d260f608707563a" style="width:90%;height:345.6px;"></div>
-<script type="application/json" data-for="htmlwidget-fd669d260f608707563a">{"x":{"visdat":{"f97c3f15a945":["function () ","plotlyVisDat"]},"cur_data":"f97c3f15a945","attrs":{"f97c3f15a945":{"x":{},"y":{},"text":{},"mode":"markers","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"},"f97c3f15a945.1":{"x":{},"y":[174.92359655008229,173.38526405654221,174.16178141028419,173.18798445540119,173.66688028221955,173.24510746513135,173.86807230913303,173.30146481339946,174.33375673601333,173.3675411590404,179.96405979095053,177.50528086247007,174.12228409871787,176.07393049678979,175.72102659255293,174.80236136054708,173.22050698133992,173.74904100980726,173.74735171403856,177.81752400797933,176.70839754637092,181.39908864932445,174.76628120644762,173.59873430526477,174.20092309581878,174.25760751291324,173.64940038157096,173.36993043967391,173.87508456179003,174.40976194583166,173.50930194548025,173.78262766727158,173.23002124030853,177.00661208296506,173.21278044082152,173.12558747390926,176.43750900522249,173.42948485674006,173.60745080615169,173.92907196534253,173.13703879651661,177.51957452486886,173.99210976139162,173.42265408615606,173.27709883952741,173.18340907952461,173.88135590955051,173.23786082505254,177.76822263718324,177.31671663502797,173.10766320228765,173.66608037307483,185.43011659034966,174.89766725667789,177.9095493695304,199.80162285410796,181.12471208395527,196.25348559216059,196.00258830139686],"type":"scatter","mode":"lines","showlegend":false,"inherit":false}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Park area density and premature mortality across NYC community districts","xaxis":{"domain":[0,1],"automargin":true,"title":"Park acres per 1,000 residents"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Premature mortality rate (per 100,000, age < 65)"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[0.69302569832679861,1.8690810549349388,1.6564223851289142,1.1028378996926698,0.14961793224441833,0.46811070631598545,0.46709274253952643,2.9197644628552655,2.251408700449208,5.0780029048463309,1.0810961238577435,0.37753640700339136],"y":[324,260.69999999999999,308.30000000000001,242.59999999999999,247.90000000000001,319.89999999999998,222.30000000000001,175,215.80000000000001,185.40000000000001,214.19999999999999,212.80000000000001],"text":["Mott Haven and Melrose<br>Park acres per 1,000: 0.69<br>Premature mortality: 324","Hunts Point and Longwood<br>Park acres per 1,000: 1.87<br>Premature mortality: 260.7","Morrisania and Crotona<br>Park acres per 1,000: 1.66<br>Premature mortality: 308.3","Highbridge and Concourse<br>Park acres per 1,000: 1.1<br>Premature mortality: 242.6","Fordham and University Heights<br>Park acres per 1,000: 0.15<br>Premature mortality: 247.9","Belmont and East Tremont<br>Park acres per 1,000: 0.47<br>Premature mortality: 319.9","Kingsbridge Heights and Bedford<br>Park acres per 1,000: 0.47<br>Premature mortality: 222.3","Riverdale and Fieldston<br>Park acres per 1,000: 2.92<br>Premature mortality: 175","Parkchester and Soundview<br>Park acres per 1,000: 2.25<br>Premature mortality: 215.8","Throgs Neck and Co-op City<br>Park acres per 1,000: 5.08<br>Premature mortality: 185.4","Morris Park and Bronxdale<br>Park acres per 1,000: 1.08<br>Premature mortality: 214.2","Williamsbridge and Baychester<br>Park acres per 1,000: 0.38<br>Premature mortality: 212.8"],"mode":"markers","type":"scatter","name":"Bronx","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.74041328547894159,0.77457111879651031,0.40806760901675854,0.23965999045239839,0.54406411397307508,0.86625885282566095,0.32364477689937832,0.48834990971906833,0.15535119172997175,2.4311117468240204,0.14496194570212945,0.092419765982986846,2.0881722042395974,0.2755472758077353,0.38278894023331922,0.57659673627595454,0.099320293304909935,2.7402211367912428],"y":[150.59999999999999,140.90000000000001,260.10000000000002,190.80000000000001,280.80000000000001,137,127.7,227.40000000000001,205.40000000000001,125.90000000000001,131.59999999999999,114.7,210.40000000000001,163.30000000000001,136.5,381.80000000000001,209.69999999999999,181.19999999999999],"text":["Greenpoint and Williamsburg<br>Park acres per 1,000: 0.74<br>Premature mortality: 150.6","Fort Greene and Brooklyn Heights<br>Park acres per 1,000: 0.77<br>Premature mortality: 140.9","Bedford Stuyvesant<br>Park acres per 1,000: 0.41<br>Premature mortality: 260.1","Bushwick<br>Park acres per 1,000: 0.24<br>Premature mortality: 190.8","East New York and Starrett City<br>Park acres per 1,000: 0.54<br>Premature mortality: 280.8","Park Slope and Carroll Gardens<br>Park acres per 1,000: 0.87<br>Premature mortality: 137","Sunset Park<br>Park acres per 1,000: 0.32<br>Premature mortality: 127.7","Crown Heights and Prospect Heights<br>Park acres per 1,000: 0.49<br>Premature mortality: 227.4","South Crown Heights and Lefferts Gardens<br>Park acres per 1,000: 0.16<br>Premature mortality: 205.4","Bay Ridge and Dyker Heights<br>Park acres per 1,000: 2.43<br>Premature mortality: 125.9","Bensonhurst<br>Park acres per 1,000: 0.14<br>Premature mortality: 131.6","Borough Park<br>Park acres per 1,000: 0.09<br>Premature mortality: 114.7","Coney Island<br>Park acres per 1,000: 2.09<br>Premature mortality: 210.4","Flatbush and Midwood<br>Park acres per 1,000: 0.28<br>Premature mortality: 163.3","Sheepshead Bay<br>Park acres per 1,000: 0.38<br>Premature mortality: 136.5","Brownsville<br>Park acres per 1,000: 0.58<br>Premature mortality: 381.8","East Flatbush<br>Park acres per 1,000: 0.1<br>Premature mortality: 209.7","Flatlands and Canarsie<br>Park acres per 1,000: 2.74<br>Premature mortality: 181.2"],"mode":"markers","type":"scatter","name":"Brooklyn","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1.1758938048011089,0.24889997484300608,0.71682664141007246,0.13001997081121919,0.41860093657602965,0.16444209853121408,0.53983855482090137,0.1984028413073837,0.82045837676335842,0.23822021822201978,4.213259487470526,2.73160782536032],"y":[71.5,63,156.80000000000001,106.40000000000001,110.2,90.5,100.40000000000001,80,174.90000000000001,284.89999999999998,284.10000000000002,136.5],"text":["Financial District<br>Park acres per 1,000: 1.18<br>Premature mortality: 71.5","Greenwich Village and Soho<br>Park acres per 1,000: 0.25<br>Premature mortality: 63","Lower East Side and Chinatown<br>Park acres per 1,000: 0.72<br>Premature mortality: 156.8","Clinton and Chelsea<br>Park acres per 1,000: 0.13<br>Premature mortality: 106.4","Midtown<br>Park acres per 1,000: 0.42<br>Premature mortality: 110.2","Stuyvesant Town and Turtle Bay<br>Park acres per 1,000: 0.16<br>Premature mortality: 90.5","Upper West Side<br>Park acres per 1,000: 0.54<br>Premature mortality: 100.4","Upper East Side<br>Park acres per 1,000: 0.2<br>Premature mortality: 80","Morningside Heights and Hamilton Heights<br>Park acres per 1,000: 0.82<br>Premature mortality: 174.9","Central Harlem<br>Park acres per 1,000: 0.24<br>Premature mortality: 284.9","East Harlem<br>Park acres per 1,000: 4.21<br>Premature mortality: 284.1","Washington Heights and Inwood<br>Park acres per 1,000: 2.73<br>Premature mortality: 136.5"],"mode":"markers","type":"scatter","name":"Manhattan","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.6145830937357698,0.27143107712390513,0.1837199898853635,0.12726286516262073,0.54784320640197004,0.16007529833087653,2.8900556276532772,2.6179796753188742,0.081618662015229146,0.41811891409727492,7.5070863737386651,1.160268902445881,2.9752186268384899,16.167306247952528],"y":[133.09999999999999,87.599999999999994,109.5,108.8,150.80000000000001,99.299999999999997,113.09999999999999,110.09999999999999,141.19999999999999,159.5,84.799999999999997,190.5,116.3,274.69999999999999],"text":["Long Island City and Astoria<br>Park acres per 1,000: 0.61<br>Premature mortality: 133.1","Woodside and Sunnyside<br>Park acres per 1,000: 0.27<br>Premature mortality: 87.6","Jackson Heights<br>Park acres per 1,000: 0.18<br>Premature mortality: 109.5","Elmhurst and Corona<br>Park acres per 1,000: 0.13<br>Premature mortality: 108.8","Ridgewood and Maspeth<br>Park acres per 1,000: 0.55<br>Premature mortality: 150.8","Rego Park and Forest Hills<br>Park acres per 1,000: 0.16<br>Premature mortality: 99.3","Flushing and Whitestone<br>Park acres per 1,000: 2.89<br>Premature mortality: 113.1","Hillcrest and Fresh Meadows<br>Park acres per 1,000: 2.62<br>Premature mortality: 110.1","Kew Gardens and Woodhaven<br>Park acres per 1,000: 0.08<br>Premature mortality: 141.2","South Ozone Park and Howard Beach<br>Park acres per 1,000: 0.42<br>Premature mortality: 159.5","Bayside and Little Neck<br>Park acres per 1,000: 7.51<br>Premature mortality: 84.8","Jamaica and Hollis<br>Park acres per 1,000: 1.16<br>Premature mortality: 190.5","Queens Village<br>Park acres per 1,000: 2.98<br>Premature mortality: 116.3","Rockaway and Broad Channel<br>Park acres per 1,000: 16.17<br>Premature mortality: 274.7"],"mode":"markers","type":"scatter","name":"Queens","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[4.9126645373280589,14.029211028953567,13.878021190951829],"y":[231.5,160.69999999999999,155.19999999999999],"text":["St. George and Stapleton<br>Park acres per 1,000: 4.91<br>Premature mortality: 231.5","South Beach and Willowbrook<br>Park acres per 1,000: 14.03<br>Premature mortality: 160.7","Tottenville and Great Kills<br>Park acres per 1,000: 13.88<br>Premature mortality: 155.2"],"mode":"markers","type":"scatter","name":"Staten Island","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.081618662015229146,0.092419765982986846,0.099320293304909935,0.12726286516262073,0.13001997081121919,0.14496194570212945,0.14961793224441833,0.15535119172997175,0.16007529833087653,0.16444209853121408,0.1837199898853635,0.1984028413073837,0.23822021822201978,0.23965999045239839,0.24889997484300608,0.27143107712390513,0.2755472758077353,0.32364477689937832,0.37753640700339136,0.38278894023331922,0.40806760901675854,0.41811891409727492,0.41860093657602965,0.46709274253952643,0.46811070631598545,0.48834990971906833,0.53983855482090137,0.54406411397307508,0.54784320640197004,0.57659673627595454,0.6145830937357698,0.69302569832679861,0.71682664141007246,0.74041328547894159,0.77457111879651031,0.82045837676335842,0.86625885282566095,1.0810961238577435,1.1028378996926698,1.160268902445881,1.1758938048011089,1.6564223851289142,1.8690810549349388,2.0881722042395974,2.251408700449208,2.4311117468240204,2.6179796753188742,2.73160782536032,2.7402211367912428,2.8900556276532772,2.9197644628552655,2.9752186268384899,4.213259487470526,4.9126645373280589,5.0780029048463309,7.5070863737386651,13.878021190951829,14.029211028953567,16.167306247952528],"y":[173.10766320228765,173.12558747390926,173.13703879651661,173.18340907952461,173.18798445540119,173.21278044082152,173.22050698133992,173.23002124030853,173.23786082505254,173.24510746513135,173.27709883952741,173.30146481339946,173.3675411590404,173.36993043967391,173.38526405654221,173.42265408615606,173.42948485674006,173.50930194548025,173.59873430526477,173.60745080615169,173.64940038157096,173.66608037307483,173.66688028221955,173.74735171403856,173.74904100980726,173.78262766727158,173.86807230913303,173.87508456179003,173.88135590955051,173.92907196534253,173.99210976139162,174.12228409871787,174.16178141028419,174.20092309581878,174.25760751291324,174.33375673601333,174.40976194583166,174.76628120644762,174.80236136054708,174.89766725667789,174.92359655008229,175.72102659255293,176.07393049678979,176.43750900522249,176.70839754637092,177.00661208296506,177.31671663502797,177.50528086247007,177.51957452486886,177.76822263718324,177.81752400797933,177.9095493695304,179.96405979095053,181.12471208395527,181.39908864932445,185.43011659034966,196.00258830139686,196.25348559216059,199.80162285410796],"type":"scatter","mode":"lines","showlegend":false,"marker":{"color":"rgba(140,86,75,1)","line":{"color":"rgba(140,86,75,1)"}},"error_y":{"color":"rgba(140,86,75,1)"},"error_x":{"color":"rgba(140,86,75,1)"},"line":{"color":"rgba(140,86,75,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-dbfe9b3c8ff54465870a" style="width:90%;height:345.6px;"></div>
+<script type="application/json" data-for="htmlwidget-dbfe9b3c8ff54465870a">{"x":{"visdat":{"e8d337d71c8":["function () ","plotlyVisDat"]},"cur_data":"e8d337d71c8","attrs":{"e8d337d71c8":{"x":{},"y":{},"text":{},"mode":"markers","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"},"e8d337d71c8.1":{"x":{},"y":[174.92359655008221,173.38526405654227,174.16178141028419,173.18798445540119,173.66688028221955,173.24510746513135,173.86807230913303,173.30146481339946,174.33375673601333,173.3675411590404,179.96405979095056,177.50528086247007,174.12228409871787,176.07393049678979,175.72102659255293,174.80236136054708,173.22050698133992,173.74904100980726,173.74735171403856,177.81752400797933,176.70839754637092,181.39908864932443,174.76628120644762,173.59873430526477,174.20092309581878,174.25760751291324,173.64940038157096,173.36993043967391,173.87508456179006,174.40976194583166,173.50930194548025,173.78262766727158,173.23002124030853,177.00661208296506,173.21278044082152,173.12558747390926,176.43750900522249,173.42948485674006,173.60745080615172,173.92907196534253,173.13703879651661,177.51957452486886,173.99210976139162,173.42265408615609,173.27709883952741,173.18340907952461,173.88135590955051,173.23786082505254,177.76822263718321,177.31671663502797,173.10766320228765,173.66608037307483,185.43011659034966,174.89766725667786,177.9095493695304,199.80162285410796,181.1247120839553,196.25348559216059,196.00258830139686],"type":"scatter","mode":"lines","showlegend":false,"inherit":false}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Park area density and premature mortality across NYC community districts","xaxis":{"domain":[0,1],"automargin":true,"title":"Park acres per 1,000 residents"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Premature mortality rate (per 100,000, age < 65)"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[0.69302569832679883,1.869081054934939,1.6564223851289146,1.1028378996926698,0.14961793224441836,0.46811070631598556,0.46709274253952632,2.9197644628552655,2.251408700449208,5.0780029048463309,1.0810961238577437,0.37753640700339136],"y":[324,260.69999999999999,308.30000000000001,242.59999999999999,247.90000000000001,319.89999999999998,222.30000000000001,175,215.80000000000001,185.40000000000001,214.19999999999999,212.80000000000001],"text":["Mott Haven and Melrose<br>Park acres per 1,000: 0.69<br>Premature mortality: 324","Hunts Point and Longwood<br>Park acres per 1,000: 1.87<br>Premature mortality: 260.7","Morrisania and Crotona<br>Park acres per 1,000: 1.66<br>Premature mortality: 308.3","Highbridge and Concourse<br>Park acres per 1,000: 1.1<br>Premature mortality: 242.6","Fordham and University Heights<br>Park acres per 1,000: 0.15<br>Premature mortality: 247.9","Belmont and East Tremont<br>Park acres per 1,000: 0.47<br>Premature mortality: 319.9","Kingsbridge Heights and Bedford<br>Park acres per 1,000: 0.47<br>Premature mortality: 222.3","Riverdale and Fieldston<br>Park acres per 1,000: 2.92<br>Premature mortality: 175","Parkchester and Soundview<br>Park acres per 1,000: 2.25<br>Premature mortality: 215.8","Throgs Neck and Co-op City<br>Park acres per 1,000: 5.08<br>Premature mortality: 185.4","Morris Park and Bronxdale<br>Park acres per 1,000: 1.08<br>Premature mortality: 214.2","Williamsbridge and Baychester<br>Park acres per 1,000: 0.38<br>Premature mortality: 212.8"],"mode":"markers","type":"scatter","name":"Bronx","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.74041328547894103,0.77457111879651064,0.40806760901675854,0.23965999045239839,0.54406411397307508,0.86625885282566129,0.32364477689937826,0.48834990971906844,0.15535119172997172,2.4311117468240204,0.14496194570212945,0.092419765982986846,2.0881722042395974,0.27554727580773525,0.38278894023331916,0.57659673627595431,0.099320293304909921,2.7402211367912432],"y":[150.59999999999999,140.90000000000001,260.10000000000002,190.80000000000001,280.80000000000001,137,127.7,227.40000000000001,205.40000000000001,125.90000000000001,131.59999999999999,114.7,210.40000000000001,163.30000000000001,136.5,381.80000000000001,209.69999999999999,181.19999999999999],"text":["Greenpoint and Williamsburg<br>Park acres per 1,000: 0.74<br>Premature mortality: 150.6","Fort Greene and Brooklyn Heights<br>Park acres per 1,000: 0.77<br>Premature mortality: 140.9","Bedford Stuyvesant<br>Park acres per 1,000: 0.41<br>Premature mortality: 260.1","Bushwick<br>Park acres per 1,000: 0.24<br>Premature mortality: 190.8","East New York and Starrett City<br>Park acres per 1,000: 0.54<br>Premature mortality: 280.8","Park Slope and Carroll Gardens<br>Park acres per 1,000: 0.87<br>Premature mortality: 137","Sunset Park<br>Park acres per 1,000: 0.32<br>Premature mortality: 127.7","Crown Heights and Prospect Heights<br>Park acres per 1,000: 0.49<br>Premature mortality: 227.4","South Crown Heights and Lefferts Gardens<br>Park acres per 1,000: 0.16<br>Premature mortality: 205.4","Bay Ridge and Dyker Heights<br>Park acres per 1,000: 2.43<br>Premature mortality: 125.9","Bensonhurst<br>Park acres per 1,000: 0.14<br>Premature mortality: 131.6","Borough Park<br>Park acres per 1,000: 0.09<br>Premature mortality: 114.7","Coney Island<br>Park acres per 1,000: 2.09<br>Premature mortality: 210.4","Flatbush and Midwood<br>Park acres per 1,000: 0.28<br>Premature mortality: 163.3","Sheepshead Bay<br>Park acres per 1,000: 0.38<br>Premature mortality: 136.5","Brownsville<br>Park acres per 1,000: 0.58<br>Premature mortality: 381.8","East Flatbush<br>Park acres per 1,000: 0.1<br>Premature mortality: 209.7","Flatlands and Canarsie<br>Park acres per 1,000: 2.74<br>Premature mortality: 181.2"],"mode":"markers","type":"scatter","name":"Brooklyn","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1.1758938048011089,0.24889997484300616,0.71682664141007213,0.13001997081121919,0.41860093657602959,0.16444209853121408,0.53983855482090137,0.19840284130738373,0.82045837676335831,0.23822021822201978,4.213259487470526,2.73160782536032],"y":[71.5,63,156.80000000000001,106.40000000000001,110.2,90.5,100.40000000000001,80,174.90000000000001,284.89999999999998,284.10000000000002,136.5],"text":["Financial District<br>Park acres per 1,000: 1.18<br>Premature mortality: 71.5","Greenwich Village and Soho<br>Park acres per 1,000: 0.25<br>Premature mortality: 63","Lower East Side and Chinatown<br>Park acres per 1,000: 0.72<br>Premature mortality: 156.8","Clinton and Chelsea<br>Park acres per 1,000: 0.13<br>Premature mortality: 106.4","Midtown<br>Park acres per 1,000: 0.42<br>Premature mortality: 110.2","Stuyvesant Town and Turtle Bay<br>Park acres per 1,000: 0.16<br>Premature mortality: 90.5","Upper West Side<br>Park acres per 1,000: 0.54<br>Premature mortality: 100.4","Upper East Side<br>Park acres per 1,000: 0.2<br>Premature mortality: 80","Morningside Heights and Hamilton Heights<br>Park acres per 1,000: 0.82<br>Premature mortality: 174.9","Central Harlem<br>Park acres per 1,000: 0.24<br>Premature mortality: 284.9","East Harlem<br>Park acres per 1,000: 4.21<br>Premature mortality: 284.1","Washington Heights and Inwood<br>Park acres per 1,000: 2.73<br>Premature mortality: 136.5"],"mode":"markers","type":"scatter","name":"Manhattan","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.6145830937357698,0.27143107712390502,0.1837199898853635,0.12726286516262075,0.54784320640197004,0.16007529833087653,2.8900556276532767,2.6179796753188742,0.08161866201522916,0.41811891409727492,7.5070863737386659,1.160268902445881,2.9752186268384895,16.167306247952531],"y":[133.09999999999999,87.599999999999994,109.5,108.8,150.80000000000001,99.299999999999997,113.09999999999999,110.09999999999999,141.19999999999999,159.5,84.799999999999997,190.5,116.3,274.69999999999999],"text":["Long Island City and Astoria<br>Park acres per 1,000: 0.61<br>Premature mortality: 133.1","Woodside and Sunnyside<br>Park acres per 1,000: 0.27<br>Premature mortality: 87.6","Jackson Heights<br>Park acres per 1,000: 0.18<br>Premature mortality: 109.5","Elmhurst and Corona<br>Park acres per 1,000: 0.13<br>Premature mortality: 108.8","Ridgewood and Maspeth<br>Park acres per 1,000: 0.55<br>Premature mortality: 150.8","Rego Park and Forest Hills<br>Park acres per 1,000: 0.16<br>Premature mortality: 99.3","Flushing and Whitestone<br>Park acres per 1,000: 2.89<br>Premature mortality: 113.1","Hillcrest and Fresh Meadows<br>Park acres per 1,000: 2.62<br>Premature mortality: 110.1","Kew Gardens and Woodhaven<br>Park acres per 1,000: 0.08<br>Premature mortality: 141.2","South Ozone Park and Howard Beach<br>Park acres per 1,000: 0.42<br>Premature mortality: 159.5","Bayside and Little Neck<br>Park acres per 1,000: 7.51<br>Premature mortality: 84.8","Jamaica and Hollis<br>Park acres per 1,000: 1.16<br>Premature mortality: 190.5","Queens Village<br>Park acres per 1,000: 2.98<br>Premature mortality: 116.3","Rockaway and Broad Channel<br>Park acres per 1,000: 16.17<br>Premature mortality: 274.7"],"mode":"markers","type":"scatter","name":"Queens","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[4.9126645373280606,14.029211028953565,13.878021190951833],"y":[231.5,160.69999999999999,155.19999999999999],"text":["St. George and Stapleton<br>Park acres per 1,000: 4.91<br>Premature mortality: 231.5","South Beach and Willowbrook<br>Park acres per 1,000: 14.03<br>Premature mortality: 160.7","Tottenville and Great Kills<br>Park acres per 1,000: 13.88<br>Premature mortality: 155.2"],"mode":"markers","type":"scatter","name":"Staten Island","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.08161866201522916,0.092419765982986846,0.099320293304909921,0.12726286516262075,0.13001997081121919,0.14496194570212945,0.14961793224441836,0.15535119172997172,0.16007529833087653,0.16444209853121408,0.1837199898853635,0.19840284130738373,0.23822021822201978,0.23965999045239839,0.24889997484300616,0.27143107712390502,0.27554727580773525,0.32364477689937826,0.37753640700339136,0.38278894023331916,0.40806760901675854,0.41811891409727492,0.41860093657602959,0.46709274253952632,0.46811070631598556,0.48834990971906844,0.53983855482090137,0.54406411397307508,0.54784320640197004,0.57659673627595431,0.6145830937357698,0.69302569832679883,0.71682664141007213,0.74041328547894103,0.77457111879651064,0.82045837676335831,0.86625885282566129,1.0810961238577437,1.1028378996926698,1.160268902445881,1.1758938048011089,1.6564223851289146,1.869081054934939,2.0881722042395974,2.251408700449208,2.4311117468240204,2.6179796753188742,2.73160782536032,2.7402211367912432,2.8900556276532767,2.9197644628552655,2.9752186268384895,4.213259487470526,4.9126645373280606,5.0780029048463309,7.5070863737386659,13.878021190951833,14.029211028953565,16.167306247952531],"y":[173.10766320228765,173.12558747390926,173.13703879651661,173.18340907952461,173.18798445540119,173.21278044082152,173.22050698133992,173.23002124030853,173.23786082505254,173.24510746513135,173.27709883952741,173.30146481339946,173.3675411590404,173.36993043967391,173.38526405654227,173.42265408615609,173.42948485674006,173.50930194548025,173.59873430526477,173.60745080615172,173.64940038157096,173.66608037307483,173.66688028221955,173.74735171403856,173.74904100980726,173.78262766727158,173.86807230913303,173.87508456179006,173.88135590955051,173.92907196534253,173.99210976139162,174.12228409871787,174.16178141028419,174.20092309581878,174.25760751291324,174.33375673601333,174.40976194583166,174.76628120644762,174.80236136054708,174.89766725667786,174.92359655008221,175.72102659255293,176.07393049678979,176.43750900522249,176.70839754637092,177.00661208296506,177.31671663502797,177.50528086247007,177.51957452486886,177.76822263718321,177.81752400797933,177.9095493695304,179.96405979095056,181.1247120839553,181.39908864932443,185.43011659034966,196.00258830139686,196.25348559216059,199.80162285410796],"type":"scatter","mode":"lines","showlegend":false,"marker":{"color":"rgba(140,86,75,1)","line":{"color":"rgba(140,86,75,1)"}},"error_y":{"color":"rgba(140,86,75,1)"},"error_x":{"color":"rgba(140,86,75,1)"},"line":{"color":"rgba(140,86,75,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<hr />
+</div>
+<div id="simple-linear-regression-model" class="section level2">
+<h2>Simple Linear Regression Model</h2>
 <p>Our modeling began with a simple linear regression using premature
 mortality as the outcome and park acres per 1,000 residents as the sole
 predictor. This “crude” model captures the unadjusted association
@@ -570,10 +577,7 @@ between park density and premature mortality and serves as a baseline
 for comparison with more complex models.</p>
 <pre class="r"><code>model_base &lt;- lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df)
 
-#summary(model_base)
-#glance(model_base)
-
-kable(tidy(model_base))</code></pre>
+kable(tidy(model_base), digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -587,151 +591,32 @@ kable(tidy(model_base))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">172.972218</td>
-<td align="right">10.971194</td>
-<td align="right">15.7660343</td>
-<td align="right">0.0000000</td>
+<td align="right">172.972</td>
+<td align="right">10.971</td>
+<td align="right">15.766</td>
+<td align="right">0.000</td>
 </tr>
 <tr class="even">
 <td align="left">park_acres_per_1000</td>
-<td align="right">1.659485</td>
-<td align="right">2.879663</td>
-<td align="right">0.5762776</td>
-<td align="right">0.5666962</td>
+<td align="right">1.659</td>
+<td align="right">2.880</td>
+<td align="right">0.576</td>
+<td align="right">0.567</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>kable(glance(model_base))</code></pre>
+<pre class="r"><code>kable(glance(model_base), digits = 3)</code></pre>
 <table style="width:100%;">
 <colgroup>
 <col width="9%" />
-<col width="12%" />
-<col width="8%" />
+<col width="13%" />
+<col width="6%" />
 <col width="9%" />
-<col width="9%" />
+<col width="7%" />
 <col width="2%" />
-<col width="9%" />
 <col width="8%" />
-<col width="8%" />
-<col width="8%" />
-<col width="10%" />
-<col width="4%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="right">r.squared</th>
-<th align="right">adj.r.squared</th>
-<th align="right">sigma</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
-<th align="right">df</th>
-<th align="right">logLik</th>
-<th align="right">AIC</th>
-<th align="right">BIC</th>
-<th align="right">deviance</th>
-<th align="right">df.residual</th>
-<th align="right">nobs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0.0057925</td>
-<td align="right">-0.0116497</td>
-<td align="right">73.14644</td>
-<td align="right">0.3320959</td>
-<td align="right">0.5666962</td>
-<td align="right">1</td>
-<td align="right">-335.9554</td>
-<td align="right">677.9107</td>
-<td align="right">684.1434</td>
-<td align="right">304972.9</td>
-<td align="right">57</td>
-<td align="right">59</td>
-</tr>
-</tbody>
-</table>
-<p>Because our EDA showed clear borough-level differences in both park
-access and demographic composition, we next extended the model to
-include borough fixed effects. This adjustment helps account for
-systematic differences in the built environment, policy context, and
-health systems across boroughs and focuses the association on
-within-borough variation in park density.</p>
-<pre class="r"><code>model_borough &lt;- lm(premature_mort_rate ~ park_acres_per_1000 + borough, data = analysis_df)
-
-#summary(model_borough)
-#glance(model_borough)
-
-#AIC(model_base, model_borough)
-#BIC(model_base, model_borough)
-
-kable(tidy(model_borough))</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">238.112436</td>
-<td align="right">18.46863</td>
-<td align="right">12.892807</td>
-<td align="right">0.0000000</td>
-</tr>
-<tr class="even">
-<td align="left">park_acres_per_1000</td>
-<td align="right">3.950027</td>
-<td align="right">3.26032</td>
-<td align="right">1.211546</td>
-<td align="right">0.2310605</td>
-</tr>
-<tr class="odd">
-<td align="left">boroughBrooklyn</td>
-<td align="right">-53.502317</td>
-<td align="right">23.11630</td>
-<td align="right">-2.314485</td>
-<td align="right">0.0245471</td>
-</tr>
-<tr class="even">
-<td align="left">boroughManhattan</td>
-<td align="right">-103.662966</td>
-<td align="right">25.23637</td>
-<td align="right">-4.107681</td>
-<td align="right">0.0001391</td>
-</tr>
-<tr class="odd">
-<td align="left">boroughQueens</td>
-<td align="right">-113.955657</td>
-<td align="right">24.49522</td>
-<td align="right">-4.652159</td>
-<td align="right">0.0000223</td>
-</tr>
-<tr class="even">
-<td align="left">boroughStaten Island</td>
-<td align="right">-98.858924</td>
-<td align="right">50.29597</td>
-<td align="right">-1.965544</td>
-<td align="right">0.0546007</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>kable(glance(model_borough))</code></pre>
-<table>
-<colgroup>
-<col width="9%" />
-<col width="12%" />
-<col width="8%" />
-<col width="9%" />
-<col width="8%" />
-<col width="2%" />
-<col width="9%" />
-<col width="8%" />
-<col width="8%" />
+<col width="7%" />
+<col width="7%" />
 <col width="8%" />
 <col width="11%" />
 <col width="4%" />
@@ -754,15 +639,133 @@ kable(tidy(model_borough))</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.3430182</td>
-<td align="right">0.2810387</td>
-<td align="right">61.66388</td>
-<td align="right">5.534388</td>
-<td align="right">0.000358</td>
+<td align="right">0.006</td>
+<td align="right">-0.012</td>
+<td align="right">73.146</td>
+<td align="right">0.332</td>
+<td align="right">0.567</td>
+<td align="right">1</td>
+<td align="right">-335.955</td>
+<td align="right">677.911</td>
+<td align="right">684.143</td>
+<td align="right">304972.9</td>
+<td align="right">57</td>
+<td align="right">59</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="multiple-linear-regression-model-borough-effects"
+class="section level2">
+<h2>Multiple Linear Regression Model (Borough Effects)</h2>
+<p>Because our EDA showed clear borough-level differences in both park
+access and demographic composition, we next extended the model to
+include borough fixed effects. This adjustment helps account for
+systematic differences in the built environment, policy context, and
+health systems across boroughs and focuses the association on
+within-borough variation in park density.</p>
+<pre class="r"><code>model_borough &lt;- lm(premature_mort_rate ~ park_acres_per_1000 + borough, data = analysis_df)
+
+kable(tidy(model_borough), digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">238.112</td>
+<td align="right">18.469</td>
+<td align="right">12.893</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">park_acres_per_1000</td>
+<td align="right">3.950</td>
+<td align="right">3.260</td>
+<td align="right">1.212</td>
+<td align="right">0.231</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughBrooklyn</td>
+<td align="right">-53.502</td>
+<td align="right">23.116</td>
+<td align="right">-2.314</td>
+<td align="right">0.025</td>
+</tr>
+<tr class="even">
+<td align="left">boroughManhattan</td>
+<td align="right">-103.663</td>
+<td align="right">25.236</td>
+<td align="right">-4.108</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughQueens</td>
+<td align="right">-113.956</td>
+<td align="right">24.495</td>
+<td align="right">-4.652</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">boroughStaten Island</td>
+<td align="right">-98.859</td>
+<td align="right">50.296</td>
+<td align="right">-1.966</td>
+<td align="right">0.055</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>kable(glance(model_borough), digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="13%" />
+<col width="6%" />
+<col width="9%" />
+<col width="7%" />
+<col width="2%" />
+<col width="8%" />
+<col width="7%" />
+<col width="6%" />
+<col width="8%" />
+<col width="11%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">r.squared</th>
+<th align="right">adj.r.squared</th>
+<th align="right">sigma</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">df</th>
+<th align="right">logLik</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">deviance</th>
+<th align="right">df.residual</th>
+<th align="right">nobs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.343</td>
+<td align="right">0.281</td>
+<td align="right">61.664</td>
+<td align="right">5.534</td>
+<td align="right">0</td>
 <td align="right">5</td>
-<td align="right">-323.7338</td>
-<td align="right">661.4677</td>
-<td align="right">676.0104</td>
+<td align="right">-323.734</td>
+<td align="right">661.468</td>
+<td align="right">676.01</td>
 <td align="right">201529</td>
 <td align="right">53</td>
 <td align="right">59</td>
@@ -773,9 +776,9 @@ kable(tidy(model_borough))</code></pre>
   Model = c(&quot;model_base&quot;, &quot;model_borough&quot;),
   AIC   = c(AIC(model_base), AIC(model_borough)),
   BIC   = c(BIC(model_base), BIC(model_borough))
-)
+  )
 
-kable(model_metrics_1)</code></pre>
+kable(model_metrics_1, digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -787,16 +790,21 @@ kable(model_metrics_1)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">model_base</td>
-<td align="right">677.9107</td>
-<td align="right">684.1434</td>
+<td align="right">677.911</td>
+<td align="right">684.143</td>
 </tr>
 <tr class="even">
 <td align="left">model_borough</td>
-<td align="right">661.4677</td>
-<td align="right">676.0104</td>
+<td align="right">661.468</td>
+<td align="right">676.010</td>
 </tr>
 </tbody>
 </table>
+<hr />
+</div>
+<div id="multiple-linear-regression-model-sociodemographic-covariates"
+class="section level2">
+<h2>Multiple Linear Regression Model (Sociodemographic Covariates)</h2>
 <p>To build a more rigorous and interpretable model, we then
 incorporated additional covariates from the CHP dataset. Guided by our
 exploratory analysis and public health literature, we focused on
@@ -816,22 +824,16 @@ conditions.</p>
 <pre class="r"><code>final_model &lt;- lm(premature_mort_rate ~ park_acres_per_1000 + poverty + race_black + borough, 
                   data = analysis_df)
 
-#summary(final_model)
-
-#tidy(final_model, conf.int = TRUE)
-#glance(final_model)
-#vif(final_model)
-
-kable(tidy(final_model, conf.int = TRUE))</code></pre>
+kable(tidy(final_model, conf.int = TRUE), digits = 3)</code></pre>
 <table>
 <colgroup>
-<col width="24%" />
-<col width="13%" />
-<col width="12%" />
-<col width="12%" />
+<col width="27%" />
 <col width="11%" />
 <col width="12%" />
+<col width="12%" />
+<col width="10%" />
 <col width="11%" />
+<col width="12%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -847,89 +849,89 @@ kable(tidy(final_model, conf.int = TRUE))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">28.4316112</td>
-<td align="right">25.5577469</td>
-<td align="right">1.1124459</td>
-<td align="right">0.2711628</td>
-<td align="right">-22.877707</td>
-<td align="right">79.740929</td>
+<td align="right">28.432</td>
+<td align="right">25.558</td>
+<td align="right">1.112</td>
+<td align="right">0.271</td>
+<td align="right">-22.878</td>
+<td align="right">79.741</td>
 </tr>
 <tr class="even">
 <td align="left">park_acres_per_1000</td>
-<td align="right">4.9567118</td>
-<td align="right">1.8069401</td>
-<td align="right">2.7431522</td>
-<td align="right">0.0083760</td>
-<td align="right">1.329128</td>
-<td align="right">8.584295</td>
+<td align="right">4.957</td>
+<td align="right">1.807</td>
+<td align="right">2.743</td>
+<td align="right">0.008</td>
+<td align="right">1.329</td>
+<td align="right">8.584</td>
 </tr>
 <tr class="odd">
 <td align="left">poverty</td>
-<td align="right">6.0343667</td>
-<td align="right">0.8512366</td>
-<td align="right">7.0889418</td>
-<td align="right">0.0000000</td>
-<td align="right">4.325438</td>
-<td align="right">7.743296</td>
+<td align="right">6.034</td>
+<td align="right">0.851</td>
+<td align="right">7.089</td>
+<td align="right">0.000</td>
+<td align="right">4.325</td>
+<td align="right">7.743</td>
 </tr>
 <tr class="even">
 <td align="left">race_black</td>
-<td align="right">1.5731569</td>
-<td align="right">0.2076553</td>
-<td align="right">7.5758087</td>
-<td align="right">0.0000000</td>
-<td align="right">1.156271</td>
-<td align="right">1.990042</td>
+<td align="right">1.573</td>
+<td align="right">0.208</td>
+<td align="right">7.576</td>
+<td align="right">0.000</td>
+<td align="right">1.156</td>
+<td align="right">1.990</td>
 </tr>
 <tr class="odd">
 <td align="left">boroughBrooklyn</td>
-<td align="right">-16.3882697</td>
-<td align="right">14.2521900</td>
-<td align="right">-1.1498773</td>
-<td align="right">0.2555580</td>
-<td align="right">-45.000735</td>
-<td align="right">12.224196</td>
+<td align="right">-16.388</td>
+<td align="right">14.252</td>
+<td align="right">-1.150</td>
+<td align="right">0.256</td>
+<td align="right">-45.001</td>
+<td align="right">12.224</td>
 </tr>
 <tr class="even">
 <td align="left">boroughManhattan</td>
-<td align="right">0.0830625</td>
-<td align="right">18.0079546</td>
-<td align="right">0.0046125</td>
-<td align="right">0.9963377</td>
-<td align="right">-36.069415</td>
-<td align="right">36.235540</td>
+<td align="right">0.083</td>
+<td align="right">18.008</td>
+<td align="right">0.005</td>
+<td align="right">0.996</td>
+<td align="right">-36.069</td>
+<td align="right">36.236</td>
 </tr>
 <tr class="odd">
 <td align="left">boroughQueens</td>
-<td align="right">-34.9932385</td>
-<td align="right">15.9306642</td>
-<td align="right">-2.1965963</td>
-<td align="right">0.0326202</td>
-<td align="right">-66.975381</td>
-<td align="right">-3.011096</td>
+<td align="right">-34.993</td>
+<td align="right">15.931</td>
+<td align="right">-2.197</td>
+<td align="right">0.033</td>
+<td align="right">-66.975</td>
+<td align="right">-3.011</td>
 </tr>
 <tr class="even">
 <td align="left">boroughStaten Island</td>
-<td align="right">-0.5428773</td>
-<td align="right">29.0580155</td>
-<td align="right">-0.0186825</td>
-<td align="right">0.9851673</td>
-<td align="right">-58.879278</td>
-<td align="right">57.793523</td>
+<td align="right">-0.543</td>
+<td align="right">29.058</td>
+<td align="right">-0.019</td>
+<td align="right">0.985</td>
+<td align="right">-58.879</td>
+<td align="right">57.794</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>kable(glance(final_model))</code></pre>
-<table>
+<pre class="r"><code>kable(glance(final_model), digits = 3)</code></pre>
+<table style="width:100%;">
 <colgroup>
 <col width="9%" />
 <col width="13%" />
-<col width="8%" />
+<col width="6%" />
 <col width="9%" />
 <col width="7%" />
 <col width="2%" />
-<col width="9%" />
 <col width="8%" />
+<col width="7%" />
 <col width="7%" />
 <col width="8%" />
 <col width="11%" />
@@ -953,14 +955,14 @@ kable(tidy(final_model, conf.int = TRUE))</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.8104702</td>
-<td align="right">0.7844564</td>
-<td align="right">33.76336</td>
-<td align="right">31.15529</td>
+<td align="right">0.81</td>
+<td align="right">0.784</td>
+<td align="right">33.763</td>
+<td align="right">31.155</td>
 <td align="right">0</td>
 <td align="right">7</td>
-<td align="right">-287.0621</td>
-<td align="right">592.1242</td>
+<td align="right">-287.062</td>
+<td align="right">592.124</td>
 <td align="right">610.822</td>
 <td align="right">58138.2</td>
 <td align="right">51</td>
@@ -968,7 +970,7 @@ kable(tidy(final_model, conf.int = TRUE))</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>kable(vif(final_model))</code></pre>
+<pre class="r"><code>kable(vif(final_model), digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -981,27 +983,27 @@ kable(tidy(final_model, conf.int = TRUE))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">park_acres_per_1000</td>
-<td align="right">1.847988</td>
+<td align="right">1.848</td>
 <td align="right">1</td>
-<td align="right">1.359407</td>
+<td align="right">1.359</td>
 </tr>
 <tr class="even">
 <td align="left">poverty</td>
-<td align="right">1.862011</td>
+<td align="right">1.862</td>
 <td align="right">1</td>
-<td align="right">1.364555</td>
+<td align="right">1.365</td>
 </tr>
 <tr class="odd">
 <td align="left">race_black</td>
-<td align="right">1.175035</td>
+<td align="right">1.175</td>
 <td align="right">1</td>
-<td align="right">1.083990</td>
+<td align="right">1.084</td>
 </tr>
 <tr class="even">
 <td align="left">borough</td>
-<td align="right">3.471511</td>
+<td align="right">3.472</td>
 <td align="right">4</td>
-<td align="right">1.168328</td>
+<td align="right">1.168</td>
 </tr>
 </tbody>
 </table>
@@ -1016,11 +1018,18 @@ results.</p>
 plot(final_model)</code></pre>
 <p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
 <pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
-<p>The diagnostic plots suggested mild heteroskedasticity and a few
+<p>The diagnostic plots suggested mild heteroscedasticity and a few
 moderately influential observations, which is expected in
 neighborhood-level data, but no evidence of a single district dominating
 the fit. Overall, the assumptions of linear regression appeared
 reasonably well-satisfied for our main-effects model.</p>
+<hr />
+</div>
+<div
+id="sensitivity-analysis-mlr-model-log-transformation-of-premature-mortality"
+class="section level2">
+<h2>Sensitivity Analysis (MLR Model Log-Transformation of Premature
+Mortality)</h2>
 <p>To assess the robustness of our findings to the functional form of
 the outcome, we conducted a sensitivity analysis using a log-transformed
 premature mortality rate. This transformation reduces right-skewness and
@@ -1035,19 +1044,15 @@ residuals show non-constant variance.</p>
 # Fit the log-linear model
 model_log &lt;- lm(log_premort ~ park_acres_per_1000 + poverty + race_black + borough, data = analysis_df)
 
-#summary(model_log)
-#tidy(model_log, conf.int = TRUE)
-#glance(model_log)
-
-kable(tidy(model_log, conf.int = TRUE))</code></pre>
+kable(tidy(model_log, conf.int = TRUE), digits = 3)</code></pre>
 <table>
 <colgroup>
-<col width="24%" />
-<col width="12%" />
+<col width="27%" />
 <col width="11%" />
 <col width="12%" />
-<col width="11%" />
 <col width="12%" />
+<col width="10%" />
+<col width="11%" />
 <col width="12%" />
 </colgroup>
 <thead>
@@ -1064,93 +1069,93 @@ kable(tidy(model_log, conf.int = TRUE))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">4.2848036</td>
-<td align="right">0.1402724</td>
-<td align="right">30.5463130</td>
-<td align="right">0.0000000</td>
-<td align="right">4.0031951</td>
-<td align="right">4.5664121</td>
+<td align="right">4.285</td>
+<td align="right">0.140</td>
+<td align="right">30.546</td>
+<td align="right">0.000</td>
+<td align="right">4.003</td>
+<td align="right">4.566</td>
 </tr>
 <tr class="even">
 <td align="left">park_acres_per_1000</td>
-<td align="right">0.0277202</td>
-<td align="right">0.0099173</td>
-<td align="right">2.7951321</td>
-<td align="right">0.0072939</td>
-<td align="right">0.0078104</td>
-<td align="right">0.0476300</td>
+<td align="right">0.028</td>
+<td align="right">0.010</td>
+<td align="right">2.795</td>
+<td align="right">0.007</td>
+<td align="right">0.008</td>
+<td align="right">0.048</td>
 </tr>
 <tr class="odd">
 <td align="left">poverty</td>
-<td align="right">0.0332622</td>
-<td align="right">0.0046720</td>
-<td align="right">7.1195329</td>
-<td align="right">0.0000000</td>
-<td align="right">0.0238829</td>
-<td align="right">0.0426416</td>
+<td align="right">0.033</td>
+<td align="right">0.005</td>
+<td align="right">7.120</td>
+<td align="right">0.000</td>
+<td align="right">0.024</td>
+<td align="right">0.043</td>
 </tr>
 <tr class="even">
 <td align="left">race_black</td>
-<td align="right">0.0088282</td>
-<td align="right">0.0011397</td>
-<td align="right">7.7460524</td>
-<td align="right">0.0000000</td>
-<td align="right">0.0065402</td>
-<td align="right">0.0111163</td>
+<td align="right">0.009</td>
+<td align="right">0.001</td>
+<td align="right">7.746</td>
+<td align="right">0.000</td>
+<td align="right">0.007</td>
+<td align="right">0.011</td>
 </tr>
 <tr class="odd">
 <td align="left">boroughBrooklyn</td>
-<td align="right">-0.0773742</td>
-<td align="right">0.0782224</td>
-<td align="right">-0.9891565</td>
-<td align="right">0.3272565</td>
-<td align="right">-0.2344122</td>
-<td align="right">0.0796638</td>
+<td align="right">-0.077</td>
+<td align="right">0.078</td>
+<td align="right">-0.989</td>
+<td align="right">0.327</td>
+<td align="right">-0.234</td>
+<td align="right">0.080</td>
 </tr>
 <tr class="even">
 <td align="left">boroughManhattan</td>
-<td align="right">-0.0826480</td>
-<td align="right">0.0988357</td>
-<td align="right">-0.8362160</td>
-<td align="right">0.4069344</td>
-<td align="right">-0.2810690</td>
-<td align="right">0.1157730</td>
+<td align="right">-0.083</td>
+<td align="right">0.099</td>
+<td align="right">-0.836</td>
+<td align="right">0.407</td>
+<td align="right">-0.281</td>
+<td align="right">0.116</td>
 </tr>
 <tr class="odd">
 <td align="left">boroughQueens</td>
-<td align="right">-0.2161650</td>
-<td align="right">0.0874346</td>
-<td align="right">-2.4723046</td>
-<td align="right">0.0168005</td>
-<td align="right">-0.3916974</td>
-<td align="right">-0.0406327</td>
+<td align="right">-0.216</td>
+<td align="right">0.087</td>
+<td align="right">-2.472</td>
+<td align="right">0.017</td>
+<td align="right">-0.392</td>
+<td align="right">-0.041</td>
 </tr>
 <tr class="even">
 <td align="left">boroughStaten Island</td>
-<td align="right">0.0470975</td>
-<td align="right">0.1594834</td>
-<td align="right">0.2953128</td>
-<td align="right">0.7689539</td>
-<td align="right">-0.2730788</td>
-<td align="right">0.3672738</td>
+<td align="right">0.047</td>
+<td align="right">0.159</td>
+<td align="right">0.295</td>
+<td align="right">0.769</td>
+<td align="right">-0.273</td>
+<td align="right">0.367</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>kable(glance(model_log))</code></pre>
+<pre class="r"><code>kable(glance(model_log), digits = 3)</code></pre>
 <table>
 <colgroup>
+<col width="10%" />
+<col width="14%" />
+<col width="6%" />
+<col width="10%" />
+<col width="8%" />
+<col width="3%" />
+<col width="7%" />
+<col width="8%" />
+<col width="7%" />
 <col width="9%" />
 <col width="12%" />
-<col width="9%" />
-<col width="9%" />
-<col width="7%" />
-<col width="2%" />
-<col width="7%" />
-<col width="8%" />
-<col width="9%" />
-<col width="8%" />
-<col width="11%" />
-<col width="4%" />
+<col width="5%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1170,16 +1175,16 @@ kable(tidy(model_log, conf.int = TRUE))</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.8268656</td>
-<td align="right">0.8031021</td>
-<td align="right">0.1853085</td>
-<td align="right">34.79556</td>
+<td align="right">0.827</td>
+<td align="right">0.803</td>
+<td align="right">0.185</td>
+<td align="right">34.796</td>
 <td align="right">0</td>
 <td align="right">7</td>
-<td align="right">20.0394</td>
-<td align="right">-22.0788</td>
-<td align="right">-3.380963</td>
-<td align="right">1.7513</td>
+<td align="right">20.039</td>
+<td align="right">-22.079</td>
+<td align="right">-3.381</td>
+<td align="right">1.751</td>
 <td align="right">51</td>
 <td align="right">59</td>
 </tr>
@@ -1189,18 +1194,13 @@ kable(tidy(model_log, conf.int = TRUE))</code></pre>
 plot(model_log)</code></pre>
 <p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
-<pre class="r"><code>#AIC(final_model, model_log)
-#BIC(final_model, model_log)
-
-#cor(analysis_df$premature_mort_rate, exp(predict(model_log)))^2
-
-model_metrics2 = tibble(
+<pre class="r"><code>model_metrics2 = tibble(
   Model = c(&quot;final_model&quot;, &quot;model_log&quot;),
   AIC   = c(AIC(final_model), AIC(model_log)),
   BIC   = c(BIC(final_model), BIC(model_log))
 )
 
-kable(model_metrics2)</code></pre>
+kable(model_metrics2, digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -1212,13 +1212,13 @@ kable(model_metrics2)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">final_model</td>
-<td align="right">592.1242</td>
-<td align="right">610.821988</td>
+<td align="right">592.124</td>
+<td align="right">610.822</td>
 </tr>
 <tr class="even">
 <td align="left">model_log</td>
-<td align="right">-22.0788</td>
-<td align="right">-3.380963</td>
+<td align="right">-22.079</td>
+<td align="right">-3.381</td>
 </tr>
 </tbody>
 </table>
@@ -1230,6 +1230,11 @@ direction and relative magnitude of associations were stable. This
 suggests that our main findings are not sensitive to the choice between
 modeling premature mortality on the original scale versus the log
 scale.</p>
+<hr />
+</div>
+<div id="sensitivity-analysis-mlr-model-interactions"
+class="section level2">
+<h2>Sensitivity Analysis (MLR Model Interactions)</h2>
 <p>Motivated by the strong clustering of socioeconomic conditions
 observed in our EDA, we also tested whether the association between park
 density and premature mortality varied by neighborhood poverty level. To
@@ -1239,20 +1244,16 @@ residents and the poverty rate.</p>
 model_interaction &lt;- lm(premature_mort_rate ~ park_acres_per_1000 * poverty + race_black + borough, 
                         data = analysis_df)
 
-#summary(model_interaction)
-#tidy(model_interaction, conf.int = TRUE)
-#glance(model_interaction)
-
-kable(tidy(model_interaction, conf.int = TRUE))</code></pre>
+kable(tidy(model_interaction, conf.int = TRUE), digits = 3)</code></pre>
 <table>
 <colgroup>
-<col width="29%" />
-<col width="12%" />
+<col width="33%" />
+<col width="10%" />
 <col width="11%" />
 <col width="11%" />
+<col width="9%" />
 <col width="10%" />
-<col width="12%" />
-<col width="10%" />
+<col width="11%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1268,99 +1269,99 @@ kable(tidy(model_interaction, conf.int = TRUE))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">43.9360294</td>
-<td align="right">26.6084040</td>
-<td align="right">1.6512087</td>
-<td align="right">0.1049639</td>
-<td align="right">-9.5085229</td>
-<td align="right">97.380582</td>
+<td align="right">43.936</td>
+<td align="right">26.608</td>
+<td align="right">1.651</td>
+<td align="right">0.105</td>
+<td align="right">-9.509</td>
+<td align="right">97.381</td>
 </tr>
 <tr class="even">
 <td align="left">park_acres_per_1000</td>
-<td align="right">-6.8359871</td>
-<td align="right">7.0162831</td>
-<td align="right">-0.9743032</td>
-<td align="right">0.3345963</td>
-<td align="right">-20.9286065</td>
-<td align="right">7.256632</td>
+<td align="right">-6.836</td>
+<td align="right">7.016</td>
+<td align="right">-0.974</td>
+<td align="right">0.335</td>
+<td align="right">-20.929</td>
+<td align="right">7.257</td>
 </tr>
 <tr class="odd">
 <td align="left">poverty</td>
-<td align="right">5.1507954</td>
-<td align="right">0.9776277</td>
-<td align="right">5.2686676</td>
-<td align="right">0.0000029</td>
-<td align="right">3.1871724</td>
-<td align="right">7.114419</td>
+<td align="right">5.151</td>
+<td align="right">0.978</td>
+<td align="right">5.269</td>
+<td align="right">0.000</td>
+<td align="right">3.187</td>
+<td align="right">7.114</td>
 </tr>
 <tr class="even">
 <td align="left">race_black</td>
-<td align="right">1.5601159</td>
-<td align="right">0.2038044</td>
-<td align="right">7.6549683</td>
-<td align="right">0.0000000</td>
-<td align="right">1.1507628</td>
-<td align="right">1.969469</td>
+<td align="right">1.560</td>
+<td align="right">0.204</td>
+<td align="right">7.655</td>
+<td align="right">0.000</td>
+<td align="right">1.151</td>
+<td align="right">1.969</td>
 </tr>
 <tr class="odd">
 <td align="left">boroughBrooklyn</td>
-<td align="right">-15.1027340</td>
-<td align="right">13.9979669</td>
-<td align="right">-1.0789234</td>
-<td align="right">0.2857993</td>
-<td align="right">-43.2184778</td>
-<td align="right">13.013010</td>
+<td align="right">-15.103</td>
+<td align="right">13.998</td>
+<td align="right">-1.079</td>
+<td align="right">0.286</td>
+<td align="right">-43.218</td>
+<td align="right">13.013</td>
 </tr>
 <tr class="even">
 <td align="left">boroughManhattan</td>
-<td align="right">-4.6619125</td>
-<td align="right">17.8719839</td>
-<td align="right">-0.2608503</td>
-<td align="right">0.7952793</td>
-<td align="right">-40.5588487</td>
-<td align="right">31.235024</td>
+<td align="right">-4.662</td>
+<td align="right">17.872</td>
+<td align="right">-0.261</td>
+<td align="right">0.795</td>
+<td align="right">-40.559</td>
+<td align="right">31.235</td>
 </tr>
 <tr class="odd">
 <td align="left">boroughQueens</td>
-<td align="right">-36.2713391</td>
-<td align="right">15.6419338</td>
-<td align="right">-2.3188526</td>
-<td align="right">0.0245301</td>
-<td align="right">-67.6890877</td>
-<td align="right">-4.853591</td>
+<td align="right">-36.271</td>
+<td align="right">15.642</td>
+<td align="right">-2.319</td>
+<td align="right">0.025</td>
+<td align="right">-67.689</td>
+<td align="right">-4.854</td>
 </tr>
 <tr class="even">
 <td align="left">boroughStaten Island</td>
-<td align="right">19.7549116</td>
-<td align="right">30.8021999</td>
-<td align="right">0.6413474</td>
-<td align="right">0.5242262</td>
-<td align="right">-42.1131277</td>
-<td align="right">81.622951</td>
+<td align="right">19.755</td>
+<td align="right">30.802</td>
+<td align="right">0.641</td>
+<td align="right">0.524</td>
+<td align="right">-42.113</td>
+<td align="right">81.623</td>
 </tr>
 <tr class="odd">
 <td align="left">park_acres_per_1000:poverty</td>
-<td align="right">0.7445042</td>
-<td align="right">0.4285932</td>
-<td align="right">1.7370884</td>
-<td align="right">0.0885289</td>
-<td align="right">-0.1163505</td>
-<td align="right">1.605359</td>
+<td align="right">0.745</td>
+<td align="right">0.429</td>
+<td align="right">1.737</td>
+<td align="right">0.089</td>
+<td align="right">-0.116</td>
+<td align="right">1.605</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>kable(glance(model_interaction))</code></pre>
-<table>
+<pre class="r"><code>kable(glance(model_interaction), digits = 3)</code></pre>
+<table style="width:100%;">
 <colgroup>
 <col width="9%" />
-<col width="12%" />
-<col width="8%" />
+<col width="13%" />
+<col width="6%" />
 <col width="9%" />
 <col width="7%" />
 <col width="2%" />
-<col width="9%" />
 <col width="8%" />
-<col width="8%" />
+<col width="7%" />
+<col width="7%" />
 <col width="8%" />
 <col width="11%" />
 <col width="4%" />
@@ -1383,15 +1384,15 @@ kable(tidy(model_interaction, conf.int = TRUE))</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.8212573</td>
-<td align="right">0.7926585</td>
-<td align="right">33.11473</td>
-<td align="right">28.71646</td>
+<td align="right">0.821</td>
+<td align="right">0.793</td>
+<td align="right">33.115</td>
+<td align="right">28.716</td>
 <td align="right">0</td>
 <td align="right">8</td>
-<td align="right">-285.3334</td>
-<td align="right">590.6668</td>
-<td align="right">611.4422</td>
+<td align="right">-285.333</td>
+<td align="right">590.667</td>
+<td align="right">611.442</td>
 <td align="right">54829.28</td>
 <td align="right">50</td>
 <td align="right">59</td>
@@ -1403,8 +1404,7 @@ plot(model_interaction)</code></pre>
 <p><img src="cleaning_eda_model_premature_mortality_files/figure-html/unnamed-chunk-15-1.png" width="90%" /></p>
 <pre class="r"><code>par(mfrow = c(1,1))
 
-#vif(model_interaction)
-kable(vif(model_interaction))</code></pre>
+kable(vif(model_interaction), digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -1417,33 +1417,33 @@ kable(vif(model_interaction))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">park_acres_per_1000</td>
-<td align="right">28.965084</td>
+<td align="right">28.965</td>
 <td align="right">1</td>
-<td align="right">5.381922</td>
+<td align="right">5.382</td>
 </tr>
 <tr class="even">
 <td align="left">poverty</td>
-<td align="right">2.553157</td>
+<td align="right">2.553</td>
 <td align="right">1</td>
-<td align="right">1.597860</td>
+<td align="right">1.598</td>
 </tr>
 <tr class="odd">
 <td align="left">race_black</td>
-<td align="right">1.176632</td>
+<td align="right">1.177</td>
 <td align="right">1</td>
-<td align="right">1.084726</td>
+<td align="right">1.085</td>
 </tr>
 <tr class="even">
 <td align="left">borough</td>
-<td align="right">4.552628</td>
+<td align="right">4.553</td>
 <td align="right">4</td>
-<td align="right">1.208600</td>
+<td align="right">1.209</td>
 </tr>
 <tr class="odd">
 <td align="left">park_acres_per_1000:poverty</td>
-<td align="right">23.614870</td>
+<td align="right">23.615</td>
 <td align="right">1</td>
-<td align="right">4.859513</td>
+<td align="right">4.860</td>
 </tr>
 </tbody>
 </table>
@@ -1469,6 +1469,7 @@ neighborhoods. Future work could incorporate measures of park quality,
 safety, and accessibility, as well as additional features of the built
 and social environment, to better understand when and how green space
 promotes health and how its benefits can be realized more equitably.</p>
+</div>
 
 
 

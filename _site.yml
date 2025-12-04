@@ -13,6 +13,8 @@ navbar:
       href: 2025-11-18_data-cleaning-eda-and-models-for-obesity.html
     - text: "Discussion"
       href: discussion.html
+    - text: "Report"
+      href: report.html      
 output:
   html_document:
     theme: cerulean

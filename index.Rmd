@@ -63,7 +63,7 @@ leaflet(parks_sf) |>
     )
 ```
 
-Built using data from NYC Parks Propety dataset from NYC Open Data https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn
+Built using data from [NYC Parks Propety dataset](https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn) from NYC Open Data 
 
 ___
 ## About Our Project
@@ -79,3 +79,5 @@ Explore the site to see what we discovered!
 ___
 
 ## Screencast
+
+Click [here](https://youtu.be/O-UPIdVv98E) to view our screencast!

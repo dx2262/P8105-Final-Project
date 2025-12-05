@@ -707,7 +707,7 @@ These variables capture distinct dimensions of community context and are commonl
 
 We estimated the following model:
 
-`obesity ~ area_per_capita + poverty + smoking + binge_drink + sugary_drink + pedestrian_hosp +         edu_college_degree_and_higher + uninsured`
+`obesity ~ area_per_capita + poverty + smoking + binge_drink + sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured`
 
 
 ```{r message = FALSE, warning = FALSE}

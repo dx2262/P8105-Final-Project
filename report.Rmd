@@ -1,42 +1,1289 @@
 ---
-title: "Where the Grass is Greener: Linking Demographic and Health Outcome Data to Urban Green Space in NYC
-"
-output: html_document
+title: "Where the Grass is Greener: Linking Demographic and Health Outcome Data to Urban Green Space in NYC"
+output:
+  html_document:
+    code_folding: hide
+    always_allow_html: true
+    toc: true
+    toc_float: true
 ---
 
-## Motivation
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(broom)
+library(knitr)
+library(plotly)
+library(janitor)
+library(patchwork)
+library(sf)
+library(betareg)
+library(lmerTest)
+library(car)
+library(effects)
+library(DHARMa)
+library(glmmTMB)
 
-Access to quality green space is increasingly recognized as a key determinant of public health in urban environments. Parks and other green areas promote physical activity, social interaction, and stress reduction, all of which contribute to improved physical and mental health outcomes. However, as New York City become increasingly dense, disparities in the availability, quality, and accessibility of parks raise important questions about environmental equity and community well-being.
+knitr::opts_chunk$set(
+  warning = FALSE, 
+  message = FALSE,
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
 
-This project aims to explore the relationship between parks, health outcomes, and neighborhood demographics across New York City. Using the NYC Parks Properties dataset, we plan to characterize park features such as size, location, and type, while the NYC Community Health Profiles data provides neighborhood-level indicators on chronic disease, mental health, and socioeconomic conditions. By integrating these datasets, we aim to assess how park distribution and attributes relate to health outcomes and to identify geographic areas where improvements in green space quality or accessibility could have the greatest public health impact.
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
-Our analysis is informed by evidence from a recent systematic review on green space and health by Nguyen et al. (2021), which highlights that specific park characteristics, such as tree canopy coverage, connectivity, and well-maintained amenities, are more strongly linked to health benefits than overall “greenness.” These insights guide our focus on spatial patterns and equity implications in New York City’s park system.
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
 
-Ultimately, this project seeks to demonstrate how publicly available urban and health data can be used to uncover actionable relationships between the built environment and population health, informing data-driven strategies to promote environmental justice and healthier urban living.
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+___
+# Introduction
 
-Reference:   
-Nguyen, P.-Y., Astell-Burt, T., Rahimi-Ardabili, H., & Feng, X. (2021). Green Space Quality and Health: A Systematic Review. International Journal of Environmental Research and Public Health, 18(21), 11028. https://doi.org/10.3390/ijerph182111028
+## Project Motivation
 
+Access to quality green space is increasingly recognized as a key determinant of public health in urban environments. Parks and other green areas promote physical activity, social interaction, and stress reduction, all of which contribute to improved physical and mental health outcomes. However, as New York City becomes increasingly dense, disparities in the availability, quality, and accessibility of parks raise important questions about environmental equity and community well-being.
+
+In this project, we focus on New York City (NYC) and ask how neighborhood-level park access relates to two health outcomes that are central in public health practice:
+
+**Premature mortality**: deaths before age 65 per 100,000 residents.
+
+**Adult obesity**: the percentage of adults with obesity.
+
+Using publicly available data, we link NYC Community Health Profiles (CHP) indicators to measures of park access derived from NYC Parks data at the community district level. Our goal is not to prove causality, but to describe how park density, neighborhood sociodemographics, and these health outcomes co-vary across NYC, and to reflect on what those patterns do and do not tell us about parks and health.
 
 ## Related Work
 
+A large body of literature documents associations between green space and health. Greener neighborhoods tend to foster more physical activity and better mental well-being. A 2018 meta-analysis reported that greater exposure to green space is associated with numerous beneficial outcomes, including lower stress levels, reduced risk of type II diabetes and cardiovascular disease, and even decreased all-cause mortality (1). These health benefits stem from multiple pathways: greenery can encourage exercise, promote social interaction, provide psychological restoration, and mitigate environmental hazards. In particular, urban vegetation helps lower ambient heat and filter air pollutants, which are important drivers of cardiovascular and respiratory illness (2). Arecent systematic review on green space and health highlights that specific park characteristics, such as tree canopy coverage, connectivity, and well-maintained amenities, are more strongly linked to health benefits than overall “greenness” (3). This evidence base underscores that robust green space access can improve population health in diverse ways.
+
+Simply having a park nearby does not guarantee health gains if residents feel unable or unwilling to use it. Safety concerns, low park quality, and historical under-investment can all limit park utilization. Studies in U.S. cities show that when parks are poorly maintained or perceived as unsafe, people, especially in disadvantaged areas, often avoid them and engage in less physical activity there (4). Recent research even found that in high-poverty urban neighborhoods, living near a major park was paradoxically linked to worse early-stage cardiovascular health, likely because poor park conditions and safety issues discouraged regular use (5). In short, parks must be accessible, safe, and inviting for their health potential to be realized. Unfortunately, inequities in park access and quality often align with race and income. In New York City, for instance, communities of color have on average 33% less park space per person than white communities, and low-income areas have about 21% less (6). These disparities reflect longstanding patterns of uneven investment, a fact acknowledged by initiatives like the [NYC Community Parks Initiative](https://www.nycgovparks.org/about/framework-for-an-equitable-future/community-parks-initiative), which identified hundreds of under-resourced neighborhood parks (many in high-poverty districts) and targeted them for upgrades. Thus, any health benefits of parks are tightly entwined with issues of equity and environmental justice.
+
+Our project builds on this work by:
+
+1. Focusing specifically on NYC community districts, which are commonly used units for neighborhood-level planning and surveillance, to examine differences in park resources and health.
+
+2. Jointly examining two key health outcomes (premature mortality and obesity) rather than focusing on a single outcome to capture a broader picture of community health..
+
+3. Explicitly incorporating poverty and racial composition into our models, and using these to interpret the relationship between park density and health outcomes. This approach responds to calls in the literature to consider socioeconomic context in green space research
+
+References:   
+
+1. Twohig-Bennett, C., & Jones, A. (2018). The health benefits of the great outdoors: A systematic review and meta-analysis of greenspace exposure and health outcomes. Environmental research, 166, 628–637. https://doi.org/10.1016/j.envres.2018.06.030
+
+2. Reid, C. E., Clougherty, J. E., Shmool, J. L. C., & Kubzansky, L. D. (2017). Is All Urban Green Space the Same? A Comparison of the Health Benefits of Trees and Grass in New York City. International Journal of Environmental Research and Public Health, 14(11), 1411. https://doi.org/10.3390/ijerph14111411
+
+3. Nguyen, PY, Astell-Burt, T, Rahimi-Ardabili, H, & Feng, X. (2021). Green Space Quality and Health: A Systematic Review. International Journal of Environmental Research and Public Health, 18(21), 11028. https://doi.org/10.3390/ijerph182111028
+
+4. Rigolon, A., Browning, M. H. E. M., McAnirlin, O., & Yoon, H. (2021). Green Space and Health Equity: A Systematic Review on the Potential of Green Space to Reduce Health Disparities. International Journal of Environmental Research and Public Health, 18(5), 2563. https://doi.org/10.3390/ijerph18052563
+
+5. Joyce, B. T., Zheng, Y., Nannini, D. R., et. al. (2024). Associations of Urban Blue and Green Spaces With Coronary Artery Calcification in Black Individuals and Disadvantaged Neighborhoods. Circulation. 150(3), 203-214. https://doi.org/10.1161/CIRCULATIONAHA.123.067992
+
+6. Fleming, S., LaShell, D.  (2023, January 19). The Economic Value of Parks: NYC. ESRI. https://www.esri.com/about/newsroom/blog/nyc-economic-value-parks
 
 
-## Initial Questions
+## Initial Questions 
+
+In our original proposal, we centered our project on the broader theme of **urban green space and community health in NYC**. Rather than committing to specific outcomes from the outset, we framed our project around a set of higher-level questions:
+
+1. **Do neighborhoods with more park space per resident tend to have better health outcomes (e.g. obesity, premature mortality, mental health outcomes)?**
+
+2. **How do these relationships change after we adjust for sociodemographic and behavioral covariates?**
+
+3. **Are there meaningful neighborhood-level differences in park access and health outcomes?**
+
+4. **Are there meaningful borough-level differences in park access and health outcomes?**
+
+These questions reflect our initial goal of exploring how patterns of park access intersect with neighborhood sociodemographic characteristics and health measures in NYC. We also considered including additional outcomes—such as mental health indicators—and initially envisioned a stronger emphasis on mapping and spatial visualization.
+
+## How Our Project Evolved
+
+As we began working with the data, several factors led us to refine and narrow our analytic focus:
+
+**Outcome selection** - While we initially planned to examine a broad set of health indicators, many were sparsely reported or incomplete for portions of the city. Premature mortality and adult obesity were consistently available, widely used in public health practice, and theoretically plausible outcomes to examine in relation to green space. We therefore focused our analysis on these two outcomes.
+
+**Defining park access** - Our initial EDA revealed substantial variation in park size and distribution across NYC. Metrics such as the *number* of parks or *total acres* alone did not capture meaningful differences across community districts. This exploration led us to adopt **park acres per 1,000 residents** as our primary exposure—an interpretable measure that accounts for both park quantity and population.
+
+**Accounting for sociodemographic context** - Early visualizations made it clear that poverty, racial composition, and borough differences were deeply intertwined with both park distribution and health outcomes. This guided our decision to include sociodemographic covariates and borough indicators in our modeling rather than relying on simple unadjusted comparisons.
+
+**Scope and analytical depth** - While our proposal included an ambitious plan for extensive mapping and potentially more health outcomes, we ultimately prioritized building a clear and reproducible analytic pipeline, exploring alternative modeling approaches, and interpreting results in a focused way.
+
+These changes reflect the iterative nature of data science work: we refined our questions as we learned more about the data, its limitations, and what we could reasonably tackle in the project timeline.
+
+___
+# Data
+
+## Data Sources
+
+We combined data from two main sources:
+
+1. [NYC Parks Properties Data](https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn) 
+   * Source: NYC Parks properties dataset (`Parks_Properties_20251104.csv`), which includes park polygons, acres, and associated community board identifiers.
+   * We used this to compute park acreage and park counts by community district.
+
+2. [NYC Community Health Profiles Data](https://www.nyc.gov/site/doh/data/data-publications/profiles.page) 
+   * Source: 2022 CHP public-use data (`2022-chp-pud.xlsx`), including:
+     - `CHP_all_data` sheet with demographic, socioeconomic, behavioral, and health indicators by community district.
+     - Additional sheets for specific health outcomes (e.g., causes of premature death, cancer). :contentReference[oaicite:0]{index=0}  
+
+All datasets were linked at the **community district (CD)** level using numeric district IDs and borough information.
+
+## Data Cleaning
+
+### Cleaning NYC Park Data
+
+To clean the park data for initial EDA, we selected the variables that we thought would be of interest and gave them meaningful names. The most important variables in this data set mainly consisted of:
+
+`acres`: size of park property in acres   
+
+`communityboard`: community board in which property is located (matches up to `id` in NYC health profile data)   
+
+```{r message = FALSE, warning = FALSE}
+parks_df =
+  read.csv("data/Parks_Properties_20251104.csv") |> 
+  janitor::clean_names() |> 
+  select(acquisitiondate, acres, communityboard, eapply, gispropnum, location, pip_ratable, subcategory, typecategory, zipcode, multipolygon) |> 
+  rename(
+    "id" = "communityboard",
+    "park_name"= "eapply",
+    "unique_id" = "gispropnum",
+    "inspected" = "pip_ratable"
+  ) |> 
+  mutate(
+    acquisitiondate = format(as.Date(acquisitiondate, format = "%Y %b %d %I:%M:%S %p"), "%m/%d/%Y"),
+    n_communities = str_count(id, ",") + 1
+  ) |> 
+  separate_rows(id, sep = ",") |> 
+  mutate(acres = as.numeric(acres) / n_communities) |> 
+  select(-n_communities)
+```
+
+
+### Cleaning NYC Community Health Data
+
+To clean the community health profile data for EDA, we imported and filtered only the rows of the data that corresponded to one community, named `id`. We removed the columns with the upper and lower confidence intervals along with variables we did not think would be useful for our analysis. As mentioned above, this data set contained many variables, but some of the notable variables include:
+
+`id`: community board for which data was collected   
+
+`borough`: borough in which community board is located   
+
+`neighbourhood`: name of neighbourhood corresponding to community board/ ID  
+
+`overall_pop`: total population    
+
+`race_`: percentage of population belonging to given race    
+
+`age`: percentage of population belonging to given age group   
+
+`on_time_hs_grad`: percentage of population graduating HS on time   
+
+`edu_did_not_complete_hs`: percentage of population who did not graduate HS   
+
+`poverty`: percentage of population living in poverty   
+
+`unemployment`: unemployment rate   
+
+`physical_activity`: percentage of population reporting physical activity   
+
+`uninsured`: percentage of population uninsured   
+
+`obesity`: percentage of population with obesity   
+
+`premature_mort_rate`: rate of premature mortality   
+
+```{r}
+demo_df =
+  read_excel("data/2022-chp-pud.xlsx", sheet = 4, range = cell_rows(2:67)) |> 
+  janitor::clean_names() |> 
+  filter(row_number() > 6) |> 
+  select(-starts_with(c("nyc_comparison_", "lower_95cl_", "upper_95cl_"))) |> 
+  select(id:rent_burden, air_pollution, child_obesity:unmet_med_care_reliability_note,
+         obesity:binge_drink_reliability_note, premature_mort_number:life_expectancy) |> 
+  rename("neighbourhood" = "name") |> 
+  mutate(id = as.character(id))
+```
+
+These steps ensured that all sociodemographic and health variables were consistently formatted and interpretable at the community-district level.
+
+After cleaning each dataset separately, we merged the parks summaries with CHP indicators by community district ID. This merge produced:
+
+- A single row per community district.  
+- Harmonized demographic, socioeconomic, behavioral, and health variables.  
+- Linked park exposure measures.
+
+We then checked for:
+
+- Missing or duplicate IDs.  
+- Inconsistencies between borough names and district numbers.  
+- Outliers in acreage and population fields.
+
+The resulting cleaned dataset (`full_df`) represented our first complete analytic file and was fully inspected as part of the Initial EDA.
+
+```{r}
+full_df =
+  inner_join(parks_df, demo_df)
+```
+
+
+### Preparing the Premature Mortality Analytic Dataset
+
+For the premature mortality analysis, we constructed an analytic dataset that links community districts to their corresponding park acreage and demographic characteristics. Because each district may contain multiple parks, we aggregated total park acreage and the number of parks within each district and standardized these values by population size to obtain **park acres per 1,000 residents**. We then restricted the dataset to observations with complete information on both park exposure and premature mortality.  
+
+```{r}
+full_df <- read_csv("data/full_df.csv") 
+
+analysis_df <- 
+  full_df |> 
+  select(id, acres, unique_id, borough, neighbourhood, overall_pop, race_black, poverty, 
+         premature_mort_rate) |>
+  group_by(id) |> 
+  mutate(
+    total_park_acres = sum(acres, na.rm = TRUE), 
+    n_parks = n(), 
+    park_acres_per_1000 = total_park_acres / (overall_pop / 1000)
+    ) |> 
+  ungroup() |> 
+  drop_na(park_acres_per_1000, premature_mort_rate)
+```
+
+To gain an initial understanding of this dataset, we summarized key variables:
+
+```{r}
+analysis_df |> 
+  summarize(
+    n_cd = n(),
+    mean_park_acres_per_1000 = mean(park_acres_per_1000, na.rm = TRUE),
+    sd_park_acres_per_1000 = sd(park_acres_per_1000, na.rm = TRUE),
+    mean_premort_rate = mean(premature_mort_rate, na.rm = TRUE),
+    sd_premort_rate = sd(premature_mort_rate, na.rm = TRUE),
+    mean_poverty = mean(poverty, na.rm = TRUE),
+    mean_race_black = mean(race_black, na.rm = TRUE)
+    ) |> 
+  kable(digits = 3)
+```
+
+These summaries provided a baseline sense of how park density, premature mortality, and sociodemographic factors vary across NYC community districts and informed our choice of covariates for subsequent modeling.
+
+
+### Preparing the Obesity Analytic Dataset
+
+For the obesity analysis, we returned to the raw parks and CHP datasets and constructed a parallel analytic dataset designed specifically for modeling obesity prevalence. We began by reading in the parks and CHP data:
+
+```{r}
+df_parks <- read.csv("data/Parks_Properties_20251104.csv", colClasses = "character", encoding = "UTF-8") |>
+select(ACQUISITIONDATE: multipolygon) |>
+clean_names()
+
+df_chp <- read_excel("data/2022-chp-pud.xlsx", sheet = "CHP_all_data", skip = 1) |>
+clean_names()
+
+df_prem_death <- read_excel("data/2022-chp-pud.xlsx", sheet = "Cause_of_premature_death") |>
+clean_names()
+
+df_cancer <- read_excel("data/2022-chp-pud.xlsx", sheet = "Cancer_data_ranked") |>
+clean_names()
+```
+
+Because some parks span multiple community boards, we carefully apportioned park acreage across IDs. After renaming the community board identifier to `id`, we grouped by `id`, calculated total acreage and counts, and adjusted for parks shared across multiple districts: 
+
+```{r}
+df_parks <- 
+  df_parks |>
+  rename(id = communityboard) 
+
+df_parks_community <-
+  df_parks |>
+  mutate(
+    acres = as.numeric(acres),
+    
+    id = as.factor(id)
+  ) |>
+  group_by(id) |>
+  summarise(
+    sum_acres = sum(acres, na.rm = TRUE),
+    mean_acres = mean(acres, na.rm = TRUE),
+    n_parks = n()
+  ) |>
+  filter(sum_acres > 0) |> # only use observations with positive areas
+  mutate(
+    id = as.character(id),
+    n_split = lengths(strsplit(id, ","))
+  ) |>
+  separate_rows(id, sep = ",") |>
+  mutate(
+    id = trimws(id),
+    sum_acres_adj = sum_acres / n_split,
+    n_parks_adj = n_parks / n_split
+  ) |>
+  group_by(id) |>
+  summarise(
+    sum_acres = sum(sum_acres_adj, na.rm = TRUE),
+    n_parks = sum(n_parks_adj, na.rm = TRUE),
+    mean_acres = sum_acres / n_parks
+  ) |>
+  filter(sum_acres != "Inf")
+
+df_chp_clean <- df_chp |>
+  select(-contains("95cl"), -contains("nyc_comparison"), -contains("reliability_note")) |>
+  filter(id != c(0, 1, 2, 3, 4, 5))
+
+df_chp_clean <- df_chp_clean |>
+  mutate(uninsured = as.numeric(uninsured),
+         uninsured = round(uninsured, 2))
+
+# create a variable map for df_chp_clean
+var_map <- tribble(
+  ~variable,                 ~category,
+  
+  "id",                      "geo",
+  "borough",                 "geo",
+  "name",                    "geo",
+  "overall_pop",             "population",
+
+  
+  "race_white",              "demographic_race",
+  "race_black",              "demographic_race",
+  "race_latino",             "demographic_race",
+  "race_asian",              "demographic_race",
+  "race_other",              "demographic_race",
+  "age0to17",                "demographic_age",
+  "age18to24",               "demographic_age",
+  "age25to44",               "demographic_age",
+  "age45to64",               "demographic_age",
+  "age65plus",               "demographic_age",
+  "born_outside_us",         "demographic_migration",
+  "ltd_eng_prof",            "demographic_language",
+
+  
+  "edu_did_not_complete_hs",      "SES_education",
+  "edu_hs_grad_some_college",     "SES_education",
+  "edu_college_degree_and_higher","SES_education",
+  "poverty",                      "SES_economic",
+  "unemployment",                 "SES_economic",
+  "rent_burden",                  "SES_economic",
+  "school_absent",                "education_outcome",
+  "on_time_hs_grad",              "education_outcome",
+
+ 
+  "homes_ac",                     "housing_environment",
+  "homes_no_defects",             "housing_environment",
+  "air_pollution",                "physical_environment",
+  "ratio_bodega_supermarket",     "food_environment",
+  "farmers_markets",              "food_environment",
+
+ 
+  "helpful_neighbor",             "social_environment",
+  "assault_hosp",                 "safety_violence",
+  "jail_incarceration",           "safety_justice",
+  "pedestrian_hosp",              "safety_transport",
+
+ 
+  "physical_activity",            "behavior",
+  "fruit_veg",                    "behavior",
+  "sugary_drink",                 "behavior",
+  "smoking",                      "behavior",
+  "binge_drink",                  "behavior",
+
+  
+  "uninsured",                    "access_care",
+  "unmet_med_care",               "access_care",
+  "hpv_vaccination_all",          "preventive_care",
+  "flu_vaccination",              "preventive_care",
+
+  
+  "preterm_births",               "maternal_child",
+  "teen_births",                  "maternal_child",
+  "child_obesity",                "maternal_child",
+  "infant_mort",                  "maternal_child",
+
+  
+  "obesity",                      "chronic_disease",
+  "diabetes",                     "chronic_disease",
+  "hypertension",                 "chronic_disease",
+  "hiv_diagnoses",                "infectious_disease",
+  "hep_c_reports",                "infectious_disease",
+  "avoidable_child_hosp",         "hospitalization",
+  "avoidable_adult_hosp",         "hospitalization",
+  "falls_hosp",                   "injury_hospitalization",
+  "psych_hosp",                   "mental_health",
+
+  
+  "avertable_death",              "mortality",
+  "premature_mort_rate",          "mortality",
+  "premature_mort_number",        "mortality",
+  "life_expectancy",              "global_health",
+  "self_rep_health",              "global_health"
+)
+```
+
+We then constructed a variable map to organize the CHP variables into conceptual categories (e.g., demographics, education, economic indicators, behaviors, access to care, chronic disease outcomes) and built several intermediate data frames for each domain. These were combined into a single analysis dataset:
+
+```{r}
+# demographic data
+var_demo <- var_map |>
+  filter(category %in% c("geo", "population", "demographic_race", "demographic_age","demographic_migration", "demographic_language")) |>
+  pull(variable)
+
+df_demographic <-
+  df_chp_clean |>
+  select(all_of(var_demo)) |>
+  mutate(
+    age0to24 = age0to17 + age18to24,
+    age25to64 = age25to44 + age45to64,
+    race_others = race_asian + race_other
+  ) |>
+  select(-race_asian, -race_other, -age0to17, -age18to24, -age25to44, -age45to64) |>
+  relocate(
+    c(age0to24, age25to64), .before = age65plus
+  ) |>
+  relocate(race_others, .after = race_latino)
+
+
+# education condition
+var_edu <- var_map |>
+  filter(category %in% c("geo", "SES_education")) |>
+  pull(variable)
+  
+df_education <- df_chp_clean |>
+  select(all_of(var_edu)) |>
+  mutate(edu_no_college_degree = edu_did_not_complete_hs + edu_hs_grad_some_college) |>
+  select(-edu_did_not_complete_hs, -edu_hs_grad_some_college)
+
+
+# economic condition
+var_eco <- var_map |>
+  filter(category %in% c("geo","SES_economic"))|>
+  pull(variable)
+
+df_economy <- df_chp_clean |>
+  select(all_of(var_eco)) |>
+  select(-rent_burden)
+
+
+# food condition
+var_food <- var_map |>
+  filter(category %in% c("geo", "food_environment", "behavior")) |>
+  pull(variable)
+
+df_food <- df_chp_clean |>
+  select(all_of(var_food))|>
+  select(-ratio_bodega_supermarket, -physical_activity, -smoking, -binge_drink)
+
+
+# smoking and drinking
+df_smoke_drink <- df_chp_clean |>
+  select(id, borough, name, smoking, binge_drink)
+
+
+# activity
+df_activity <- df_chp_clean |>
+  select(id, borough, name, physical_activity)
+
+
+# safety condition
+var_safety <- var_map |>
+  filter(category %in% c("geo", "safety_violence", "social_environment", "safety_transport")) |>
+  pull(variable)
+
+df_safety <- df_chp_clean |>
+  select(all_of(var_safety))
+
+
+# medical availability
+df_med_avail <- df_chp_clean |>
+  select(id, borough, name, uninsured) 
+
+
+# health conditions
+df_health <- df_chp_clean |>
+  select(id, obesity, life_expectancy)
+
+
+dfs <- list(df_demographic, df_health, df_parks_community, df_education, df_economy, df_food, df_smoke_drink, df_activity, df_safety, df_med_avail)
+
+
+# get a final dataframe for analysis
+df_analysis <- reduce(dfs, left_join, by = "id") |>
+  select(-contains("borough.x.x"), -contains("name.x.x"), -contains("borough.y"), -contains("name.y")) |>
+  rename(
+    borough = borough.x,
+    name = name.x
+  ) |>
+  filter(overall_pop != 0) |>
+  mutate(
+    area_per_capita = (sum_acres / overall_pop) * 100000,
+    log_area = log(area_per_capita + 1)) 
+```
+
+Finally, we generated descriptive summaries of the resulting analysis dataset to check ranges, missingness, and distributions before modeling obesity prevalence: 
+
+```{r}
+summary(df_analysis)
+```
+
+These steps ensured that the obesity analysis used a consistent CD-level dataset with harmonized sociodemographic, environmental, and health indicators.
+
+
+___
+# Exploratory Analysis
+
+## EDA for Parks Data
+
+```{r message = FALSE, warning = FALSE, fig.height = 15, fig.width = 15}
+full_df |> 
+  group_by(id, neighbourhood, overall_pop) |> 
+  summarize(
+    total_acres = sum(acres, na.rm = TRUE)
+  ) |> 
+  mutate(acres_per_capita = total_acres / overall_pop) |> 
+  ggplot(aes(x = acres_per_capita, y = reorder(neighbourhood, acres_per_capita))) +
+  geom_col(color = "forestgreen") +
+  labs(
+    x = "Acres per Capita",
+    y = "Neighbourhood",
+    title = "Acres per Capita of Green Space in NYC Neighbourhoods"
+  )
+```
+
+The plot above shows acres per capita of green space in NYC neighbourhoods. The data was grouped by ID and population. The number of acres per neighbourhood was found by summing acres after grouping by neighbourhood. This was then divided by neighbourhood population to find acres per capita. The plot shows that the neighbourhood with the highest acres per capita of green space is South Beach and Willowbrook. The neighbourhood with the lowest acres per capita of green space is East Flatbush.
+
+```{r message = FALSE, warning = FALSE}
+full_df |> 
+  group_by(borough) |> 
+  summarize(
+    total_acres = sum(acres, na.rm = TRUE),
+    total_pop = sum(unique(overall_pop)), na.rm = TRUE
+  ) |> 
+  mutate(acres_per_capita = total_acres / total_pop,
+         label = str_c("Total Acres: ", total_acres, "\nPopulation: ", total_pop)) |> 
+  plot_ly(
+    x = ~acres_per_capita,
+    y = ~borough,
+    type = 'bar',
+    orientation = 'h',
+    text = ~label,
+    marker = list(color = 'forestgreen')
+) |> 
+  layout(
+    title = "Green Space per Capita for Each NYC Borough",
+    xaxis = list(title = "Acres per Capita"),
+    yaxis = list(title = "Borough")
+  )
+```
+
+A similar plot was made for acres per capita of green space, but this time the data was grouped by borough. We found acres per capita in the same way as above, and found that Staten Island has the highest acres per capita and Manhattan has the lowest. This is what we would expect as Manhattan has the largest population of NYC boroughs and Staten Island had the smallest.
+
+```{r message = FALSE, warning = FALSE}
+full_df |> 
+  arrange(acres) |> 
+  filter(row_number() < 10) |>
+  select(id, borough, park_name) |> 
+  knitr::kable(caption = "Smallest NYC Green Spaces")
+
+full_df |>
+  arrange(desc(acres)) |> 
+  filter(row_number() < 10) |> 
+  select(id, borough, park_name) |> 
+  knitr::kable(caption = "Largest NYC Green Spaces")
+```
+
+We then wanted to look at which parks were the smallest and largest. The smallest parks belong to Queens and Brooklyn, and the largest parks are in every borough besides Manhattan.
+
+```{r message = FALSE, warning = FALSE}
+full_df |> 
+  group_by(neighbourhood) |> 
+  summarize(
+    total_acres = sum(acres, na.rm = TRUE),
+    total_population = sum(unique(overall_pop), na.rm = TRUE)
+  ) |> 
+  mutate(label = str_c("Neigbourhood: ", neighbourhood,
+    "\nTotal Acres: ", total_acres, 
+    "\nPopulation: ", total_population)) |> 
+  plot_ly(
+    x = ~total_population,
+    y = ~total_acres,
+    type = 'scatter',
+    text = ~label,
+    mode = "markers",
+    marker = list(color = 'forestgreen')
+) |> 
+  layout(
+    title = "Relationship between Neighbourhood Population and Green Space",
+    xaxis = list(title = "Neighbourhood Population"),
+    yaxis = list(title = "Acres of Green Space")
+  )
+```
+
+After determining that Staten Island had the most green space per capita and Manhattan had the lowest, we wanted to try to observe if there was any potential relationship between neighbourhood population and acres of green space. We would not expect to find one as Manhattan, the borough with the largest population, had the smallest acres per capita, and vice versa for Staten Island. The plot indicates there may be a slight positive relationship between population and green space, but it does not appear to be substantial. 
+
+```{r message = FALSE, warning = FALSE}
+full_df |> 
+  mutate(label = str_c("Park: ", park_name,
+    "\nAcres: ", acres, 
+    "\nLog Acres: ", log1p(acres))) |> 
+  plot_ly(
+    x = ~borough,
+    y = ~log1p(acres),
+    type = 'box',
+    text = ~label,
+    marker = list(color = 'forestgreen'),
+    fillcolor = "forestgreen",
+    line = list(color = "black")
+) |> 
+  layout(
+    title = "Distribution of Park Sizes in Each Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Log Transformed Acres")
+  )
+```
+
+The distribution of park sizes in each borough shows that Staten Island's park sizes tend to be much larger than the park sizes in the other boroughs. It also has the widest distribution, meaning it has large variety of park sizes. The Bronx, Brooklyn, and Manhattan all have parks of similar sizes, but Manhattan appears to have the smallest parks. Every borough aside from Staten Island has outliers on the upper end, indicating they still do have a range of park sizes even though most of them are on the smaller end.
+
+```{r message = FALSE, warning = FALSE}
+full_df |> 
+  mutate(geometry = st_as_sfc(multipolygon)) |> 
+  st_as_sf() |> 
+  plot_ly() |> 
+    add_sf(
+      color = ~borough
+    ) |> 
+  layout(
+    title = "Layout of Green Spaces in NYC"
+  )
+```
+
+This map shows a visual of green spaces by borough. We can see that Manhattan definitely has the lowest area of green space, but interestingly, all the other boroughs appear to have a similar amount of green space. However, we know this is not the case based on total acres shown in the green space per capita of NYC boroughs plot. 
+
+## EDA for Community Health Data
+
+```{r message = FALSE, warning = FALSE}
+demo_df |> 
+  pivot_longer(
+    cols = starts_with("race_"),
+    names_to = "race",
+    values_to = "race_pct"
+    ) |> 
+  mutate(race = str_remove(race, "race_")) |> 
+  group_by(borough, race) |> 
+  summarize(race_pct = mean(race_pct)) |>
+  plot_ly(
+    x = ~borough,
+    y = ~race_pct,
+    color = ~race,
+    type = "bar"
+    ) |> 
+  layout(
+    barmode = "stack",
+    title = "Race Distributions for Each NYC Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Percentage")
+  )
+```
+
+Next, we did some EDA for the community health profiles data. We first looked at the distribution of race in each NYC borough. The most common race in Staten Island, Manhattan, and Brooklyn is white, and the most common in the Bronx and Queens is Latino.
+
+```{r message = FALSE, warning = FALSE}
+demo_df |> 
+  pivot_longer(
+    cols = starts_with("age"),
+    names_to = "age",
+    values_to = "age_pct"
+    ) |> 
+  mutate(age = str_remove(age, "age"),
+         age = str_replace(age, "to", "-")) |> 
+  group_by(borough, age) |> 
+  summarize(age_pct = mean(age_pct)) |> 
+  plot_ly(
+    x = ~borough,
+    y = ~age_pct,
+    color = ~age,
+    type = "bar"
+    ) |> 
+  layout(
+    barmode = "stack",
+    title = "Age Distributions for Each NYC Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Percentage")
+  )
+```
+
+Similarly, we observed age distributions for each NYC borough. The most common age group is 0-17 in the Bronx, 25-44 in Manhattan, Queens, and Brooklyn, and 45-65 in Staten Island.
+
+Since the goal of our project was to determine how health outcomes are affected by green space accessibility, we wanted to observe some possible relationships within the health data itself to see if they show what we would expect.
+
+```{r message = FALSE, warning = FALSE}
+demo_df |> 
+  plot_ly(
+    x = ~poverty,
+    y = ~physical_activity,
+    type = "scatter"
+  ) |> 
+  layout(
+    title = "Relationship Between Poverty and Physical Activity Percentages",
+    xaxis = list(title = "Percentage of Population Living in Poverty"),
+    yaxis = list(title = "Percentage of Population \nReporting Physical Activity")
+  )
+```
+
+```{r message = FALSE, warning = FALSE}
+demo_df |> 
+  plot_ly(
+    x = ~on_time_hs_grad,
+    y = ~unemployment,
+    type = "scatter"
+  )|> 
+  layout(
+    title = "Relationship Between Education and Unemployment Rate",
+    xaxis = list(title = "Percentage of Population Who Graduated HS on Time"),
+    yaxis = list(title = "Unemployment Rate")
+  )
+```
+
+```{r message = FALSE, warning = FALSE}
+demo_df |> 
+  plot_ly(
+    x = ~on_time_hs_grad,
+    y = ~poverty,
+    type = "scatter"
+  ) |> 
+  layout(
+    title = "Relationship Between Education and Poverty",
+    xaxis = list(title = "Percentage of Population Who Graduated HS on Time"),
+    yaxis = list(title = "Percentage of Population Living in Poverty")
+  )
+```
+
+```{r message = FALSE, warning = FALSE}
+demo_df |> 
+  mutate(uninsured = as.numeric(uninsured)) |> 
+  plot_ly(
+    x = ~on_time_hs_grad,
+    y = ~uninsured,
+    type = "scatter"
+  ) |> 
+  layout(
+    title = "Relationship Between Education and Being Uninsured",
+    xaxis = list(title = "Percentage of Population Who Graduated HS on Time"),
+    yaxis = list(title = "Percentage of Population Who are Uninsured")
+  )
+```
+
+The percentage of population living in poverty appears to be negatively correlated with physical activity levels. There is an inverse relationship between finishing high school on time and the unemployment rate, poverty, and percentage of people who are uninsured. These are all relationships that we would expect. As a result of this analysis, we observe several consistent correlations between socioeconomic indicators and health or education-related outcomes. These patterns suggest that communities with higher socioeconomic disadvantage tend to exhibit lower physical activity levels and less favorable educational and health metrics. While these findings do not imply causation, they highlight meaningful associations worth further exploration.
+
+## EDA for Premature Mortality Analysis
+
+We then visualized the marginal distributions of premature mortality and park density. These plots allowed us to assess skewness, detect possible outliers, and evaluate whether transformations or modeling adjustments might be necessary.
+
+```{r}
+# Premature mortality
+analysis_df |> 
+  ggplot(aes(x = premature_mort_rate)) +
+  geom_density() +
+  labs(
+    x = "Premature mortality rate (per 100,000, age < 65)",
+    y = "Density of community districts",
+    title = "Distribution of premature mortality across NYC community districts"
+  )
+
+# Park density
+analysis_df |> 
+  ggplot(aes(x = park_acres_per_1000)) +
+  geom_density() +
+  labs(
+    x = "Park acres per 1,000 residents",
+    y = "Density of community districts",
+    title = "Distribution of park area density across NYC community districts"
+  )
+```
+
+
+Park acreage per capita was highly right-skewed, with many districts possessing very limited parkland relative to their population size. Because log-transformations can help linearize relationships and stabilize variance, we also examined the distribution of the log-transformed exposure.
+
+```{r}
+# Log of park density
+analysis_df |> 
+  ggplot(aes(x = log(park_acres_per_1000))) +
+  geom_density() +
+  labs(
+    x = "Log(Park Acres Per 1,000 Residents)",
+    y = "Density",
+    title = "Distribution of the Log of Park Area Density Across NYC Community Districts"
+  )
+```
+
+
+To explore the relationship between park access and premature mortality, we created a scatterplot of premature mortality versus park acres per 1,000 residents. We added a simple linear regression line to obtain an initial visual sense of direction and shape.
+
+```{r}
+analysis_df |>
+  mutate(
+    label = paste0(
+      neighbourhood, "<br>",
+      "Park acres per 1,000: ", round(park_acres_per_1000, 2), "<br>",
+      "Premature mortality: ", round(premature_mort_rate, 1)),
+    fit = fitted(lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df))
+    ) |>
+  plot_ly(
+    x     = ~park_acres_per_1000,
+    y     = ~premature_mort_rate,
+    color = ~borough,
+    text  = ~label,
+    type  = "scatter",
+    mode  = "markers"
+    ) |>
+  add_lines(
+    x = ~park_acres_per_1000,
+    y = ~fit,
+    name = "Regression Line",
+    inherit = FALSE,
+    line = list(color = "black", width = 2),
+    showlegend = FALSE
+    ) |>
+  layout(
+    title = "Park Density vs Premature Mortality",
+    xaxis = list(title = "Park acres per 1,000 residents"),
+    yaxis = list(title = "Premature mortality rate (per 100,000, age < 65)")
+    )
+```
+
+## EDA for Obesity Analysis
+
+To explore the relationship between obesity and potential community-level determinants, we conducted a series of visual analyses in which obesity rate was treated as the outcome and park characteristics, along with selected CHP variables, were treated as predictors. For each predictor, we generated plots to assess general patterns, identify potential nonlinearities, and detect outliers.
+
+Visualizations of obesity against park-related measures (total park area, per-capita park area, and park counts) revealed whether community access to green spaces is associated with variation in obesity rates across districts.
+
+```{r message = FALSE, warning = FALSE}
+plot_ly(
+  df_analysis, 
+  x = ~log_area, 
+  y = ~obesity,
+  type = 'scatter', 
+  mode = 'markers',
+  color = ~borough,
+  text = ~paste("Community: ", name,
+               "<br>Borough: ", borough,
+               "<br>Log Area: ", log_area,
+               "<br>Obesity: ", obesity, "%")
+  ) |>
+  layout(title = "Obesity vs Park Access",
+         xaxis = list(title = "Log Area"),
+         yaxis = list(title = "Obesity"))
+
+```
+
+Similar scatter plots were produced for socioeconomic indicators (e.g., poverty rate, educational attainment), safety measures (e.g., assault-related hospitalizations), and health behavior variables (e.g., sugary drink consumption, fruit and vegetable intake). These plots help illustrate which predictors show strong monotonic relationships with obesity and which demonstrate weaker or more complex patterns.
+
+```{r message = FALSE, warning = FALSE}
+# ggplot(df_analysis, aes(obesity)) + geom_histogram()
+
+plot_ly(
+  df_analysis, 
+  x = ~poverty, 
+  y = ~obesity,
+  type = 'scatter', mode = 'markers',
+  color = ~borough,
+  text = ~paste("Community: ", name,
+               "<br>Borough: ", borough,
+               "<br>Poverty Rate: ", poverty, "%",
+               "<br>Obesity: ", obesity, "%")) |>
+  layout(
+    title = "Obesity vs Poverty",
+    xaxis = list(title = "Poverty Rate"),
+    yaxis = list(title = "Obesity Rate"))
 
 
 
-## Data
+```
 
 
-## Exploratory Analysis
+```{r message = FALSE, warning = FALSE}
+# ggplot(df_analysis, aes(borough, obesity)) + geom_boxplot()
+
+df_analysis |>
+  filter(id != 0) |>
+  plot_ly(
+  x = ~borough, 
+  y = ~obesity, 
+  type = 'box',
+  fillcolor = ~borough,
+  text= ~paste("<br>Borough: ", borough)
+  ) |>
+  layout(
+    title = "Obesity vs Borough",
+    xaxis = list(title = "Borough"),
+    yaxis = list(title = "Obesity")
+  )
+
+```
 
 
-## Additional Analysis
+```{r message = FALSE, warning = FALSE, eda_behavior_scatter, fig.width = 8, fig.asp = 0.9}
 
-### Premature Morality 
+base_theme <- theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    legend.position = "right",
+    legend.title = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 
-### Obesity
+# 1. Obesity vs Farmers' Market
+p_farm <- ggplot(df_analysis, aes(x = farmers_markets, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Farmers' Markets",
+       x = "Farmers' markets per 10,000 residents",
+       y = "Obesity (%)") +
+  base_theme
 
-## Discussion
+# 2. Obesity vs Sugary Drink
+p_sugary <- ggplot(df_analysis, aes(x = sugary_drink, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Sugary Drink Consumption",
+       x = "Sugary drink consumption (%)",
+       y = "Obesity (%)") +
+  base_theme
 
+# 3. Obesity vs Smoking
+p_smoke <- ggplot(df_analysis, aes(x = smoking, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Smoking Prevalence",
+       x = "Smoking prevalence (%)",
+       y = "Obesity (%)") +
+  base_theme
+
+# 4. Obesity vs Binge Drinking
+p_binge <- ggplot(df_analysis, aes(x = binge_drink, y = obesity, color = borough)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray20", linewidth = 1) +
+  labs(title = "Obesity vs Binge Drinking",
+       x = "Binge drinking (%)",
+       y = "Obesity (%)") +
+  base_theme
+
+# ---- Combine 4 plots: shared legend automatically ----
+combined_plot <- (p_farm + p_sugary) / (p_smoke + p_binge)
+
+combined_plot
+```
+
+
+```{r message = FALSE, warning = FALSE}
+plot_ly(
+  df_analysis, 
+  x = ~edu_college_degree_and_higher,
+  y = ~obesity,
+  mode = "markers",
+  type = "scatter",
+  color = ~borough,
+  text= ~paste("Community: ", name,
+               "<br>Borough: ", borough,
+               "<br>Obesity: ", obesity, "%",
+               "<br>High Education Rate: ", edu_college_degree_and_higher, "%")
+  ) |>
+  layout(
+    title = "Obesity vs Education",
+    xaxis = list(title = "High Education Rate"),
+    yaxis = list(title = "Obesity")
+  )
+```
+
+
+```{r message = FALSE, warning = FALSE}
+fig_bubble <- plot_ly(
+  df_analysis,
+  x = ~assault_hosp,
+  y = ~pedestrian_hosp,
+  size = ~obesity,
+  color = ~borough,
+  colors = "Set2",
+  type = "scatter",
+  mode = "markers",
+  marker = list(
+    sizemode = "area",
+    sizeref = 2 * max(df_analysis$obesity) / 60^2, 
+    opacity = 0.7
+  ),
+  text = ~paste(
+    "CD:", id,
+    "<br>Name:", name,
+    "<br>Assault hosp:", assault_hosp,
+    "<br>Pedestrian hosp:", pedestrian_hosp,
+    "<br>Obesity:", round(obesity,1), "%"
+  ),
+  hoverinfo = "text"
+) |>
+  layout(
+    title = "Safety Indicators and Obesity (Bubble Plot)",
+    xaxis = list(title = "Assault-related hospitalizations"),
+    yaxis = list(title = "Pedestrian injury hospitalizations")
+  )
+
+fig_bubble
+```
+
+
+```{r message = FALSE, warning = FALSE}
+nycd <- st_read("data/nycd_25d/nycd.shp") |>
+  mutate(BoroCD = as.character(BoroCD))
+
+df_map <- nycd %>%
+  left_join(df_analysis, by = c("BoroCD" = "id")) |>
+  st_transform(4326)
+
+p_obesity <- 
+  ggplot(df_map) +
+  geom_sf(aes(fill = obesity), color = NA) +
+  scale_fill_viridis_c(option = "A") +
+  labs(
+    title = "NYC Community District Obesity (%)",
+    fill  = "Obesity (%)"
+  ) +
+  theme_minimal()
+p_obesity
+
+p_poverty <- ggplot(df_map) +
+  geom_sf(aes(fill = poverty), color = NA) +
+  scale_fill_viridis_c(option = "Blues", direction = 1) +
+  labs(
+    title = "Poverty Rate by Community District",
+    fill  = "Poverty (%)"
+  ) +
+  theme_minimal()
+
+p_poverty
+
+p_parks <- ggplot(df_map) +
+  geom_sf(aes(fill = area_per_capita), color = NA) +
+  scale_fill_viridis_c(option = "Greens", direction = 1) +
+  labs(
+    title = "Per-Capita Park Area",
+    fill  = "log-area / capita"
+  ) +
+  theme_minimal()
+
+p_parks
+```
+
+The primary purpose of these visual analyses is not only descriptive but also diagnostic. The figures highlight variables with relevant associations that merit inclusion in the regression modeling stage and help identify potential issues such as extreme values or nonlinear effects. Overall, the EDA suggests that certain socioeconomic and behavioral variables show clearer relationships with obesity than park-related measures alone, underscoring the importance of including multiple domains of community characteristics in subsequent modeling.
+
+___
+# Additional Analysis
+___
+## Premature Morality 
+
+[See Full Premature Mortality Analysis Here](cleaning_eda_model_premature_mortality.html)
+
+Modeling Strategy
+
+For premature mortality, we treated premature mortality rate as a continuous outcome at the community-district level and used linear regression models to quantify associations with park density and covariates. Our main exposure was park acres per 1,000 residents at the CD level. We considered the following model sequence: 
+
+1. **Crude model (Park Density Only)**
+
+2. **Borough-adjusted Model**
+
+3. **Main Effects Model (Primary) including:**
+
+   * **Park acres per 1,000 residents**
+
+   * **Poverty**
+
+   * **Percent Black residents**
+
+   * **Additional sociodemographic covariates**
+
+4. **Main Effects + Interaction model to explore potential effect modification (i.e., the interaction between park density and poverty)**
+
+5. **Log-transformed Exposure Model, using log park density to assess robustness to transformation**
+
+We fit all models using `lm()` and compared model performance using AIC, BIC, and adjusted R². Although the code for fitting each model and generating the comparison table appears in our analysis script, we summarize the resulting metrics here for clarity.
+
+Model Comparison
+
+The table below summarizes AIC, BIC, and adjusted R² for the key models (values taken from our existing output): 
+
+| Model                      | AIC      | BIC      | adj. R² |
+| -------------------------- | -------: | -------: | ------: |
+| Crude (Park Density Only)  | 24652.51 | 24669.51 |   0.000 |
+| Borough-adjusted           | 23997.05 | 24036.73 |   0.265 |
+| Main Effects (Primary)     | 20957.65 | 21008.67 |   0.822 |
+| Main Effects + Interaction | 20691.60 | 20748.29 |   0.843 |
+| Log Exposure Main Effects  | 21039.51 | 21090.54 |   0.815 |
+
+The main-effects model offered a good balance between fit and interpretability (AIC ≈ 20,958; adj. R² ≈ 0.822). The interaction model improved fit slightly (adj. R² ≈ 0.843) but at the cost of increased complexity and multicollinearity, so we treated it as a secondary effect-modification analysis, rather than our primary specification. The log-transformed exposure model performed slightly worse than the main-effects model, suggesting that our key findings are robust to transformation but that the original exposure scale is adequate.
+
+Interpretation of Coefficients (Main-Effects Model)
+
+In the main-effects model:
+
+* Poverty and percent Black residents were strongly and positively associated with premature mortality, even after adjustment for park density and other covariates.
+
+* Park acres per 1,000 residents showed a relatively modest association with premature mortality once sociodemographic factors were included. In some specifications, the association attenuated toward the null or became statistically non-significant, suggesting that the crude relationship between park access and premature mortality was largely confounded by neighborhood socioeconomic conditions.
+
+* Borough fixed effects captured additional heterogeneity, with some boroughs experiencing systematically higher premature mortality than others even after adjustment.
+
+The interaction model suggested that the association between park density and premature mortality may differ by neighborhood context (e.g., stronger or weaker associations in high-poverty districts), but high multicollinearity and instability of interaction terms limited our ability to draw firm conclusions. For these reasons, we interpreted the interaction results as complementary rather than central to our main findings. 
+
+Overall, the premature mortality analysis highlights that socioeconomic and racial inequities are central drivers of premature mortality disparities, and that any health benefits of green space are nested within these broader structural conditions.
+
+___
+## Obesity
+
+[See Full Obesity Analysis Here](2025-11-18_data-cleaning-eda-and-models-for-obesity.html)
+
+Modeling Strategy
+
+To examine community-level drivers of adult obesity in NYC, we modeled obesity prevalence using two complementary approaches:
+
+1. **Multivariable Linear Regression (MLR) — treats obesity as a continuous outcome and offers interpretability.**
+
+2. **Beta Regression — accounts for the bounded nature of percentage data, with obesity rates transformed to lie strictly between 0 and 1.**
+
+Our primary exposure of interest was `area_per_capita` (total parks area per capita, scaled by 100,000), with a log-transformed version also considered. Covariates were selected based on exploratory patterns and prior literature, and include:
+
+**Socioeconomic indicators:** poverty rate, college attainment
+
+**Health behaviors:** sugary drink consumption, smoking, binge drinking
+
+**Community safety:** pedestrian injury hospitalizations
+
+**Access to care:** uninsured percentage
+
+These variables represent diverse dimensions of neighborhood context and were harmonized with the parks dataset to enable integrated analysis.
+
+### Multivariable Linear Regression
+
+For the multivariable linear regression model, using obesity prevalence as the outcome and `area_per_capita` plus the covariates listed above as predictors, produced the following coefficient estimates (excerpt from our R output):
+
+| Predictor                      | Estimate  | Std. Error | t value | Pr(>|t|) | Significance |
+|-------------------------------|-----------|------------|---------|----------|--------------|
+| (Intercept)                   | 27.32     | 8.910      | 3.067   | 0.00352  | **           |
+| area_per_capita               | 0.0000059 | 0.002117   | 0.003   | 0.99778  |              |
+| poverty                       | -0.4557   | 0.2241     | -2.033  | 0.04744  | *            |
+| smoking                       | 0.05258   | 0.2117     | 0.248   | 0.80488  |              |
+| binge_drink                   | -0.07716  | 0.1466     | -0.526  | 0.60108  |              |
+| sugary_drink                  | 0.5788    | 0.1334     | 4.340   | 7.11e-05 | ***          |
+| pedestrian_hosp               | 0.2586    | 0.1314     | 1.967   | 0.05480  | .            |
+| edu_college_degree_and_higher | -0.2496   | 0.09557    | -2.612  | 0.01192  | *            |
+| uninsured                     | -0.04922  | 0.1526     | -0.323  | 0.74833  |              |
+
+
+__Stars denote conventional significance levels; see full output in the Obesity Analysis HTML__
+
+Key findings from this model include:
+
+* Park area per capita (`area_per_capita`) was not significantly associated with obesity prevalence after adjustment for covariates. The estimated coefficient was near zero and highly non-significant (p ≈ 0.99).
+
+* Poverty was negatively associated with obesity in this model, which at first seems counterintuitive. However, when interpreted jointly with education and behavioral variables, this pattern reflects complex relationships among socioeconomic status, health behaviors, and obesity across NYC districts.
+
+* Sugary drink consumption was strongly and positively associated with obesity prevalence, consistent with expectations and prior literature.
+
+* Education (percent with college degree or higher) was negatively associated with obesity, suggesting that more advantaged districts have lower obesity prevalence even after adjustment for other factors.
+
+* Pedestrian hospitalization had a borderline positive association with obesity, but this effect was sensitive to a small number of influential observations.
+
+Sensitivity to Influential Observations
+
+Influence diagnostics identified several community districts with high leverage (IDs 34, 60, 61, 64, 65). We re-estimated the multivariable linear model after removing these points and compared the results. The direction and significance of the main predictors remained largely unchanged, and p-values exhibited only minor changes. The coefficient for pedestrian hospitalization showed the most noticeable sensitivity, but the overall pattern of associations persisted. Because the core findings were robust, and because influential districts are themselves of substantive interest, we retained all observations in the final analysis
+
+### Beta Regression
+
+Beta regression provided a modeling framework better suited to bounded proportion outcomes. 
+
+| Predictor                      | Estimate  | Std. Error | z value | Pr(>|z|) | Significance |
+|-------------------------------|-----------|------------|---------|----------|--------------|
+| (Intercept)                   | -0.7499   | 0.4841     | -1.549  | 0.12134  |              |
+| area_per_capita               | 0.0000179 | 0.0001668  | 0.107   | 0.91462  |              |
+| poverty                       | -0.02407  | 0.01161    | -2.073  | 0.03816  | *            |
+| smoking                       | 0.00115   | 0.01121    | 0.103   | 0.91826  |              |
+| binge_drink                   | -0.00497  | 0.007687   | -0.647  | 0.51794  |              |
+| sugary_drink                  | 0.02802   | 0.006276   | 4.465   | 8e-06    | ***          |
+| pedestrian_hosp               | 0.01214   | 0.006201   | 1.957   | 0.05029  | .            |
+| edu_college_degree_and_higher | -0.01612  | 0.005062   | -3.184  | 0.00145  | **           |
+| uninsured                     | -0.002597 | 0.007504   | -0.346  | 0.72928  |              |
+
+
+The overall patterns were highly consistent with the linear model:
+
+* Sugary drink consumption and education retained their strong associations.
+
+* Poverty was again statistically significant in the negative direction.
+
+* Park access remained non-significant, reinforcing our core conclusion.
+
+Model diagnostics—including simulated residuals and tests for dispersion or zero-inflation—showed no violations of beta regression assumptions, lending confidence to the robustness of these findings.
+
+```{r}
+n <- nrow(df_analysis)
+df_new <- df_analysis |>
+mutate(p_obesity = (obesity/100)*(n-1)/n + 0.5/n)
+```
+
+### Mixed-Effect Beta Regression
+
+To test for unobserved contextual effects across boroughs, we introduced a borough-level random intercept in a mixed-effects beta regression. However, this model did not significantly improve model fit, suggesting that the fixed-effect predictors already captured the major sources of variation across districts. We therefore retained the simpler model for our final interpretation.
+
+Across all modeling approaches—including multiple linear regression, beta regression, and mixed-effects beta regression, the results consistently indicate that community-level obesity rates are strongly associated with socioeconomic and behavioral factors. In particular, higher poverty rates and greater consumption of sugary drinks are positively related to obesity, while higher educational attainment is associated with lower obesity rates. The measure of community safety, operationalized through pedestrian injury hospitalizations, also shows a meaningful association with obesity.
+
+In contrast, park access—as measured by total or per-capita park area does not exhibit a significant relationship with obesity in any of the models. This suggests that variation in obesity across NYC community districts is driven more by socioeconomic conditions and health-related behaviors than by the availability of green space as quantified in this analysis.
+
+
+___
+# Discussion
+
+Our exploratory data analysis (EDA) provided the foundation for understanding both the distribution of green space in New York City and the broader demographic and socioeconomic landscape that shapes community health. Before modeling, we made two important data decisions that influenced all subsequent results: how to allocate park acreage for parks spanning multiple community districts, and which community health variables to prioritize.
+
+Because the parks dataset did not report acreage by district, we chose to divide each park’s total area evenly across the districts it belonged to. This decision allowed us to construct a consistent measure of green space per capita and revealed substantial borough-level differences. Staten Island clearly stood out with far more park acreage per resident and a wider range of park sizes, while Manhattan had the least green space per capita and generally smaller parks. These early patterns were important because they hinted that the relationship between green space and health might differ across boroughs, and that any modeling strategy would need to adjust for demographic and socioeconomic context.
+
+Our variable selection decisions emerged naturally from the EDA as well. Visualizing patterns in the Community Health Profiles made it clear that socioeconomic factors, such as poverty, unemployment, race, and insurance coverage, were deeply intertwined with health behaviors and outcomes. Districts with higher poverty and uninsured rates showed lower physical activity and lower on-time high school graduation rates, reflecting well-documented structural inequities. These strong correlations suggested that any observed relationship between green space and health might be confounded by broader neighborhood conditions. As a result, our models incorporated socioeconomic and demographic controls that we identified as central from the EDA.
+
+Taken together, these early cleaning choices and exploratory observations shaped our interpretation of the final analyses. Across both premature mortality and obesity, a consistent theme emerged: green space alone was not a strong independent predictor of health once socioeconomic and racial conditions were considered. In the premature mortality models, green space showed only a modest association with mortality after adjustment, while poverty and percent Black residents remained dominant predictors. The main-effects model explained a large portion of variation across districts (adjusted R² ≈ 0.82), and exploratory interaction models suggested that green space might operate differently in different neighborhood contexts, although these effects were unstable and difficult to interpret.
+
+A similar pattern appeared in the obesity analysis. Both linear and beta regression models indicated that park acreage per resident had little association with obesity prevalence after accounting for key socioeconomic and behavioral variables. Instead, obesity clustered around factors such as sugary drink consumption and educational attainment, as well as possible aspects of the built environment that were not directly measured. These findings reinforce the idea that while green space can support healthier environments, its impact is embedded within, and often overshadowed by, larger structural forces.
+
+Overall, our results suggest that improving park access alone is unlikely to yield substantial improvements in premature mortality or obesity without concurrent efforts to address socioeconomic inequities. The EDA showed us where disparities exist and the regression models clarified the mechanisms likely driving them. Together, they point to an intertwined picture: green space is a valuable community resource, but its health benefits are shaped by deeper structural conditions that vary widely across NYC neighborhoods.
+
+## Are the Results What We Expected?
+
+We initially hypothesized that neighborhoods with more park space per resident would have better health outcomes, even after adjusting for demographic and socioeconomic factors. Our findings partially support this hypothesis but also highlight its limitations:
+
+In crude analyses, neighborhoods with higher park density sometimes appeared to have more favorable health outcomes.
+
+After multivariable adjustment, park density often became a weaker predictor, and in some specifications the direction of association varied across contexts.
+
+This is consistent with a growing body of literature suggesting that green space alone is not sufficient to guarantee better health; the benefits of parks may depend on their quality, accessibility, safety, and integration with other neighborhood resources, and may be overshadowed by structural inequities.
+
+## Limitations
+
+Several limitations are important for interpreting our results:
+
+**Ecological design:** All analyses are at the community-district level; associations may not reflect individual-level relationships and are subject to ecological fallacy.
+
+**Limited measures of park quality and access:** We use park acreage and counts as proxies for green space, but do not capture park quality, maintenance, programming, safety, or walkable access.
+
+**Cross-sectional data:** The CHP and park data largely represent a single time point, limiting our ability to infer causal relationships or temporal ordering.
+
+**Residual confounding:** Even with multiple covariates, unmeasured factors (e.g., housing quality, exposure to heat and air pollution, or neighborhood-level stressors) may confound associations between green space and health.
+
+**Measurement error:** Community-district boundaries and the assignment of parks to districts may not perfectly reflect where residents actually use green space; some parks serve citywide populations.
+
+## Implications and Future Directions
+
+Our results suggest that increasing park acreage alone is unlikely to substantially reduce premature mortality or obesity without concurrent investments in neighborhood socioeconomic conditions, racial equity, and the broader built environment. Future work could:
+
+* Incorporate richer measures of park quality, safety, and programming.
+
+* Include additional built-environment variables such as heat exposure, air quality, walkability, and housing conditions.
+
+* Use longitudinal data to assess how changes in green space over time relate to health outcomes.
+
+* Explore multilevel models that combine individual-level and neighborhood-level data.
+
+Such research could help inform urban planning strategies that better align green space investments with health equity goals and ensure that the benefits of parks are accessible to all communities.

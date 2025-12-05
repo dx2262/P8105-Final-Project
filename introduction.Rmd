@@ -1,22 +1,76 @@
 ---
 title: "Introduction"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
-Access to quality green space is increasingly recognized as a key determinant of public health in urban environments. Parks and other green areas promote physical activity, social interaction, and stress reduction, all of which contribute to improved physical and mental health outcomes. However, as New York City become increasingly dense, disparities in the availability, quality, and accessibility of parks raise important questions about environmental equity and community well-being.
+# Project Motivation
 
-This project aims to explore the relationship between parks, health outcomes, and neighborhood demographics across New York City. Using the NYC Parks Properties dataset, we plan to characterize park features such as size, location, and type, while the NYC Community Health Profiles data provides neighborhood-level indicators on chronic disease, mental health, and socioeconomic conditions. By integrating these datasets, we aim to assess how park distribution and attributes relate to health outcomes and to identify geographic areas where improvements in green space quality or accessibility could have the greatest public health impact.
+Access to quality green space is increasingly recognized as a key determinant of public health in urban environments. Parks and other green areas promote physical activity, social interaction, and stress reduction, all of which contribute to improved physical and mental health outcomes. However, as New York City becomes increasingly dense, disparities in the availability, quality, and accessibility of parks raise important questions about environmental equity and community well-being.
 
-Our analysis is informed by evidence from a recent systematic review on green space and health by Nguyen et al. (2021), which highlights that specific park characteristics, such as tree canopy coverage, connectivity, and well-maintained amenities, are more strongly linked to health benefits than overall “greenness.” These insights guide our focus on spatial patterns and equity implications in New York City’s park system.
+In this project, we focus on New York City (NYC) and ask how neighborhood-level park access relates to two health outcomes that are central in public health practice:
 
-Ultimately, this project seeks to demonstrate how publicly available urban and health data can be used to uncover actionable relationships between the built environment and population health, informing data-driven strategies to promote environmental justice and healthier urban living.
+**Premature mortality**: deaths before age 65 per 100,000 residents.
 
-Initial Questions:
+**Adult obesity**: the percentage of adults with obesity.
+
+Using publicly available data, we link NYC Community Health Profiles (CHP) indicators to measures of park access derived from NYC Parks data at the community district level. Our goal is not to prove causality, but to describe how park density, neighborhood sociodemographics, and these health outcomes co-vary across NYC, and to reflect on what those patterns do and do not tell us about parks and health.
+
+# Related Work
+
+A large body of literature documents associations between green space and health. Greener neighborhoods tend to foster more physical activity and better mental well-being. A 2018 meta-analysis reported that greater exposure to green space is associated with numerous beneficial outcomes, including lower stress levels, reduced risk of type II diabetes and cardiovascular disease, and even decreased all-cause mortality (1). These health benefits stem from multiple pathways: greenery can encourage exercise, promote social interaction, provide psychological restoration, and mitigate environmental hazards. In particular, urban vegetation helps lower ambient heat and filter air pollutants, which are important drivers of cardiovascular and respiratory illness (2). Arecent systematic review on green space and health highlights that specific park characteristics, such as tree canopy coverage, connectivity, and well-maintained amenities, are more strongly linked to health benefits than overall “greenness” (3). This evidence base underscores that robust green space access can improve population health in diverse ways.
+
+Simply having a park nearby does not guarantee health gains if residents feel unable or unwilling to use it. Safety concerns, low park quality, and historical under-investment can all limit park utilization. Studies in U.S. cities show that when parks are poorly maintained or perceived as unsafe, people, especially in disadvantaged areas, often avoid them and engage in less physical activity there (4). Recent research even found that in high-poverty urban neighborhoods, living near a major park was paradoxically linked to worse early-stage cardiovascular health, likely because poor park conditions and safety issues discouraged regular use (5). In short, parks must be accessible, safe, and inviting for their health potential to be realized. Unfortunately, inequities in park access and quality often align with race and income. In New York City, for instance, communities of color have on average 33% less park space per person than white communities, and low-income areas have about 21% less (6). These disparities reflect longstanding patterns of uneven investment, a fact acknowledged by initiatives like the [NYC Community Parks Initiative](https://www.nycgovparks.org/about/framework-for-an-equitable-future/community-parks-initiative), which identified hundreds of under-resourced neighborhood parks (many in high-poverty districts) and targeted them for upgrades. Thus, any health benefits of parks are tightly entwined with issues of equity and environmental justice.
+
+Our project builds on this work by:
+
+1. Focusing specifically on NYC community districts, which are commonly used units for neighborhood-level planning and surveillance, to examine differences in park resources and health.
+
+2. Jointly examining two key health outcomes (premature mortality and obesity) rather than focusing on a single outcome to capture a broader picture of community health..
+
+3. Explicitly incorporating poverty and racial composition into our models, and using these to interpret the relationship between park density and health outcomes. This approach responds to calls in the literature to consider socioeconomic context in green space research
+
+References:   
+
+1. Twohig-Bennett, C., & Jones, A. (2018). The health benefits of the great outdoors: A systematic review and meta-analysis of greenspace exposure and health outcomes. Environmental research, 166, 628–637. https://doi.org/10.1016/j.envres.2018.06.030
+
+2. Reid, C. E., Clougherty, J. E., Shmool, J. L. C., & Kubzansky, L. D. (2017). Is All Urban Green Space the Same? A Comparison of the Health Benefits of Trees and Grass in New York City. International Journal of Environmental Research and Public Health, 14(11), 1411. https://doi.org/10.3390/ijerph14111411
+
+3. Nguyen, PY, Astell-Burt, T, Rahimi-Ardabili, H, & Feng, X. (2021). Green Space Quality and Health: A Systematic Review. International Journal of Environmental Research and Public Health, 18(21), 11028. https://doi.org/10.3390/ijerph182111028
+
+4. Rigolon, A., Browning, M. H. E. M., McAnirlin, O., & Yoon, H. (2021). Green Space and Health Equity: A Systematic Review on the Potential of Green Space to Reduce Health Disparities. International Journal of Environmental Research and Public Health, 18(5), 2563. https://doi.org/10.3390/ijerph18052563
+
+5. Joyce, B. T., Zheng, Y., Nannini, D. R., et. al. (2024). Associations of Urban Blue and Green Spaces With Coronary Artery Calcification in Black Individuals and Disadvantaged Neighborhoods. Circulation. 150(3), 203-214. https://doi.org/10.1161/CIRCULATIONAHA.123.067992
+
+6. Fleming, S., LaShell, D.  (2023, January 19). The Economic Value of Parks: NYC. ESRI. https://www.esri.com/about/newsroom/blog/nyc-economic-value-parks
 
 
+# Initial Questions 
 
+In our original proposal, we centered our project on the broader theme of **urban green space and community health in NYC**. Rather than committing to specific outcomes from the outset, we framed our project around a set of higher-level questions:
 
+1. **Do neighborhoods with more park space per resident tend to have better health outcomes (e.g. obesity, premature mortality, mental health outcomes)?**
 
-Reference:   
-Nguyen, P.-Y., Astell-Burt, T., Rahimi-Ardabili, H., & Feng, X. (2021). Green Space Quality and Health: A Systematic Review. International Journal of Environmental Research and Public Health, 18(21), 11028. https://doi.org/10.3390/ijerph182111028
+2. **How do these relationships change after we adjust for sociodemographic and behavioral covariates?**
 
+3. **Are there meaningful neighborhood-level differences in park access and health outcomes?**
+
+4. **Are there meaningful borough-level differences in park access and health outcomes?**
+
+These questions reflect our initial goal of exploring how patterns of park access intersect with neighborhood sociodemographic characteristics and health measures in NYC. We also considered including additional outcomes—such as mental health indicators—and initially envisioned a stronger emphasis on mapping and spatial visualization.
+
+# How Our Project Evolved
+
+As we began working with the data, several factors led us to refine and narrow our analytic focus:
+
+**Outcome selection** - While we initially planned to examine a broad set of health indicators, many were sparsely reported or incomplete for portions of the city. Premature mortality and adult obesity were consistently available, widely used in public health practice, and theoretically plausible outcomes to examine in relation to green space. We therefore focused our analysis on these two outcomes.
+
+**Defining park access** - Our initial EDA revealed substantial variation in park size and distribution across NYC. Metrics such as the *number* of parks or *total acres* alone did not capture meaningful differences across community districts. This exploration led us to adopt **park acres per 1,000 residents** as our primary exposure—an interpretable measure that accounts for both park quantity and population.
+
+**Accounting for sociodemographic context** - Early visualizations made it clear that poverty, racial composition, and borough differences were deeply intertwined with both park distribution and health outcomes. This guided our decision to include sociodemographic covariates and borough indicators in our modeling rather than relying on simple unadjusted comparisons.
+
+**Scope and analytical depth** - While our proposal included an ambitious plan for extensive mapping and potentially more health outcomes, we ultimately prioritized building a clear and reproducible analytic pipeline, exploring alternative modeling approaches, and interpreting results in a focused way.
+
+These changes reflect the iterative nature of data science work: we refined our questions as we learned more about the data, its limitations, and what we could reasonably tackle in the project timeline.

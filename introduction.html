@@ -29,6 +29,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -221,6 +224,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -228,6 +294,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -294,46 +370,182 @@ $(document).ready(function () {
 </div>
 
 
+<div id="project-motivation" class="section level1">
+<h1>Project Motivation</h1>
 <p>Access to quality green space is increasingly recognized as a key
 determinant of public health in urban environments. Parks and other
 green areas promote physical activity, social interaction, and stress
 reduction, all of which contribute to improved physical and mental
-health outcomes. However, as New York City become increasingly dense,
+health outcomes. However, as New York City becomes increasingly dense,
 disparities in the availability, quality, and accessibility of parks
 raise important questions about environmental equity and community
 well-being.</p>
-<p>This project aims to explore the relationship between parks, health
-outcomes, and neighborhood demographics across New York City. Using the
-NYC Parks Properties dataset, we plan to characterize park features such
-as size, location, and type, while the NYC Community Health Profiles
-data provides neighborhood-level indicators on chronic disease, mental
-health, and socioeconomic conditions. By integrating these datasets, we
-aim to assess how park distribution and attributes relate to health
-outcomes and to identify geographic areas where improvements in green
-space quality or accessibility could have the greatest public health
-impact.</p>
-<p>Our analysis is informed by evidence from a recent systematic review
-on green space and health by Nguyen et al. (2021), which highlights that
-specific park characteristics, such as tree canopy coverage,
-connectivity, and well-maintained amenities, are more strongly linked to
-health benefits than overall “greenness.” These insights guide our focus
-on spatial patterns and equity implications in New York City’s park
-system.</p>
-<p>Ultimately, this project seeks to demonstrate how publicly available
-urban and health data can be used to uncover actionable relationships
-between the built environment and population health, informing
-data-driven strategies to promote environmental justice and healthier
-urban living.</p>
-<p>Initial Questions:</p>
-<p>Reference:<br />
-Nguyen, P.-Y., Astell-Burt, T., Rahimi-Ardabili, H., &amp; Feng, X.
+<p>In this project, we focus on New York City (NYC) and ask how
+neighborhood-level park access relates to two health outcomes that are
+central in public health practice:</p>
+<p><strong>Premature mortality</strong>: deaths before age 65 per
+100,000 residents.</p>
+<p><strong>Adult obesity</strong>: the percentage of adults with
+obesity.</p>
+<p>Using publicly available data, we link NYC Community Health Profiles
+(CHP) indicators to measures of park access derived from NYC Parks data
+at the community district level. Our goal is not to prove causality, but
+to describe how park density, neighborhood sociodemographics, and these
+health outcomes co-vary across NYC, and to reflect on what those
+patterns do and do not tell us about parks and health.</p>
+</div>
+<div id="related-work" class="section level1">
+<h1>Related Work</h1>
+<p>A large body of literature documents associations between green space
+and health. Greener neighborhoods tend to foster more physical activity
+and better mental well-being. A 2018 meta-analysis reported that greater
+exposure to green space is associated with numerous beneficial outcomes,
+including lower stress levels, reduced risk of type II diabetes and
+cardiovascular disease, and even decreased all-cause mortality (1).
+These health benefits stem from multiple pathways: greenery can
+encourage exercise, promote social interaction, provide psychological
+restoration, and mitigate environmental hazards. In particular, urban
+vegetation helps lower ambient heat and filter air pollutants, which are
+important drivers of cardiovascular and respiratory illness (2). Arecent
+systematic review on green space and health highlights that specific
+park characteristics, such as tree canopy coverage, connectivity, and
+well-maintained amenities, are more strongly linked to health benefits
+than overall “greenness” (3). This evidence base underscores that robust
+green space access can improve population health in diverse ways.</p>
+<p>Simply having a park nearby does not guarantee health gains if
+residents feel unable or unwilling to use it. Safety concerns, low park
+quality, and historical under-investment can all limit park utilization.
+Studies in U.S. cities show that when parks are poorly maintained or
+perceived as unsafe, people, especially in disadvantaged areas, often
+avoid them and engage in less physical activity there (4). Recent
+research even found that in high-poverty urban neighborhoods, living
+near a major park was paradoxically linked to worse early-stage
+cardiovascular health, likely because poor park conditions and safety
+issues discouraged regular use (5). In short, parks must be accessible,
+safe, and inviting for their health potential to be realized.
+Unfortunately, inequities in park access and quality often align with
+race and income. In New York City, for instance, communities of color
+have on average 33% less park space per person than white communities,
+and low-income areas have about 21% less (6). These disparities reflect
+longstanding patterns of uneven investment, a fact acknowledged by
+initiatives like the <a
+href="https://www.nycgovparks.org/about/framework-for-an-equitable-future/community-parks-initiative">NYC
+Community Parks Initiative</a>, which identified hundreds of
+under-resourced neighborhood parks (many in high-poverty districts) and
+targeted them for upgrades. Thus, any health benefits of parks are
+tightly entwined with issues of equity and environmental justice.</p>
+<p>Our project builds on this work by:</p>
+<ol style="list-style-type: decimal">
+<li><p>Focusing specifically on NYC community districts, which are
+commonly used units for neighborhood-level planning and surveillance, to
+examine differences in park resources and health.</p></li>
+<li><p>Jointly examining two key health outcomes (premature mortality
+and obesity) rather than focusing on a single outcome to capture a
+broader picture of community health..</p></li>
+<li><p>Explicitly incorporating poverty and racial composition into our
+models, and using these to interpret the relationship between park
+density and health outcomes. This approach responds to calls in the
+literature to consider socioeconomic context in green space
+research</p></li>
+</ol>
+<p>References:</p>
+<ol style="list-style-type: decimal">
+<li><p>Twohig-Bennett, C., &amp; Jones, A. (2018). The health benefits
+of the great outdoors: A systematic review and meta-analysis of
+greenspace exposure and health outcomes. Environmental research, 166,
+628–637. <a href="https://doi.org/10.1016/j.envres.2018.06.030"
+class="uri">https://doi.org/10.1016/j.envres.2018.06.030</a></p></li>
+<li><p>Reid, C. E., Clougherty, J. E., Shmool, J. L. C., &amp;
+Kubzansky, L. D. (2017). Is All Urban Green Space the Same? A Comparison
+of the Health Benefits of Trees and Grass in New York City.
+International Journal of Environmental Research and Public Health,
+14(11), 1411. <a href="https://doi.org/10.3390/ijerph14111411"
+class="uri">https://doi.org/10.3390/ijerph14111411</a></p></li>
+<li><p>Nguyen, PY, Astell-Burt, T, Rahimi-Ardabili, H, &amp; Feng, X.
 (2021). Green Space Quality and Health: A Systematic Review.
 International Journal of Environmental Research and Public Health,
 18(21), 11028. <a href="https://doi.org/10.3390/ijerph182111028"
-class="uri">https://doi.org/10.3390/ijerph182111028</a></p>
+class="uri">https://doi.org/10.3390/ijerph182111028</a></p></li>
+<li><p>Rigolon, A., Browning, M. H. E. M., McAnirlin, O., &amp; Yoon, H.
+(2021). Green Space and Health Equity: A Systematic Review on the
+Potential of Green Space to Reduce Health Disparities. International
+Journal of Environmental Research and Public Health, 18(5), 2563. <a
+href="https://doi.org/10.3390/ijerph18052563"
+class="uri">https://doi.org/10.3390/ijerph18052563</a></p></li>
+<li><p>Joyce, B. T., Zheng, Y., Nannini, D. R., et. al. (2024).
+Associations of Urban Blue and Green Spaces With Coronary Artery
+Calcification in Black Individuals and Disadvantaged Neighborhoods.
+Circulation. 150(3), 203-214. <a
+href="https://doi.org/10.1161/CIRCULATIONAHA.123.067992"
+class="uri">https://doi.org/10.1161/CIRCULATIONAHA.123.067992</a></p></li>
+<li><p>Fleming, S., LaShell, D. (2023, January 19). The Economic Value
+of Parks: NYC. ESRI. <a
+href="https://www.esri.com/about/newsroom/blog/nyc-economic-value-parks"
+class="uri">https://www.esri.com/about/newsroom/blog/nyc-economic-value-parks</a></p></li>
+</ol>
+</div>
+<div id="initial-questions" class="section level1">
+<h1>Initial Questions</h1>
+<p>In our original proposal, we centered our project on the broader
+theme of <strong>urban green space and community health in NYC</strong>.
+Rather than committing to specific outcomes from the outset, we framed
+our project around a set of higher-level questions:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Do neighborhoods with more park space per resident tend
+to have better health outcomes (e.g. obesity, premature mortality,
+mental health outcomes)?</strong></p></li>
+<li><p><strong>How do these relationships change after we adjust for
+sociodemographic and behavioral covariates?</strong></p></li>
+<li><p><strong>Are there meaningful neighborhood-level differences in
+park access and health outcomes?</strong></p></li>
+<li><p><strong>Are there meaningful borough-level differences in park
+access and health outcomes?</strong></p></li>
+</ol>
+<p>These questions reflect our initial goal of exploring how patterns of
+park access intersect with neighborhood sociodemographic characteristics
+and health measures in NYC. We also considered including additional
+outcomes—such as mental health indicators—and initially envisioned a
+stronger emphasis on mapping and spatial visualization.</p>
+</div>
+<div id="how-our-project-evolved" class="section level1">
+<h1>How Our Project Evolved</h1>
+<p>As we began working with the data, several factors led us to refine
+and narrow our analytic focus:</p>
+<p><strong>Outcome selection</strong> - While we initially planned to
+examine a broad set of health indicators, many were sparsely reported or
+incomplete for portions of the city. Premature mortality and adult
+obesity were consistently available, widely used in public health
+practice, and theoretically plausible outcomes to examine in relation to
+green space. We therefore focused our analysis on these two
+outcomes.</p>
+<p><strong>Defining park access</strong> - Our initial EDA revealed
+substantial variation in park size and distribution across NYC. Metrics
+such as the <em>number</em> of parks or <em>total acres</em> alone did
+not capture meaningful differences across community districts. This
+exploration led us to adopt <strong>park acres per 1,000
+residents</strong> as our primary exposure—an interpretable measure that
+accounts for both park quantity and population.</p>
+<p><strong>Accounting for sociodemographic context</strong> - Early
+visualizations made it clear that poverty, racial composition, and
+borough differences were deeply intertwined with both park distribution
+and health outcomes. This guided our decision to include
+sociodemographic covariates and borough indicators in our modeling
+rather than relying on simple unadjusted comparisons.</p>
+<p><strong>Scope and analytical depth</strong> - While our proposal
+included an ambitious plan for extensive mapping and potentially more
+health outcomes, we ultimately prioritized building a clear and
+reproducible analytic pipeline, exploring alternative modeling
+approaches, and interpreting results in a focused way.</p>
+<p>These changes reflect the iterative nature of data science work: we
+refined our questions as we learned more about the data, its
+limitations, and what we could reasonably tackle in the project
+timeline.</p>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -366,6 +578,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

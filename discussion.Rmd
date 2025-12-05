@@ -1,9 +1,58 @@
 ---
 title: "Discussion"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
-Our EDA provided important context for understanding our data, as it provided us with information related to both both green space availability and NYC community health. Cleaning and preparing the data required making two key decisions: choosing how to handle parks that span multiple community districts and choosing which variables to analyze. Regarding the first issue, acreage was not reported by community, so we divided each park’s area evenly across the districts it belonged to, allowing for a consistent measure of green space per capita. This approach enabled us to identify clear differences in green space distribution. Staten Island consistently had the highest acres of green space per capita, while Manhattan had the lowest. The distribution of park sizes also varied by borough, with Staten Island showing both the largest parks and the widest range of park sizes, whereas other boroughs, particularly Manhattan, proved to have smaller green spaces.
+Our exploratory data analysis (EDA) provided the foundation for understanding both the distribution of green space in New York City and the broader demographic and socioeconomic landscape that shapes community health. Before modeling, we made two important data decisions that influenced all subsequent results: how to allocate park acreage for parks spanning multiple community districts, and which community health variables to prioritize.
 
-Regarding the second decision, we focused on analyzing variables that we though might be related as well as variables we thought to be the most objective measures of health. EDA of the community health data showed socioeconomic patterns that aligned with our expectations. Boroughs exhibited distinct racial and age compositions, and different health indicators showed strong correlations with socioeconomic measures. Higher levels of poverty, unemployment, and people who were uninsured were associated with lower physical activity and lower rates of on-time high school graduation. Although these relationships show correlation rather than causation, they provide a valuable foundation for understanding how green space accessibility might relate to health and social outcomes across NYC communities.
+Because the parks dataset did not report acreage by district, we chose to divide each park’s total area evenly across the districts it belonged to. This decision allowed us to construct a consistent measure of green space per capita and revealed substantial borough-level differences. Staten Island clearly stood out with far more park acreage per resident and a wider range of park sizes, while Manhattan had the least green space per capita and generally smaller parks. These early patterns were important because they hinted that the relationship between green space and health might differ across boroughs, and that any modeling strategy would need to adjust for demographic and socioeconomic context.
+
+Our variable selection decisions emerged naturally from the EDA as well. Visualizing patterns in the Community Health Profiles made it clear that socioeconomic factors, such as poverty, unemployment, race, and insurance coverage, were deeply intertwined with health behaviors and outcomes. Districts with higher poverty and uninsured rates showed lower physical activity and lower on-time high school graduation rates, reflecting well-documented structural inequities. These strong correlations suggested that any observed relationship between green space and health might be confounded by broader neighborhood conditions. As a result, our models incorporated socioeconomic and demographic controls that we identified as central from the EDA.
+
+Taken together, these early cleaning choices and exploratory observations shaped our interpretation of the final analyses. Across both premature mortality and obesity, a consistent theme emerged: green space alone was not a strong independent predictor of health once socioeconomic and racial conditions were considered. In the premature mortality models, green space showed only a modest association with mortality after adjustment, while poverty and percent Black residents remained dominant predictors. The main-effects model explained a large portion of variation across districts (adjusted R² ≈ 0.82), and exploratory interaction models suggested that green space might operate differently in different neighborhood contexts, although these effects were unstable and difficult to interpret.
+
+A similar pattern appeared in the obesity analysis. Both linear and beta regression models indicated that park acreage per resident had little association with obesity prevalence after accounting for key socioeconomic and behavioral variables. Instead, obesity clustered around factors such as sugary drink consumption and educational attainment, as well as possible aspects of the built environment that were not directly measured. These findings reinforce the idea that while green space can support healthier environments, its impact is embedded within, and often overshadowed by, larger structural forces.
+
+Overall, our results suggest that improving park access alone is unlikely to yield substantial improvements in premature mortality or obesity without concurrent efforts to address socioeconomic inequities. The EDA showed us where disparities exist and the regression models clarified the mechanisms likely driving them. Together, they point to an intertwined picture: green space is a valuable community resource, but its health benefits are shaped by deeper structural conditions that vary widely across NYC neighborhoods.
+
+# Are the Results What We Expected?
+
+We initially hypothesized that neighborhoods with more park space per resident would have better health outcomes, even after adjusting for demographic and socioeconomic factors. Our findings partially support this hypothesis but also highlight its limitations:
+
+In crude analyses, neighborhoods with higher park density sometimes appeared to have more favorable health outcomes.
+
+After multivariable adjustment, park density often became a weaker predictor, and in some specifications the direction of association varied across contexts.
+
+This is consistent with a growing body of literature suggesting that green space alone is not sufficient to guarantee better health; the benefits of parks may depend on their quality, accessibility, safety, and integration with other neighborhood resources, and may be overshadowed by structural inequities.
+
+# Limitations
+
+Several limitations are important for interpreting our results:
+
+**Ecological design:** All analyses are at the community-district level; associations may not reflect individual-level relationships and are subject to ecological fallacy.
+
+**Limited measures of park quality and access:** We use park acreage and counts as proxies for green space, but do not capture park quality, maintenance, programming, safety, or walkable access.
+
+**Cross-sectional data:** The CHP and park data largely represent a single time point, limiting our ability to infer causal relationships or temporal ordering.
+
+**Residual confounding:** Even with multiple covariates, unmeasured factors (e.g., housing quality, exposure to heat and air pollution, or neighborhood-level stressors) may confound associations between green space and health.
+
+**Measurement error:** Community-district boundaries and the assignment of parks to districts may not perfectly reflect where residents actually use green space; some parks serve citywide populations.
+
+# Implications and Future Directions
+
+Our results suggest that increasing park acreage alone is unlikely to substantially reduce premature mortality or obesity without concurrent investments in neighborhood socioeconomic conditions, racial equity, and the broader built environment. Future work could:
+
+* Incorporate richer measures of park quality, safety, and programming.
+
+* Include additional built-environment variables such as heat exposure, air quality, walkability, and housing conditions.
+
+* Use longitudinal data to assess how changes in green space over time relate to health outcomes.
+
+* Explore multilevel models that combine individual-level and neighborhood-level data.
+
+Such research could help inform urban planning strategies that better align green space investments with health equity goals and ensure that the benefits of parks are accessible to all communities.
 

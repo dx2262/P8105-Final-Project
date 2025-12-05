@@ -17,7 +17,9 @@ navbar:
     - text: "Discussion"
       href: discussion.html
     - text: "Report"
-      href: report.html      
+      href: report.html  
+    - icon: fa-github fa-lg
+      href: https://github.com/dx2262/P8105-Final-Project.git/
 output:
   html_document:
     theme: sandstone

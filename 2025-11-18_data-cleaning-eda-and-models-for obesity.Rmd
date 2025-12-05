@@ -14,6 +14,8 @@ library(tidyverse)
 library(plotly)
 library(readxl)
 library(janitor)
+library(knitr)
+library(broom)
 
 
 knitr::opts_chunk$set(
@@ -726,7 +728,7 @@ model_mlr <- lm(
   data = df_analysis
 )
 
-summary(model_mlr)
+kable(tidy(model_mlr))
 ```
 
 In this model, poverty, sugary drink consumption, and educational attainment were statistically significant predictors. The coefficient for pedestrian hospitalizations was marginally above the conventional significance threshold and can be considered borderline significant. Together, these results highlight the importance of socioeconomic and behavioral factors in explaining variation in obesity across NYC community districts.
@@ -761,7 +763,7 @@ We then assessed multicollinearity among the predictors using Variance Inflation
 No Obvious Multicollinearity.
 
 ```{r message = FALSE, warning = FALSE}
-vif(model_mlr)
+kable(vif(model_mlr))
 ```
 
 Theoretically, `poverty` and `sugary_drink` should have strong linear relationships, however in this dataset, they don't. Besides, the effect of poverty on obesity in this dataset is also not significant. Maybe we should pay more attention on the origin of this poverty data.  
@@ -788,8 +790,7 @@ df_no_inf <- df[-influential_points, ]
 
 model_mlr_no_inf <- lm(formula(model_mlr), data = df_no_inf)
 
-summary(model_mlr_no_inf)
-
+kable(tidy(model_mlr_no_inf))
 ```
 
 Overall, after removing the outliers, the outcome is very similar to the former one, so mlr model is stable enough for analysing obesity. Only the coefficient for pedestrian_hosp showed noticeable sensitivity, suggesting that its effect may be driven by a few extreme communities. Influence diagnostics identified several observations with high leverage (IDs 34, 60, 61, 64, 65). To assess the robustness of our findings, we re-estimated the multivariable linear model after removing these influential points. The direction and significance of the main predictors remained unchanged, and p-values exhibited minimal variation. This indicates that the observed associations are not driven by a few extreme communities. Therefore, all observations were retained in the final analysis.  
@@ -864,7 +865,7 @@ summary(model_beta_mixed)
 To evaluate whether the mixed-effects beta regression model provided a meaningful improvement in fit over the single-level beta regression model, we formally compared the two specifications using an ANOVA (likelihood ratio) test. The test statistic yielded a p-value of 1, indicating no evidence that the model with a borough-level random intercept fits the data better than the simpler beta regression model without random effects.
 
 ```{r message = FALSE, warning = FALSE}
-anova(model_beta, model_beta_mixed)
+kable(anova(model_beta, model_beta_mixed))
 ```
 
 

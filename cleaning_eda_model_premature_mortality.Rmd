@@ -36,73 +36,29 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 ___
-## Data Cleaning and Exploratory Analysis
+# Data Cleaning and Exploratory Analysis
 
-We first assembled neighborhood-level measures of health and sociodemographic context using the **Community Health Profiles (CHP)** dataset. This resource provides demographic, socioeconomic, behavioral, and health outcome indicators for New York City’s 59 community districts. Because the CHP worksheet includes a descriptive header row, we skipped the first line and treated the second row as the variable names. We then restricted the data to community districts (excluding borough-wide or citywide aggregates) and retained premature mortality measures alongside key covariates that our exploratory analysis and prior literature suggested would be important confounders, including poverty and the percent of Black residents.
-
-```{r}
-clean_chp_df <- 
-  read_excel("data/2022-chp-pud.xlsx", 
-             sheet = "CHP_all_data", 
-             skip = 1) |> 
-  clean_names() |> 
-  transmute(
-    cd_id = as.integer(id), 
-    borough = borough, 
-    cd_name = name, 
-    overall_pop = overall_pop, 
-    premature_mort_number = premature_mort_number, 
-    premature_mort_rate = premature_mort_rate, 
-    poverty = poverty, 
-    race_black = race_black) |> 
-  filter(cd_id >= 101)
-```
-
-
-Next, we imported the **NYC Parks Properties** dataset, which includes acreage, administrative, and location information for individual parks. Because many parks span multiple community boards, we expanded rows so that each community board–park combination appears on its own row. We then standardized community board codes and aggregated park area to obtain total park acres within each community district. These aggregated values form the basis for our main exposure: neighborhood park access.
+We began by constructing an analytic dataset that links community districts to their corresponding park acreage and demographic characteristics. Because each district may contain multiple parks, we aggregated total park acreage and the number of parks within each district and standardized these values by population size to obtain park acres per 1,000 residents. We then restricted the dataset to observations with complete information on both park exposure and premature mortality.
 
 ```{r}
-clean_parks_df <- 
-  read_csv("data/Parks_Properties_20251104.csv") |> 
-  clean_names() |> 
+full_df <- read_csv("data/full_df.csv") 
+
+analysis_df <- 
+  full_df |> 
+  select(id, acres, unique_id, borough, neighbourhood, overall_pop, race_black, poverty, 
+         premature_mort_rate) |>
+  group_by(id) |> 
   mutate(
-    communityboard = as.character(communityboard)
-    ) |>  
-  separate_rows(communityboard, sep = "[/,]") |> 
-  mutate(
-    communityboard = str_trim(communityboard),
-    cd_id = as.integer(communityboard)
-  ) |> 
-  filter(
-    !is.na(cd_id), 
-    cd_id >= 101, cd_id <= 599, 
-    !is.na(acres),
-    acres > 0
-  ) |> 
-  group_by(cd_id) |> 
-  summarize(
     total_park_acres = sum(acres, na.rm = TRUE), 
     n_parks = n(), 
-    .groups = "drop"
-  )
-```
-
-
-We then merged the CHP and Parks datasets using community district identifiers (cd_id). To make park access comparable across districts of very different sizes, we calculated a population-standardized measure of park density—park acres per 1,000 residents. Finally, we restricted the analytic dataset to community districts with complete data on the exposure, outcome, and covariates. This gave us a clean, community-district-level dataset for modeling.
-
-```{r}
-analysis_df <- 
-  clean_chp_df |> 
-  left_join(clean_parks_df, by = "cd_id") |> 
-  mutate(
     park_acres_per_1000 = total_park_acres / (overall_pop / 1000)
-  ) |> 
-  drop_na(park_acres_per_1000, premature_mort_rate) |> 
-  mutate(borough = factor(borough))
+    ) |> 
+  ungroup() |> 
+  drop_na(park_acres_per_1000, premature_mort_rate)
 ```
 
 
-We began our exploratory analysis by summarizing the key features of this analytic dataset, including the distributions of premature mortality, park density, and major sociodemographic variables. These summaries provided a high-level view of variation in both the exposure and outcome across community districts and helped us gauge the overall scale and heterogeneity of the data.
+To gain an initial understanding of the data, we summarized distributions of the key exposure, outcome, and sociodemographic variables. These summaries help contextualize the variation across districts and provide a baseline expectation for subsequent visual and statistical analyses.
 
 ```{r}
 analysis_df |> 
@@ -119,7 +75,7 @@ analysis_df |>
 ```
 
 
-We next visualized the marginal distributions of park acres per 1,000 residents and premature mortality rates. These plots allowed us to examine skewness, identify potential outliers, and get an initial sense of whether a linear regression framework was a reasonable starting point.
+We then visualized the marginal distributions of premature mortality and park density. These plots allowed us to assess skewness, detect possible outliers, and evaluate whether transformations or modeling adjustments might be necessary.
 
 ```{r}
 # Premature mortality
@@ -128,7 +84,7 @@ analysis_df |>
   geom_density() +
   labs(
     x = "Premature mortality rate (per 100,000, age < 65)",
-    y = "Number of community districts",
+    y = "Density of community districts",
     title = "Distribution of premature mortality across NYC community districts"
   )
 
@@ -138,23 +94,38 @@ analysis_df |>
   geom_density() +
   labs(
     x = "Park acres per 1,000 residents",
-    y = "Number of community districts",
+    y = "Density of community districts",
     title = "Distribution of park area density across NYC community districts"
   )
 ```
 
 
-To investigate the crude relationship between park access and premature mortality, we created a scatterplot of premature mortality versus park acres per 1,000 residents citywide. Overlaying simple linear fits provided an initial visual check on the direction and approximate shape of the relationship.
+Park acreage per capita was highly right-skewed, with many districts possessing very limited parkland relative to their population size. Because log-transformations can help linearize relationships and stabilize variance, we also examined the distribution of the log-transformed exposure.
+
+```{r}
+# Log of park density
+analysis_df |> 
+  ggplot(aes(x = log(park_acres_per_1000))) +
+  geom_density() +
+  labs(
+    x = "Log(Park Acres Per 1,000 Residents)",
+    y = "Density",
+    title = "Distribution of the Log of Park Area Density Across NYC Community Districts"
+  )
+```
+
+
+To explore the relationship between park access and premature mortality, we created a scatterplot of premature mortality versus park acres per 1,000 residents. We added a simple linear regression line to obtain an initial visual sense of direction and shape.
 
 ```{r}
 analysis_df |>
   mutate(
     label = paste0(
-      cd_name, "<br>",
+      neighbourhood, "<br>",
       "Park acres per 1,000: ", round(park_acres_per_1000, 2), "<br>",
-      "Premature mortality: ", round(premature_mort_rate, 1)
-    )
-  ) |>
+      "Premature mortality: ", round(premature_mort_rate, 1)),
+    fit = fitted(lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df))
+    ) |>
   plot_ly(
     x     = ~park_acres_per_1000,
     y     = ~premature_mort_rate,
@@ -162,142 +133,197 @@ analysis_df |>
     text  = ~label,
     type  = "scatter",
     mode  = "markers"
-  ) |>
+    ) |>
   add_lines(
     x = ~park_acres_per_1000,
-    y = fitted(lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df)),
+    y = ~fit,
+    name = "Regression Line",
     inherit = FALSE,
+    line = list(color = "black", width = 2),
     showlegend = FALSE
-  ) |>
+    ) |>
   layout(
     title = "Park area density and premature mortality across NYC community districts",
     xaxis = list(title = "Park acres per 1,000 residents"),
     yaxis = list(title = "Premature mortality rate (per 100,000, age < 65)")
-  )
+    )
 ```
 
 ___ 
-## Simple Linear Regression Model
+# Modeling Strategy
 
-Our modeling began with a simple linear regression using premature mortality as the outcome and park acres per 1,000 residents as the sole predictor. This “crude” model captures the unadjusted association between park density and premature mortality and serves as a baseline for comparison with more complex models.
+Our modeling strategy proceeded in stages. We first examined the crude (unadjusted) association between park acreage and premature mortality, then sequentially adjusted for borough and key sociodemographic covariates. We treated the model including park density, poverty, percent Black residents, and borough fixed effects as our **primary main-effects specification**. Finally, we conducted two sensitivity analyses: one using a log-transformed park exposure, and another including an interaction between park density and poverty to assess potential effect modification.
+
+## Simple Linear Regression Model (Crude)
+
+We began with a simple linear regression model including only park acres per 1,000 residents as a predictor of premature mortality. This crude model provides an unadjusted estimate of the association between park access and premature mortality and serves as a baseline for comparison as we introduce additional covariates.
 
 ```{r}
-model_base <- lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df)
+crude_model <- lm(premature_mort_rate ~ park_acres_per_1000, data = analysis_df)
 
-kable(tidy(model_base), digits = 3)
-kable(glance(model_base), digits = 3)
+kable(tidy(crude_model), digits = 3)
+kable(glance(crude_model), digits = 3)
 ```
 
 ---
-## Multiple Linear Regression Model (Borough Effects)
+## Multiple Linear Regression Model (Borough Adjusted)
 
-Because our EDA showed clear borough-level differences in both park access and demographic composition, we next extended the model to include borough fixed effects. This adjustment helps account for systematic differences in the built environment, policy context, and health systems across boroughs and focuses the association on within-borough variation in park density.
+Our exploratory work showed clear differences in both park access and demographic composition across NYC boroughs. To account for these systematic geographic differences, we extended our model to include borough fixed effects. This borough-adjusted model allows us to examine the association between park density and mortality within boroughs, reducing confounding from large-scale structural and environmental differences.
 
 ```{r}
-model_borough <- lm(premature_mort_rate ~ park_acres_per_1000 + borough, data = analysis_df)
+borough_model <- lm(premature_mort_rate ~ park_acres_per_1000 + borough, data = analysis_df)
 
-kable(tidy(model_borough), digits = 3)
-kable(glance(model_borough), digits = 3)
+kable(tidy(borough_model), digits = 3)
+kable(glance(borough_model), digits = 3)
+```
 
+Comparing AIC and BIC across the slr and borough-adjusted models suggests that including borough substantially improves model fit.
+
+```{r}
 model_metrics_1 = tibble(
-  Model = c("model_base", "model_borough"),
-  AIC   = c(AIC(model_base), AIC(model_borough)),
-  BIC   = c(BIC(model_base), BIC(model_borough))
+  Model = c("crude_model", "borough_model"),
+  AIC   = c(AIC(crude_model), AIC(borough_model)),
+  BIC   = c(BIC(crude_model), BIC(borough_model))
   )
 
 kable(model_metrics_1, digits = 3)
 ```
 
 ___
-## Multiple Linear Regression Model (Sociodemographic Covariates)
+## Primary Main-Effects Model (Park, Poverty, Race, Borough)
 
-To build a more rigorous and interpretable model, we then incorporated additional covariates from the CHP dataset. Guided by our exploratory analysis and public health literature, we focused on variables that are both conceptually important and empirically strong predictors of premature mortality. Poverty and racial composition (captured here as the percent of Black residents) are well-established determinants of health and are closely linked to structural inequities across New York City. Our final main-effects model therefore includes poverty and percent Black residents as key covariates, while retaining borough fixed effects and our primary exposure, park density.
+Guided by our exploratory analysis and prior literature, we then incorporated key sociodemographic covariates, poverty and the percent of Black residents, along with borough fixed effects. This main-effects model is our **primary specification**, designed to capture the association between park density and premature mortality while adjusting for major neighborhood-level determinants of health.
 
-This specification represents a balance between explanatory power and parsimony. It adjusts for major confounding pathways without saturating the model with highly collinear variables, and it allows us to estimate the association between park access and premature mortality in the context of neighborhood-level socioeconomic and structural conditions.
+The main-effects model therefore includes:
+
+**Primary exposure:** park acres per 1,000 residents
+**Key confounders:** poverty, percent Black
+**Spatial controls:** borough fixed effects
 
 ```{r}
-final_model <- lm(premature_mort_rate ~ park_acres_per_1000 + poverty + race_black + borough, 
+primary_model <- lm(premature_mort_rate ~ park_acres_per_1000 + poverty + race_black + borough, 
                   data = analysis_df)
 
-kable(tidy(final_model, conf.int = TRUE), digits = 3)
-kable(glance(final_model), digits = 3)
-kable(vif(final_model), digits = 3)
+kable(tidy(primary_model, conf.int = TRUE), digits = 3)
+kable(glance(primary_model), digits = 3)
+kable(vif(primary_model), digits = 3)
 ```
 
 
-After fitting the final model, we examined standard regression diagnostics to assess model fit and verify assumptions. Specifically, we inspected plots of residuals versus fitted values, Normal QQ plots, scale–location plots, and residuals versus leverage. These diagnostics help us evaluate linearity, homoscedasticity, approximate normality of residuals, and the influence of individual community districts on the results.
+We assessed standard regression diagnostics for the primary main-effects model to evaluate linearity, homoscedasticity, normality of residuals, and the influence of individual community districts.
 
 ```{r}
 par(mfrow = c(2, 2))
-plot(final_model)
+plot(primary_model)
 par(mfrow = c(1, 1))
 ```
-
 
 The diagnostic plots suggested mild heteroscedasticity and a few moderately influential observations, which is expected in neighborhood-level data, but no evidence of a single district dominating the fit. Overall, the assumptions of linear regression appeared reasonably well-satisfied for our main-effects model.
 
 ___
-## Sensitivity Analysis (MLR Model Log-Transformation of Premature Mortality)
+## Sensitivity Analysis (Log-Transformed Park Density)
 
-To assess the robustness of our findings to the functional form of the outcome, we conducted a sensitivity analysis using a log-transformed premature mortality rate. This transformation reduces right-skewness and can stabilize variance, potentially improving model fit if the original residuals show non-constant variance.
+Because park acreage per capita was highly right-skewed, we fit a sensitivity model using the log of park acres per 1,000 residents as the exposure, while retaining poverty, percent Black, and borough as covariates. This specification evaluates whether our conclusions are sensitive to the functional form of the park density measure.
 
 ```{r}
-analysis_df <- 
-  analysis_df |>
-  mutate(
-    log_premort = log(premature_mort_rate)
-  )
-
 # Fit the log-linear model
-model_log <- lm(log_premort ~ park_acres_per_1000 + poverty + race_black + borough, data = analysis_df)
+log_model <- lm(premature_mort_rate ~ log(park_acres_per_1000) + poverty + race_black + borough, data = analysis_df)
 
-kable(tidy(model_log, conf.int = TRUE), digits = 3)
-kable(glance(model_log), digits = 3)
+kable(tidy(log_model, conf.int = TRUE), digits = 3)
+kable(glance(log_model), digits = 3)
 ```
 
 
 ```{r}
 par(mfrow = c(2,2))
-plot(model_log)
+plot(log_model)
 par(mfrow = c(1,1))
 ```
 
 
 ```{r}
 model_metrics2 = tibble(
-  Model = c("final_model", "model_log"),
-  AIC   = c(AIC(final_model), AIC(model_log)),
-  BIC   = c(BIC(final_model), BIC(model_log))
+  Model = c("primary_model", "log_model"),
+  AIC   = c(AIC(primary_model), AIC(log_model)),
+  BIC   = c(BIC(primary_model), BIC(log_model))
 )
 
 kable(model_metrics2, digits = 3)
 ```
 
-The log-linear model yielded very similar conclusions: park density remained positively associated with premature mortality, and poverty and percent Black population continued to be the strongest predictors. Model fit improved slightly in terms of adjusted R² and diagnostics, but the direction and relative magnitude of associations were stable. This suggests that our main findings are not sensitive to the choice between modeling premature mortality on the original scale versus the log scale.
+The log-transformed exposure model produced estimates that were similar in direction and magnitude to the primary model, with slightly worse AIC/BIC, suggesting that our main findings are not sensitive to this transformation.
 
 ___
-## Sensitivity Analysis (MLR Model Interactions)
+## Effect Modification: Interaction Between Park Density and Poverty
 
-Motivated by the strong clustering of socioeconomic conditions observed in our EDA, we also tested whether the association between park density and premature mortality varied by neighborhood poverty level. To do this, we added an interaction term between park acres per 1,000 residents and the poverty rate.
+To explore whether the association between park density and premature mortality varies by neighborhood socioeconomic context, we fit a model including an interaction between park acres per 1,000 residents and the poverty rate. This model allows the slope for park density to differ across levels of poverty, capturing potential effect modification.
 
 ```{r}
-# Interaction model: Does the effect of park access vary by poverty level?
-model_interaction <- lm(premature_mort_rate ~ park_acres_per_1000 * poverty + race_black + borough, 
+interaction_model <- lm(premature_mort_rate ~ park_acres_per_1000 * poverty + race_black + borough, 
                         data = analysis_df)
 
-kable(tidy(model_interaction, conf.int = TRUE), digits = 3)
-kable(glance(model_interaction), digits = 3)
+kable(tidy(interaction_model, conf.int = TRUE), digits = 3)
+kable(glance(interaction_model), digits = 3)
 ```
 
 
 ```{r}
 par(mfrow = c(2,2))
-plot(model_interaction)
+plot(interaction_model)
 par(mfrow = c(1,1))
 
-kable(vif(model_interaction), digits = 3)
+kable(vif(interaction_model), digits = 3)
 ```
 
-The interaction term between park density and poverty was positive and marginally significant, suggesting that the association between park acreage and premature mortality may be more strongly positive in higher-poverty neighborhoods. However, the improvement in overall model fit relative to the main-effects model was modest, and the added complexity did not substantially change our substantive conclusions. We therefore present the interaction model as a complementary sensitivity analysis rather than our primary specification.
+The interaction term between park density and poverty was large and highly significant, indicating that the association between park acreage and premature mortality differs across poverty levels. However, although this model modestly improved overall fit, it also introduced higher multicollinearity and greater complexity. We therefore treat the interaction model as a complementary effect-modification analysis rather than our primary specification.
 
-Overall, our analysis demonstrates that premature mortality varies substantially across NYC community districts and is strongly patterned by socioeconomic and racial composition. After adjusting for borough, poverty, and racial composition, the association between park acreage per 1,000 residents and premature mortality was positive rather than negative, and this pattern was robust to alternative model specifications. This counterintuitive finding suggests that greater park area alone may not be sufficient to reduce premature mortality and that structural determinants, including poverty and racial inequities, continue to play a dominant role in shaping health outcomes across NYC neighborhoods. Future work could incorporate measures of park quality, safety, and accessibility, as well as additional features of the built and social environment, to better understand when and how green space promotes health and how its benefits can be realized more equitably.
+# Model Comparison Summary
+
+To compare competing specifications on a common scale, we summarized AIC, BIC, and adjusted R² across all models. The primary main-effects model (park density, poverty, percent Black, and borough) achieved a strong balance of goodness-of-fit and parsimony, while the interaction model further improved fit at the cost of increased complexity and collinearity.
+
+```{r}
+total_model_metrics <- tibble(
+  Model = c(
+    "Crude (Park Density Only)",
+    "Borough-adjusted",
+    "Main Effects (Primary)",
+    "Main Effects + Interaction",
+    "Log Exposure Main Effects"),
+  AIC = c(
+    AIC(crude_model),
+    AIC(borough_model),
+    AIC(primary_model),
+    AIC(interaction_model),
+    AIC(log_model)),
+  BIC = c(
+    BIC(crude_model),
+    BIC(borough_model),
+    BIC(primary_model),
+    BIC(interaction_model),
+    BIC(log_model)),
+  adj_R2 = c(
+    glance(crude_model)$adj.r.squared,
+    glance(borough_model)$adj.r.squared,
+    glance(primary_model)$adj.r.squared,
+    glance(interaction_model)$adj.r.squared,
+    glance(log_model)$adj.r.squared)
+  )
+
+kable(total_model_metrics, digits = 3)
+```
+
+The main-effects model offered the best balance between fit and interpretability (AIC ≈ 20,958; adj. R² = 0.822). Although the interaction model improved fit slightly (adj. R² = 0.843), it introduced high multicollinearity and added complexity, and therefore serves as a secondary effect-modification analysis rather than the primary specification. The log-transformed exposure model performed slightly worse than the main-effects model, indicating that the key findings are robust to transformation but that the original exposure scale is adequate.
+
+# Overall Interpretation
+
+Our analysis highlights substantial variation in premature mortality across New York City community districts and demonstrates the central role of socioeconomic and racial inequities in shaping these disparities. While park acreage per capita is often treated as a beneficial environmental resource, our findings indicate that simple measures of green space quantity do not uniformly translate into improved health outcomes across neighborhoods.
+
+In unadjusted analyses, park density showed no association with premature mortality. However, once we accounted for broad geographic context using borough fixed effects, the association became positive; districts with more park acreage per capita had higher premature mortality rates. This pattern persisted and grew stronger in the fully adjusted main-effects model, even after controlling for poverty and racial composition. These results suggest that the distribution of park acreage across NYC is closely intertwined with underlying structural conditions, and that acreage alone is not a sufficient indicator of health-promoting green space.
+
+Poverty and the percent of Black residents emerged as the strongest predictors of premature mortality, consistent with longstanding research on structural racism, economic disinvestment, and environmental inequity. These covariates explained a substantial portion of the variability in health outcomes, and their strong associations underscore the continued influence of neighborhood socioeconomic conditions on early mortality risk.
+
+The sensitivity analysis using log-transformed park density produced nearly identical conclusions and slightly worse model fit, reinforcing the robustness of the primary findings. Importantly, our effect-modification analysis revealed that the association between park acreage and premature mortality differs markedly across poverty levels. In low-poverty districts, higher park acreage was associated with lower premature mortality, while in high-poverty districts the association reversed direction and became strongly positive. This interaction suggests that the potential health benefits of green space may be contingent on neighborhood conditions such as park quality, safety, accessibility, or adjacent environmental burdens—factors that are not captured by acreage-based metrics.
+
+Although the interaction model significantly improved explanatory power, it also introduced higher multicollinearity and added complexity. For these reasons, we treat the interaction results as complementary rather than as our primary specification. Nonetheless, the presence of strong effect modification highlights an equity-relevant insight: green space benefits are not evenly distributed, and green space may even cluster alongside environmental or socioeconomic stressors in more disadvantaged neighborhoods.
+
+Taken together, our results suggest that increasing park acreage alone is unlikely to reduce premature mortality without concurrent investments in neighborhood socioeconomic conditions, racial equity, and the quality and accessibility of parks themselves. Future research should incorporate richer measures of park quality, safety, programming, and walkable access, as well as additional built-environment factors such as heat exposure, air quality, and housing conditions. Such work may help inform urban planning strategies that more effectively align green space investments with health equity goals.

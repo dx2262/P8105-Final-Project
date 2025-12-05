@@ -34,9 +34,9 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 
 
+# Data Cleaning and Exploratory Analysis
 
-
-# read the data
+In this part, we begin by integrating the NYC Parks dataset with the Community Health Profiles (CHP) dataset. 
 
 ```{r message = FALSE, warning = FALSE}
 df_parks <- read.csv("data/Parks_Properties_20251104.csv", colClasses = "character", encoding = "UTF-8") |>
@@ -56,7 +56,9 @@ df_cancer <- read_excel("data/2022-chp-pud.xlsx", sheet = "Cancer_data_ranked") 
 ```
 
 
-# one park, multiple IDs
+Because the two sources might use different formats for Community District (CD) identifiers, the first step is to standardize these administrative codes. To ensure compatibility, all CD identifiers were converted to character format, and the Parks identifiers were mapped to the CD structure used in the CHP dataset. After this harmonization, the Parks data could be reliably merged with the CHP dataset.
+
+An additional and important issue concerns parks that span multiple Community Districts. Directly assigning each park’s full acreage to every associated CD would result in double-counting and systematic inflation of park exposure at the community level. To address this, we applied an even allocation procedure. For any park that overlaps n districts, its total acreage A was divided equally among the n districts, such that each district received A/n. Park counts were treated analogously by assigning each overlapping district a fractional count of 1/n. The allocated acreage and fractional counts were then summed within each district. This approach ensures that park areas and park counts are not duplicated across districts, while preserving the correct total acreage and total number of parks across the city. The resulting district-level indicators therefore reflect a non-redundant and statistically coherent measure of park exposure.
 
 ```{r message = FALSE, warning = FALSE}
 df_parks <- 
@@ -141,8 +143,6 @@ df_parks_community <-
 ```
 
 
-# combine the area df into the chp-pud
-
 ```{r message = FALSE, warning = FALSE}
 # get rid of reliability index
 
@@ -165,7 +165,7 @@ df_chp_clean <- df_chp_clean |>
   
 ```
 
-
+As an initial step in the exploratory data analysis, we organized the variables in the Community Health Profiles (CHP) dataset into meaningful thematic categories. To formalize this structure, we created a variable map (`var_map`) that assigns each CHP variable to a conceptual domain based on its substantive interpretation. The major domains include basic demographic characteristics, educational attainment, economic conditions, community safety, dietary and health-related behaviors, and health insurance coverage. This categorization provides a systematic overview of the dataset and clarifies the role each variable plays in describing community-level conditions across New York City.
 
 ```{r message = FALSE, warning = FALSE}
 # create a variable map for df_chp_clean
@@ -254,6 +254,10 @@ var_map <- tribble(
 
 ```
 
+
+From each category, we selected one or more representative variables to be used in downstream modeling. The selection was guided by theoretical relevance, interpretability, data completeness, and the ability of each variable to capture important variation across community districts. Specifically, the variables chosen include indicators related to demographics (e.g., race and age), education (e.g., proportion of residents with a bachelor’s degree), economic conditions (e.g., poverty rate and unemployment), community safety (e.g., assault-related hospitalizations, pedestrian injury hospitalizations), dietary and health behaviors (e.g., sugary drink consumption, fruit and vegetable intake, smoking and drinking), and access to healthcare (e.g., health insurance coverage). These variables were reviewed, cleaned, and standardized when necessary to ensure consistency and suitability for statistical modeling.
+
+Following the categorization and variable selection, we merged the cleaned CHP dataset with the processed Parks dataset. This integration enables an examination of how park availability (measured through district-level park area and park counts) relates to community socioeconomic conditions, safety indicators, health behaviors, and population health outcomes such as obesity. The merged analytic dataset forms the foundation for the visualizations and descriptive analyses presented in the remainder of the EDA section.
 
 ```{r message = FALSE, warning = FALSE}
 
@@ -367,13 +371,13 @@ library(DHARMa)
 library(glmmTMB)
 ```
 
-# descriptive analysis
+To explore the relationship between obesity and potential community-level determinants, we conducted a series of visual analyses in which obesity rate was treated as the outcome and park characteristics, along with selected CHP variables, were treated as predictors. For each predictor, we generated plots to assess general patterns, identify potential nonlinearities, and detect outliers.
 
 ```{r message = FALSE, warning = FALSE}
 summary(df_analysis)
 ```
 
-## linear relationship or not?
+Visualizations of obesity against park-related measures (total park area, per-capita park area, and park counts) revealed whether community access to green spaces is associated with variation in obesity rates across districts. 
 
 ```{r}
 # df_analysis |>
@@ -409,8 +413,7 @@ plot_ly(
 ```
 
 
-
-## obesity eda for other variables
+Similar scatter plots were produced for socioeconomic indicators (e.g., poverty rate, educational attainment), safety measures (e.g., assault-related hospitalizations), and health behavior variables (e.g., sugary drink consumption, fruit and vegetable intake). These plots help illustrate which predictors show strong monotonic relationships with obesity and which demonstrate weaker or more complex patterns.
 
 
 obesity ~ poverty
@@ -462,7 +465,6 @@ df_analysis |>
 
 
 obesity ~ food
-
 ```{r message = FALSE, warning = FALSE, eda_behavior_scatter, fig.width = 8, fig.asp = 0.9}
 
 base_theme <- theme_minimal(base_size = 12) +
@@ -516,9 +518,7 @@ combined_plot
 ```
 
 
-
 obesity ~ education
-
 ```{r message = FALSE, warning = FALSE}
 # ggplot(df_analysis, aes(edu_college_degree_and_higher, obesity)) + 
 #     geom_point() + geom_smooth(method="lm")
@@ -545,9 +545,7 @@ plot_ly(
 ```
 
 
-
 obesity ~ safety
-
 ```{r message = FALSE, warning = FALSE}
 fig_bubble <- plot_ly(
   df_analysis,
@@ -584,7 +582,7 @@ fig_bubble
 
 
 
-## some maps
+## Maps
 
 ```{r message = FALSE, warning = FALSE}
 nycd <- st_read("data/nycd_25d/nycd.shp") |>
@@ -681,11 +679,34 @@ p_parks
 # fig
 ```
 
+The primary purpose of these visual analyses is not only descriptive but also diagnostic. The figures highlight variables with relevant associations that merit inclusion in the regression modeling stage and help identify potential issues such as extreme values or nonlinear effects. Overall, the EDA suggests that certain socioeconomic and behavioral variables show clearer relationships with obesity than park-related measures alone, underscoring the importance of including multiple domains of community characteristics in subsequent modeling.
 
-# MLR 
+# Multiple Linear Regression (MLR)
 
+## Fitting the MLR
 
-## fitting the MLR
+We first fitted a multiple linear regression (MLR) model to evaluate the associations between obesity and a set of community-level predictors. MLR was chosen because it allows us to examine the effect of park access while simultaneously accounting for a range of socioeconomic, behavioral, safety, and demographic factors that may confound the relationship between green space and obesity. Compared with simple bivariate analyses, the multivariable framework provides a clearer assessment of the independent contribution of each predictor.
+
+The predictors included in the model were selected based on both theoretical relevance and the empirical patterns observed during the EDA stage. Specifically, we incorporated variables representing:
+
+•	Park access (`area_per_capita`);
+
+•	Socioeconomic conditions (poverty rate);
+
+•	Health behaviors (smoking, sugary drink consumption, binge drinking);
+
+•	Community safety (pedestrian injury hospitalizations);
+
+•	Educational attainment (proportion with a college degree or higher);
+
+•	Access to care (uninsured rate).
+
+These variables capture distinct dimensions of community context and are commonly identified in the literature as determinants of obesity or related health outcomes. They also demonstrated meaningful variation and interpretable associations with obesity in preliminary visual analyses.
+
+We estimated the following model:
+
+`obesity ~ area_per_capita + poverty + smoking + binge_drink + sugary_drink + pedestrian_hosp +         edu_college_degree_and_higher + uninsured`
+
 
 ```{r message = FALSE, warning = FALSE}
 df_analysis <- 
@@ -708,22 +729,26 @@ model_mlr <- lm(
 summary(model_mlr)
 ```
 
+In this model, poverty, sugary drink consumption, and educational attainment were statistically significant predictors. The coefficient for pedestrian hospitalizations was marginally above the conventional significance threshold and can be considered borderline significant. Together, these results highlight the importance of socioeconomic and behavioral factors in explaining variation in obesity across NYC community districts.
+
 
 ## MLR Diagnostic
 
+To evaluate whether the assumptions of the multiple linear regression model were satisfied, we conducted a series of diagnostic checks. Residual plots and Q–Q plots were first examined to assess linearity, homoscedasticity, and normality of residuals. The diagnostic figures showed no major deviations from these assumptions, indicating that the linear model provides an adequate fit for the data and that the residual distribution is approximately normal.
 
-linear relationship and equal variances
+Linear relationship and equal variances.
 
 ```{r message = FALSE, warning = FALSE}
 plot(model_mlr, which = 1)
 ```
 
+Heavy tail comparaed with normal distribution.
 
-heavy tail comparaed with normal distribution
 ```{r message = FALSE, warning = FALSE}
 plot(model_mlr, which = 2)
 ```
 
+We examined influential observations using the `influencePlot()` function. The plot identified approximately three to four community districts that may exert disproportionate influence on the regression estimates. These points may represent meaningful outliers or communities with unique characteristics, and further investigation may be warranted to determine whether they reflect data quality issues, structural differences, or true population heterogeneity. Nonetheless, the overall model appears robust, and no influential point was severe enough to undermine the general conclusions.
 
 There are some outliers.
 
@@ -731,25 +756,29 @@ There are some outliers.
 influencePlot(model_mlr)
 ```
 
+We then assessed multicollinearity among the predictors using Variance Inflation Factors (VIFs). Most predictors had VIF values below 5, suggesting limited collinearity. However, the variables `poverty` and `edu_college_degree_and_higher` yielded VIF values between 5 and 10, indicating moderate multicollinearity. This pattern is expected, as socioeconomic status and educational attainment are conceptually and empirically correlated. While these levels of VIF do not invalidate the model, they suggest that the coefficients for these variables should be interpreted with some caution.
 
-No Obvious Multicollinearity 
+No Obvious Multicollinearity.
 
 ```{r message = FALSE, warning = FALSE}
 vif(model_mlr)
 ```
 
+Theoretically, `poverty` and `sugary_drink` should have strong linear relationships, however in this dataset, they don't. Besides, the effect of poverty on obesity in this dataset is also not significant. Maybe we should pay more attention on the origin of this poverty data.  
 
-Theoretically, poverty and sugary_drink should have strong linear relationships, however in this dataset, they don't. Besides, the effect of poverty on obesity in this dataset is also not significant. Maybe we should pay more attention on the origin of this poverty data.   
 
+We further evaluated the regression model by testing for autocorrelation in the residuals using the Durbin–Watson (DW) test. The test statistic indicated no evidence of first-order autocorrelation, suggesting that the residuals are independent and that temporal or spatial dependence is not a concern in this cross-sectional dataset.
 
-No Autocorrelation Between Residuals
+No Autocorrelation Between Residuals.
 
 ```{r message = FALSE, warning = FALSE}
 lmtest::dwtest(model_mlr)
 ```
 
 
-## Analysing Stability (sensitivity analysis)
+## Analysing Stability (Sensitivity Analysis)
+
+To assess the robustness of the model, we refitted the regression after removing the influential observations identified in the influence plot. The re-estimated coefficients and significance levels were largely consistent with the original results, indicating that the presence of a few potentially influential districts did not substantially affect the model’s conclusions. This stability strengthens confidence in the validity of the findings derived from the multiple linear regression framework.
 
 ```{r message = FALSE, warning = FALSE}
 df <- df_analysis
@@ -763,25 +792,18 @@ summary(model_mlr_no_inf)
 
 ```
 
-
-
-Overall, after removing the outliers, the outcome is very similar to the former one, so mlr model is stable enough for analysing obesity.  
-Only the coefficient for pedestrian_hosp showed noticeable sensitivity, suggesting that its effect may be driven by a few extreme communities.  
-
-Influence diagnostics identified several observations with high leverage (IDs 34, 60, 61, 64, 65).
-To assess the robustness of our findings, we re-estimated the multivariable linear model after removing these influential points.
-
-The direction and significance of the main predictors remained unchanged, and p-values exhibited minimal variation.
-This indicates that the observed associations are not driven by a few extreme communities.
-
-Therefore, all observations were retained in the final analysis.  
+Overall, after removing the outliers, the outcome is very similar to the former one, so mlr model is stable enough for analysing obesity. Only the coefficient for pedestrian_hosp showed noticeable sensitivity, suggesting that its effect may be driven by a few extreme communities. Influence diagnostics identified several observations with high leverage (IDs 34, 60, 61, 64, 65). To assess the robustness of our findings, we re-estimated the multivariable linear model after removing these influential points. The direction and significance of the main predictors remained unchanged, and p-values exhibited minimal variation. This indicates that the observed associations are not driven by a few extreme communities. Therefore, all observations were retained in the final analysis.  
 
 
 # Beta Regression
 
-
 ## Fitting the Model
 
+Because the outcome variable in this study (community-level obesity rate) is a continuous proportion bounded between 0 and 1, we also fitted a beta regression model. Multiple linear regression treats the response as unbounded and assumes constant variance, which may not be appropriate for proportion data and can result in predicted values falling outside the [0,1] range. These limitations motivate the use of a modeling framework specifically designed for bounded outcomes.
+
+Beta regression assumes that the response follows a beta distribution, which is flexible and well suited for variables confined to the unit interval. Using a logit link, the model relates the mean of the beta distribution to a linear combination of predictors, allowing covariates to influence the expected proportion while respecting its natural bounds. In addition, beta regression accommodates heteroscedasticity commonly observed in proportion data through a dispersion parameter, providing a more realistic representation of the underlying variability.
+
+Given these advantages, beta regression offers an appropriate and theoretically justified approach for modeling obesity rates across NYC community districts, and serves as a complementary check on the findings obtained from the multiple linear regression model.
 
 ```{r message = FALSE, warning = FALSE}
 n <- nrow(df_analysis)
@@ -797,9 +819,13 @@ model_beta <- glmmTMB(
 summary(model_beta)
 ```
 
+The beta regression model produced results that were highly consistent with those obtained from the multiple linear regression. The same set of predictors—poverty, sugary drink consumption, and educational attainment—remained statistically significant, while the coefficient for pedestrian injury hospitalizations was again borderline significant. The direction and relative magnitude of the estimated effects were also similar across the two modeling approaches.
 
+This consistency indicates that the substantive conclusions are robust to the choice of modeling framework. Although beta regression is theoretically more appropriate for proportion outcomes such as obesity rates, the similarity in results suggests that the linear regression model did not suffer from severe violations of its assumptions in this dataset. At the same time, the beta regression provides additional reassurance that the observed associations are not artifacts of model misspecification and remain stable when using a distributional model tailored to bounded continuous outcomes.
 
 ## Beta Regression Diagnostic
+
+To assess whether the beta regression model satisfied its distributional assumptions, we conducted a series of diagnostic checks using simulated residuals from the DHARMa package. The residual diagnostic plot showed no systematic deviations, indicating that the model adequately captures the mean–variance structure of the data. The dispersion test did not provide evidence of overdispersion or underdispersion, suggesting that the beta distribution’s flexibility is sufficient for modeling the observed variability in obesity rates. In addition, the zero-inflation test confirmed that the data do not exhibit excess zeros, which is consistent with the fact that obesity rates in NYC community districts lie strictly within the (0,1) interval.
 
 ```{r message = FALSE, warning = FALSE}
 res_beta <- simulateResiduals(model_beta)
@@ -808,16 +834,17 @@ testDispersion(res_beta)
 testZeroInflation(res_beta)
 ```
 
-
 We assessed model fit using simulated residuals generated through the DHARMa package.
-No significant deviations from model assumptions were detected. The uniform quantile-quantile plot showed no deviations (KS test p = 0.98).
-The dispersion test indicated no overdispersion (p = 0.97), and the zero-inflation test suggested no excess zeros (p = 1).
-Residuals were evenly distributed across predicted values, with no evidence of nonlinearity or heteroskedasticity.
-Overall, the diagnostic results confirm that the beta regression model provides an adequate fit to the data. 
+No significant deviations from model assumptions were detected. The uniform quantile-quantile plot showed no deviations (KS test p = 0.98). The dispersion test indicated no overdispersion (p = 0.97), and the zero-inflation test suggested no excess zeros (p = 1). Residuals were evenly distributed across predicted values, with no evidence of nonlinearity or heteroskedasticity.
+
+Overall, all diagnostic tests indicated a good model fit, supporting the validity of the beta regression specification. Combined with the consistency of results between the beta regression and the multiple linear regression model, these diagnostics further reinforce the robustness of our findings.
 
 
 # Beta Mixed Model
 
+Given the geographic and demographic diversity of New York City, we hypothesized that the relationship between community-level predictors and obesity rates might vary across boroughs. Boroughs differ substantially in built environment, socioeconomic composition, access to public resources, population density, and patterns of health behavior. These structural differences raise the possibility that observations within the same borough are more similar to each other than to observations from other boroughs, introducing a hierarchical dependency that is not captured by standard regression models.
+
+To account for this potential clustering, we extended the beta regression model by incorporating borough-level random effects. The mixed-effects beta regression framework allows us to model obesity rates as a bounded continuous outcome while simultaneously capturing unobserved heterogeneity across boroughs. By including a random intercept for borough, the model adjusts for shared contextual factors that may influence all community districts within the same borough, thereby improving the accuracy of fixed-effect estimates and providing a more realistic representation of the multilevel structure of the data.
 
 ```{r message = FALSE, warning = FALSE}
 model_beta_mixed <- glmmTMB(
@@ -832,22 +859,25 @@ summary(model_beta_mixed)
 ```
 
 
-
 ## Testing Whether a Mixed Model is Necessary
 
+To evaluate whether the mixed-effects beta regression model provided a meaningful improvement in fit over the single-level beta regression model, we formally compared the two specifications using an ANOVA (likelihood ratio) test. The test statistic yielded a p-value of 1, indicating no evidence that the model with a borough-level random intercept fits the data better than the simpler beta regression model without random effects.
 
 ```{r message = FALSE, warning = FALSE}
 anova(model_beta, model_beta_mixed)
 ```
 
 
-We compared a beta mixed-effects model with a random intercept for borough
-to a marginal beta regression model without random effects, using a likelihood ratio test.
-The random intercept variance was essentially zero (≈ 4×10⁻¹¹), and the likelihood ratio test was not significant (p = 1).
-AIC values for the two models were nearly identical.
-These results indicate that little residual variability remains between boroughs after adjusting for covariates, so we proceeded with the simpler marginal beta regression model. 
+We compared a beta mixed-effects model with a random intercept for borough to a marginal beta regression model without random effects, using a likelihood ratio test.
+The random intercept variance was essentially zero (≈ 4×10⁻¹¹), and the likelihood ratio test was not significant (p = 1). AIC values for the two models were nearly identical. These results indicate that little residual variability remains between boroughs after adjusting for covariates, so we proceeded with the simpler marginal beta regression model. 
 
+Following the principle of parsimony, and given the lack of improvement in model fit, we retained the single-level beta regression model as our primary modeling approach. This suggests that, in this dataset, accounting for borough-level random effects does not materially enhance the explanation of variation in obesity rates beyond what is already captured by the observed community-level predictors.
 
+# Overall Interpretation
+
+Across all modeling approaches, including multiple linear regression, beta regression, and mixed-effects beta regression, the results consistently indicate that community-level obesity rates are strongly associated with socioeconomic and behavioral factors. In particular, higher poverty rates and greater consumption of sugary drinks are positively related to obesity, while higher educational attainment is associated with lower obesity rates. The measure of community safety, operationalized through pedestrian injury hospitalizations, also shows a meaningful association with obesity.
+
+In contrast, park access (as measured by total or per-capita park area) does not exhibit a significant relationship with obesity in any of the models. This suggests that variation in obesity across NYC community districts is driven more by socioeconomic conditions and health-related behaviors than by the availability of green space as quantified in this analysis.
 
 
 

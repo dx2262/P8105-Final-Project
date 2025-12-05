@@ -1,8 +1,11 @@
 ---
-title: "2025-11-18_first-data-wrangling"
-author: "Chris"
-date: "2025-11-18"
-output: html_document
+title: "Obesity Analysis"
+output:
+  html_document:
+    code_folding: hide
+    always_allow_html: true
+    toc: true
+    toc_float: true
 ---
 
 
@@ -35,7 +38,7 @@ scale_fill_discrete = scale_fill_viridis_d
 
 # read the data
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 df_parks <- read.csv("data/Parks_Properties_20251104.csv", colClasses = "character", encoding = "UTF-8") |>
   select(ACQUISITIONDATE: multipolygon) |>
   clean_names() 
@@ -55,7 +58,7 @@ df_cancer <- read_excel("data/2022-chp-pud.xlsx", sheet = "Cancer_data_ranked") 
 
 # one park, multiple IDs
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 df_parks <- 
   df_parks |>
   rename(id = communityboard) 
@@ -116,7 +119,7 @@ df_parks_community <-
 
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 # df_parks_split <-
 #   df_parks_all_dist |>
 #   mutate(
@@ -140,7 +143,7 @@ df_parks_community <-
 
 # combine the area df into the chp-pud
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 # get rid of reliability index
 
 df_chp_clean <- df_chp |>
@@ -164,7 +167,7 @@ df_chp_clean <- df_chp_clean |>
 
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 # create a variable map for df_chp_clean
 var_map <- tribble(
   ~variable,                 ~category,
@@ -252,7 +255,7 @@ var_map <- tribble(
 ```
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 
 # demographic data
 var_demo <- var_map |>
@@ -353,7 +356,7 @@ df_analysis <- reduce(dfs, left_join, by = "id") |>
 ```
 
 
-```{r}
+```{r include = FALSE}
 library(patchwork)
 library(sf)
 library(betareg)
@@ -366,7 +369,7 @@ library(glmmTMB)
 
 # descriptive analysis
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 summary(df_analysis)
 ```
 
@@ -386,7 +389,7 @@ summary(df_analysis)
 There are no obvious relationships between log_area and obesity.
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 plot_ly(
   df_analysis, 
   x = ~log_area, 
@@ -411,7 +414,7 @@ plot_ly(
 
 
 obesity ~ poverty
-```{r}
+```{r message = FALSE, warning = FALSE}
 # ggplot(df_analysis, aes(obesity)) + geom_histogram()
 
 plot_ly(
@@ -435,7 +438,7 @@ plot_ly(
 
 
 obesity ~ borough
-```{r}
+```{r message = FALSE, warning = FALSE}
 # ggplot(df_analysis, aes(borough, obesity)) + geom_boxplot()
 
 df_analysis |>
@@ -460,7 +463,7 @@ df_analysis |>
 
 obesity ~ food
 
-```{r eda_behavior_scatter, fig.width = 8, fig.asp = 0.9}
+```{r message = FALSE, warning = FALSE, eda_behavior_scatter, fig.width = 8, fig.asp = 0.9}
 
 base_theme <- theme_minimal(base_size = 12) +
   theme(
@@ -516,7 +519,7 @@ combined_plot
 
 obesity ~ education
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 # ggplot(df_analysis, aes(edu_college_degree_and_higher, obesity)) + 
 #     geom_point() + geom_smooth(method="lm")
 
@@ -545,7 +548,7 @@ plot_ly(
 
 obesity ~ safety
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 fig_bubble <- plot_ly(
   df_analysis,
   x = ~assault_hosp,
@@ -583,7 +586,7 @@ fig_bubble
 
 ## some maps
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 nycd <- st_read("data/nycd_25d/nycd.shp") |>
   mutate(BoroCD = as.character(BoroCD))
 
@@ -684,7 +687,7 @@ p_parks
 
 ## fitting the MLR
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 df_analysis <- 
   df_analysis |>
   mutate(
@@ -711,27 +714,27 @@ summary(model_mlr)
 
 linear relationship and equal variances
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 plot(model_mlr, which = 1)
 ```
 
 
 heavy tail comparaed with normal distribution
-```{r}
+```{r message = FALSE, warning = FALSE}
 plot(model_mlr, which = 2)
 ```
 
 
 There are some outliers.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 influencePlot(model_mlr)
 ```
 
 
 No Obvious Multicollinearity 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 vif(model_mlr)
 ```
 
@@ -741,14 +744,14 @@ Theoretically, poverty and sugary_drink should have strong linear relationships,
 
 No Autocorrelation Between Residuals
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 lmtest::dwtest(model_mlr)
 ```
 
 
 ## Analysing Stability (sensitivity analysis)
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 df <- df_analysis
 influential_points <- c(34, 60, 61, 64, 65)
 
@@ -780,7 +783,7 @@ Therefore, all observations were retained in the final analysis.
 ## Fitting the Model
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 n <- nrow(df_analysis)
 df_new <- df_analysis |>
   mutate(p_obesity = (obesity/100)*(n-1)/n + 0.5/n)
@@ -798,7 +801,7 @@ summary(model_beta)
 
 ## Beta Regression Diagnostic
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 res_beta <- simulateResiduals(model_beta)
 plot(res_beta)
 testDispersion(res_beta)
@@ -816,7 +819,7 @@ Overall, the diagnostic results confirm that the beta regression model provides 
 # Beta Mixed Model
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 model_beta_mixed <- glmmTMB(
   p_obesity ~ area_per_capita + poverty + smoking + binge_drink +
     sugary_drink + pedestrian_hosp + edu_college_degree_and_higher + uninsured +
@@ -833,7 +836,7 @@ summary(model_beta_mixed)
 ## Testing Whether a Mixed Model is Necessary
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 anova(model_beta, model_beta_mixed)
 ```
 

@@ -4,6 +4,8 @@ output:
   html_document:
     code_folding: hide
     always_allow_html: true
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -28,6 +30,9 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
+
+## Data Sources
+
 Our two data sources were the [NYC Community Health Profiles](https://www.nyc.gov/site/doh/data/data-publications/profiles.page) and [NYC Park Properties](https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn). The NYC community health profiles capture the health of 59 community districts across the city. They
 contain over 50 measures of neighborhood health. The part data identifies property managed partially or solely by NYC Parks.
 
@@ -51,6 +56,8 @@ parks_df =
   select(-n_communities)
 ```
 
+## Cleaning Park Data
+
 To clean the park data for initial EDA, we selected the variables that we thought would be of interest and gave them meaningful names. The most important variables in this data set mainly consisted of:
 
 `acres`: size of park property in acres   
@@ -71,6 +78,8 @@ demo_df =
   rename("neighbourhood" = "name") |> 
   mutate(id = as.character(id))
 ```
+
+## Cleaning Community Health Data
 
 To clean the community health profile data for EDA, we imported and filtered only the rows of the data that corresponded to one community, named `id`. We removed the columns with the upper and lower confidence intervals along with variables we did not think would be useful for our analysis. As mentioned above, this data set contained many variables, but some of the notable variables include:
 
@@ -109,6 +118,8 @@ full_df =
 ```
 
 The data sets were joined by the community board/ ID variable.
+
+## EDA for Parks Data
 
 ```{r message = FALSE, warning = FALSE, fig.height = 15, fig.width = 15}
 full_df |> 
@@ -169,7 +180,6 @@ full_df |>
 ```
 
 We then wanted to look at which parks were the smallest and largest. The smallest parks belong to Queens and Brooklyn, and the largest parks are in every borough besides Manhattan.
-
 
 ```{r message = FALSE, warning = FALSE}
 full_df |> 
@@ -235,6 +245,7 @@ full_df |>
 
 This map shows a visual of green spaces by borough. We can see that Manhattan definitely has the lowest area of green space, but interestingly, all the other boroughs appear to have a similar amount of green space. However, we know this is not the case based on total acres shown in the green space per capita of NYC boroughs plot. 
 
+## EDA for Community Health Data
 
 ```{r message = FALSE, warning = FALSE}
 demo_df |> 
@@ -350,7 +361,7 @@ demo_df |>
 ```
 
 
-The percentage of population living in poverty appears to be negatively correlated with phyisical activity levels. There is an inverse relationship between finishing high school on time and the unemployment rate, poverty, and percentage of people who are uninsured. These are all relationships that we would expect. As a result of this analysis, we observe several consistent correlations between socioeconomic indicators and health or education-related outcomes. These patterns suggest that communities with higher socioeconomic disadvantage tend to exhibit lower physical activity levels and less favorable educational and health metrics. While these findings do not imply causation, they highlight meaningful associations worth further exploration.
+The percentage of population living in poverty appears to be negatively correlated with physical activity levels. There is an inverse relationship between finishing high school on time and the unemployment rate, poverty, and percentage of people who are uninsured. These are all relationships that we would expect. As a result of this analysis, we observe several consistent correlations between socioeconomic indicators and health or education-related outcomes. These patterns suggest that communities with higher socioeconomic disadvantage tend to exhibit lower physical activity levels and less favorable educational and health metrics. While these findings do not imply causation, they highlight meaningful associations worth further exploration.
 
 
 

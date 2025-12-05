@@ -5,6 +5,7 @@ output:
     code_folding: hide
     always_allow_html: true
 ---
+Authors: Nicole Criscuolo, Maria Serafini, Chris (Tianhang) Wang, Danchen Xu
 
 ___
 

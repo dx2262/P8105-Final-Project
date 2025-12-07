@@ -44,15 +44,20 @@ Several limitations are important for interpreting our results:
 
 # Implications and Future Directions
 
-Our results suggest that increasing park acreage alone is unlikely to substantially reduce premature mortality or obesity without concurrent investments in neighborhood socioeconomic conditions, racial equity, and the broader built environment. Future work could:
+Our results suggest that increasing park acreage alone is unlikely to substantially reduce premature mortality or obesity without concurrent investments in neighborhood socioeconomic conditions, racial equity, and the broader built environment. In this study, green space functioned less as a direct health determinant and more as a context-dependent resource whose potential benefits were shaped—and often constrained—by underlying structural conditions. In some neighborhoods, particularly those with lower poverty, green space may provide opportunities for physical activity, stress reduction, and social cohesion. In other areas, especially those facing concentrated disadvantage, parks may coexist with environmental burdens, safety concerns, or limited usability, thereby attenuating or even reversing their expected health effects. Future work could: 
 
-* Incorporate richer measures of park quality, safety, and programming.
+* Incorporate richer measures of park quality, accessibility, safety, and programming to better capture the mechanisms through which parks support health.
 
-* Include additional built-environment variables such as heat exposure, air quality, walkability, and housing conditions.
+* Include additional built-environment variables such as heat exposure, air quality, walkability, land-use patterns, and housing conditions.
 
-* Use longitudinal data to assess how changes in green space over time relate to health outcomes.
+* Use longitudinal data to assess how changes in green space over time relate to health outcomes and whether improvements are equitably distributed.
 
-* Explore multilevel models that combine individual-level and neighborhood-level data.
+* Explore multilevel models that combine individual-level and neighborhood-level data to disentangle usage patterns, perceptions of parks, and heterogeneous effects across communities.
 
-Such research could help inform urban planning strategies that better align green space investments with health equity goals and ensure that the benefits of parks are accessible to all communities.
+Such research may clarify when and for whom green space acts as a health-promoting asset versus a marker of broader structural inequities. This evidence can inform urban planning strategies that better align green space investments with health equity goals and ensure that park benefits are both meaningful and accessible across all neighborhoods.
+
+
+
+
+
 
